@@ -1,0 +1,153 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+:root {
+  --background: #f8fafc; /* Slate 50 */
+  --foreground: #0f172a; /* Slate 900 */
+}
+
+:root.dark {
+  --background: #020617; /* Slate 950 */
+  --foreground: #f8fafc; /* Slate 50 */
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: Arial, Helvetica, sans-serif;
+  transition: background-color 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+}
+
+/* ==========================================================================
+   Admin Dashboard Theme Overrides (Applied when root has no .dark class)
+   ========================================================================== */
+
+:root:not(.dark) .admin-portal {
+  background-color: #f8fafc !important; /* Slate 50 */
+  color: #0f172a !important; /* Slate 900 */
+}
+
+/* Main inner background pane */
+:root:not(.dark) .admin-portal .flex-1.flex.flex-col.min-w-0 {
+  background-color: #f8fafc !important;
+}
+
+/* Sidebar override */
+:root:not(.dark) .admin-portal aside {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Sidebar active / inactive buttons */
+:root:not(.dark) .admin-portal aside button {
+  color: #475569 !important; /* Slate 600 */
+}
+:root:not(.dark) .admin-portal aside button:hover:not(.text-rose-400) {
+  background-color: #f1f5f9 !important;
+  color: #0f172a !important;
+}
+:root:not(.dark) .admin-portal aside button.bg-slate-950 {
+  background-color: #f1f5f9 !important;
+  border-color: #c084fc30 !important; /* light tint border */
+  color: #0891b2 !important; /* Cyan 600 */
+}
+
+/* Settings drop-down and controls in sidebar */
+:root:not(.dark) .admin-portal aside select,
+:root:not(.dark) .admin-portal aside .bg-slate-950 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #334155 !important;
+}
+
+/* Section Containers and Cards */
+:root:not(.dark) .admin-portal .bg-slate-900\/60,
+:root:not(.dark) .admin-portal .bg-slate-900\/40,
+:root:not(.dark) .admin-portal .bg-slate-900 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.05), 0 1px 2px -1px rgba(0, 0, 0, 0.05);
+}
+
+/* Section card titles and guide details */
+:root:not(.dark) .admin-portal .bg-slate-950 {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+}
+
+/* Text color overrides */
+:root:not(.dark) .admin-portal .text-slate-100,
+:root:not(.dark) .admin-portal .text-slate-200,
+:root:not(.dark) .admin-portal h2,
+:root:not(.dark) .admin-portal h3,
+:root:not(.dark) .admin-portal h4 {
+  color: #0f172a !important; /* Slate 900 */
+}
+
+:root:not(.dark) .admin-portal .text-slate-400 {
+  color: #475569 !important; /* Slate 600 */
+}
+
+:root:not(.dark) .admin-portal .text-slate-500 {
+  color: #64748b !important; /* Slate 500 */
+}
+
+/* Form input, textarea, and select styling */
+:root:not(.dark) .admin-portal input,
+:root:not(.dark) .admin-portal select:not(.w-full.bg-slate-950) {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+:root:not(.dark) .admin-portal input:focus,
+:root:not(.dark) .admin-portal select:focus {
+  border-color: #06b6d4 !important; /* Cyan 500 */
+  box-shadow: 0 0 0 2px rgba(6, 182, 212, 0.15) !important;
+}
+
+/* Tables styling */
+:root:not(.dark) .admin-portal th {
+  background-color: #f8fafc !important;
+  border-bottom: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+}
+:root:not(.dark) .admin-portal td {
+  border-bottom: 1px solid #f1f5f9 !important;
+  color: #334155 !important;
+}
+:root:not(.dark) .admin-portal tr:hover td {
+  background-color: #f8fafc/50 !important;
+}
+
+/* Custom Modal overrides */
+:root:not(.dark) .admin-portal .bg-slate-900\/80 {
+  background-color: rgba(241, 245, 249, 0.8) !important; /* light blur overlay */
+}
+:root:not(.dark) .admin-portal .bg-slate-900\/90 {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+:root:not(.dark) .admin-portal textarea {
+  background-color: #f8fafc !important;
+  border-color: #e2e8f0 !important;
+  color: #0f172a !important;
+}
+
+/* Mobile header styling */
+:root:not(.dark) .admin-portal header.md\:hidden {
+  background-color: #ffffff !important;
+  border-color: #e2e8f0 !important;
+}
+:root:not(.dark) .admin-portal header.md\:hidden span {
+  color: #0f172a !important;
+}
+
+/* Navigation items hover overrides */
+:root:not(.dark) .admin-portal .border-slate-800 {
+  border-color: #e2e8f0 !important;
+}
+:root:not(.dark) .admin-portal .border-slate-800\/80 {
+  border-color: #e2e8f0 !important;
+}
