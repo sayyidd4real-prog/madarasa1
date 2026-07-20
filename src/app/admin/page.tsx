@@ -938,11 +938,11 @@ export default function AdminDashboard() {
   }
 
   return (
-    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col md:flex-row admin-portal">
+    <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col lg:flex-row admin-portal lg:h-screen lg:overflow-hidden">
       
       {/* Sidebar navigation */}
       <aside
-        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-8 transition-transform duration-300 md:relative md:translate-x-0 ${
+        className={`fixed inset-y-0 left-0 z-50 w-64 bg-slate-900 border-r border-slate-800 p-6 flex flex-col gap-8 transition-transform duration-300 lg:translate-x-0 ${
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         }`}
       >
@@ -959,7 +959,7 @@ export default function AdminDashboard() {
           </div>
           <button
             type="button"
-            className="md:hidden text-slate-400 hover:text-slate-200"
+            className="lg:hidden text-slate-400 hover:text-slate-200"
             onClick={() => setIsSidebarOpen(false)}
           >
             <X className="w-5 h-5" />
@@ -1112,10 +1112,10 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main content pane */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-950">
+      <div className="flex-1 flex flex-col min-w-0 bg-slate-950 lg:h-screen lg:overflow-hidden lg:ml-64">
         
         {/* Mobile Header Bar */}
-        <header className="md:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800">
+        <header className="lg:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800">
           <div className="flex items-center gap-2">
             <MadrasaLogoIcon className="w-5 h-5 text-emerald-400" />
             <span className="font-bold text-sm tracking-tight">{t("academy_name")}</span>
