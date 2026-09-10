@@ -16,13 +16,27 @@ import {
   HelpCircle,
   ExternalLink
 } from "lucide-react";
+import { useRouter } from "next/navigation";
 import { usePortal } from "@/context/PortalContext";
 import { translations } from "@/context/translations";
 import { MadrasaLogoIcon } from "@/components/MadrasaLogo";
 
 export default function LandingPage() {
-  const { language, setLanguage, theme, toggleTheme } = usePortal();
+  const router = useRouter();
+  const { language, setLanguage, theme, toggleTheme, currentUser, isInitialized } = usePortal();
   
+  React.useEffect(() => {
+    if (isInitialized) {
+      if (!currentUser) {
+        router.push("/login");
+      } else if (currentUser.role === "super_admin" || currentUser.role === "admin") {
+        router.push("/admin");
+      } else if (currentUser.role === "student") {
+        router.push("/student");
+      }
+    }
+  }, [isInitialized, currentUser, router]);
+
   const t = (key: keyof typeof translations["en"]) => {
     const dict = translations[language] || translations["en"];
     return dict[key] || translations["en"][key] || key;

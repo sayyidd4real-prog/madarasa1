@@ -1,0 +1,390 @@
+{
+  "user_accounts": [
+    {
+      "id": "usr-1001",
+      "fullName": "Super Admin",
+      "email": "admin@madrasa.com",
+      "passwordHash": "$2b$10$nf2mQvyf6xCVnovtSwnooO90A02bDBGaWonUrf1PYLSZ4mcaJ6oiW",
+      "role": "super_admin",
+      "status": "active",
+      "createdAt": "2026-07-27T09:13:34.185Z"
+    },
+    {
+      "id": "usr-1002",
+      "fullName": "Madrasa Staff Admin",
+      "email": "staff@madrasa.com",
+      "passwordHash": "$2b$10$nf2mQvyf6xCVnovtSwnooO90A02bDBGaWonUrf1PYLSZ4mcaJ6oiW",
+      "role": "admin",
+      "status": "active",
+      "createdAt": "2026-07-27T09:13:34.185Z"
+    }
+  ],
+  "classes": [
+    {
+      "id": "cls-1789020673729",
+      "className": "Class1",
+      "room": "134",
+      "instructor": "Class1"
+    }
+  ],
+  "subjects": [
+    {
+      "id": "SUB-101",
+      "subjectName": "English",
+      "subjectCode": "ENG-101",
+      "description": "Core English reading & grammar course"
+    },
+    {
+      "id": "SUB-102",
+      "subjectName": "Arabic",
+      "subjectCode": "ARA-101",
+      "description": "Arabic grammar, literature and speaking"
+    },
+    {
+      "id": "SUB-103",
+      "subjectName": "Biology",
+      "subjectCode": "BIO-101",
+      "description": "Introduction to cellular biology and genetics"
+    },
+    {
+      "id": "SUB-104",
+      "subjectName": "Chemistry",
+      "subjectCode": "CHM-101",
+      "description": "General chemistry, bonding and atomic structure"
+    },
+    {
+      "id": "SUB-105",
+      "subjectName": "Physics",
+      "subjectCode": "PHY-101",
+      "description": "Mechanics, kinematics and light properties"
+    },
+    {
+      "id": "SUB-106",
+      "subjectName": "Mathematics",
+      "subjectCode": "MTH-101",
+      "description": "Calculus, equations and statistical methods"
+    },
+    {
+      "id": "SUB-107",
+      "subjectName": "Islamic Studies",
+      "subjectCode": "ISL-101",
+      "description": "Islamic history, jurisprudence and Quran studies"
+    },
+    {
+      "id": "SUB-108",
+      "subjectName": "Geography",
+      "subjectCode": "GEO-101",
+      "description": "Physical geography and human civilizations"
+    },
+    {
+      "id": "SUB-109",
+      "subjectName": "History",
+      "subjectCode": "HIS-101",
+      "description": "Global world history and ancient eras"
+    }
+  ],
+  "students": [
+    {
+      "id": "STU-1001",
+      "name": "Ahmed Ali",
+      "email": "ahmed@example.com",
+      "gradeGroup": "Class One",
+      "academicYear": "2025–2026",
+      "passwordHash": "$2b$10$Mah62d9gTqvsdbhP/62oa.9csg.pRmF8RfjuK9tXRqwQffWyuDxu.",
+      "status": "active",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "STU-1002",
+      "name": "Fatima Omar",
+      "email": "fatima@example.com",
+      "gradeGroup": "Biology Class",
+      "academicYear": "2025–2026",
+      "passwordHash": "$2b$10$Mah62d9gTqvsdbhP/62oa.9csg.pRmF8RfjuK9tXRqwQffWyuDxu.",
+      "status": "active",
+      "deletedAt": "2026-09-10T06:10:57.911Z"
+    },
+    {
+      "id": "STU-1003",
+      "name": "Test Student",
+      "email": "teststudent@example.com",
+      "gradeGroup": "Class One",
+      "academicYear": "2025-2026",
+      "passwordHash": "$2b$10$Yq0dCOeY4ysaBo.z6xsn2uRL6acjyj.UkPvvgounP3YfyaOrqvlaa",
+      "status": "active",
+      "deletedAt": "2026-07-27T09:13:36.002Z"
+    },
+    {
+      "id": "STU-1004",
+      "name": "Second Student",
+      "email": "second@example.com",
+      "gradeGroup": "Class One",
+      "academicYear": "2025-2026",
+      "passwordHash": "$2b$10$1lisMbTsiHtl2w3CFavnben0nBWqaaH.MyVUv3YOBR9N3endmPSz6",
+      "status": "active",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    }
+  ],
+  "exams": [
+    {
+      "id": "EXM-101",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "Mathematics",
+      "term": "Term 1",
+      "score": 97,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-102",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "Islamic Studies",
+      "term": "Term 1",
+      "score": 88,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-1785143634115-1",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "English",
+      "term": "Term 1",
+      "score": 88,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-1785144068522-1",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "Arabic",
+      "term": "Term 1",
+      "score": 99,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-1785144068522-2",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "Biology",
+      "term": "Term 1",
+      "score": 68,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-1785144068522-3",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "Chemistry",
+      "term": "Term 1",
+      "score": 90,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-1785144068522-4",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "Physics",
+      "term": "Term 1",
+      "score": 66,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-1785144068522-7",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "Geography",
+      "term": "Term 1",
+      "score": 66,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-1785144068522-8",
+      "studentId": "STU-1001",
+      "className": "Class One",
+      "academicYear": "2025–2026",
+      "subject": "History",
+      "term": "Term 1",
+      "score": 45,
+      "maxPoints": 100,
+      "feedback": "Updated",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "EXM-1785144157625-0",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "English",
+      "term": "Term 1",
+      "score": 78,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    },
+    {
+      "id": "EXM-1785144157625-1",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "Arabic",
+      "term": "Term 1",
+      "score": 67,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    },
+    {
+      "id": "EXM-1785144157625-2",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "Biology",
+      "term": "Term 1",
+      "score": 88,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    },
+    {
+      "id": "EXM-1785144157625-3",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "Chemistry",
+      "term": "Term 1",
+      "score": 99,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    },
+    {
+      "id": "EXM-1785144157625-4",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "Physics",
+      "term": "Term 1",
+      "score": 87,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    },
+    {
+      "id": "EXM-1785144157625-5",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "Mathematics",
+      "term": "Term 1",
+      "score": 65,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    },
+    {
+      "id": "EXM-1785144157625-6",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "Islamic Studies",
+      "term": "Term 1",
+      "score": 56,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    },
+    {
+      "id": "EXM-1785144157625-7",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "Geography",
+      "term": "Term 1",
+      "score": 78,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    },
+    {
+      "id": "EXM-1785144157625-8",
+      "studentId": "STU-1004",
+      "className": "Class One",
+      "academicYear": "2025-2026",
+      "subject": "History",
+      "term": "Term 1",
+      "score": 88,
+      "maxPoints": 100,
+      "feedback": "",
+      "deletedAt": "2026-09-10T06:08:41.581Z"
+    }
+  ],
+  "fees": [
+    {
+      "id": "fee-1",
+      "studentId": "STU-1001",
+      "feeName": "Tuition Fee Term 1",
+      "amount": 500,
+      "paid": 400,
+      "deductions": 50,
+      "status": "Partial",
+      "transactionType": "Charge",
+      "date": "2026-01-01",
+      "referenceNumber": "CHG-100001",
+      "createdBy": "Admin",
+      "notes": "",
+      "academicYear": "2025–2026",
+      "deletedAt": "2026-09-10T06:08:43.339Z"
+    },
+    {
+      "id": "fee-2",
+      "studentId": "STU-1002",
+      "feeName": "Tuition Fee Term 1",
+      "amount": 500,
+      "paid": 500,
+      "deductions": 0,
+      "status": "Paid",
+      "transactionType": "Charge",
+      "date": "2026-01-01",
+      "referenceNumber": "CHG-100002",
+      "createdBy": "Admin",
+      "notes": "",
+      "academicYear": "2025–2026",
+      "deletedAt": "2026-09-10T06:09:13.996Z"
+    }
+  ],
+  "student_id_sequence": {
+    "last_val": 1004
+  },
+  "issued_student_ids": [
+    "STU-1001",
+    "STU-1002",
+    "STU-1003",
+    "STU-1004"
+  ],
+  "attendance": []
+}

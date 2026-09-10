@@ -20,7 +20,7 @@ export const translations = {
     access_dashboard: "Access Dashboard",
     signing_in: "Signing in...",
     verifying: "Verifying...",
-    logout: "Exit Portal",
+    logout: "Logout",
     back_to_home: "Back to Home",
     
     // Landing Page

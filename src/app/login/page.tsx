@@ -4,7 +4,7 @@ import React, { useState } from "react";
 import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
-import { Lock, User, GraduationCap, Loader2, ArrowLeft } from "lucide-react";
+import { Lock, User, GraduationCap, Loader2, ArrowLeft, Eye, EyeOff, ShieldCheck, AlertCircle } from "lucide-react";
 
 import { usePortal } from "@/context/PortalContext";
 import { useToast } from "@/context/ToastContext";
@@ -21,81 +21,107 @@ export default function LoginPage() {
     return dict[key] || translations["en"][key] || key;
   };
 
-  // Active tab state: "student" | "admin"
-  const [activeTab, setActiveTab] = useState<"student" | "admin">("student");
+  // Active tab state: "admin" | "student"
+  const [activeTab, setActiveTab] = useState<"admin" | "student">("admin");
 
-  // Admin Inputs
-  const [adminUsername, setAdminUsername] = useState("");
+  // Admin / Staff Inputs
+  const [adminIdentifier, setAdminIdentifier] = useState("");
   const [adminPassword, setAdminPassword] = useState("");
+  const [showAdminPassword, setShowAdminPassword] = useState(false);
 
   // Student Inputs
-  const [studentIdOrName, setStudentIdOrName] = useState("");
+  const [studentIdentifier, setStudentIdentifier] = useState("");
+  const [studentPassword, setStudentPassword] = useState("");
+  const [showStudentPassword, setShowStudentPassword] = useState(false);
 
-  // Loading and feedback
+  // Shared options
+  const [rememberMe, setRememberMe] = useState(true);
+
+  // Loading and error state
   const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleAdminSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!adminUsername.trim() || !adminPassword.trim()) {
-      showToast("Please fill in all admin credentials", "error");
+    setErrorMessage(null);
+
+    if (!adminIdentifier.trim() || !adminPassword.trim()) {
+      const msg = "Please enter your Email Address and Password.";
+      setErrorMessage(msg);
+      showToast(msg, "error");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const result = await login("admin", adminUsername, adminPassword);
+      const result = await login("admin", adminIdentifier.trim(), adminPassword.trim());
       setIsLoading(false);
 
       if (result.success) {
-        showToast("Welcome back, Administrator!", "success");
+        showToast("Welcome back! Redirecting to Dashboard...", "success");
         router.push("/admin");
       } else {
-        showToast(result.error || "Invalid Admin username or password", "error");
+        const errorText = result.error || "Invalid email or password.";
+        setErrorMessage(errorText);
+        showToast(errorText, "error");
       }
     } catch {
       setIsLoading(false);
-      showToast("Database connection error", "error");
+      const errorText = "Database or network connection error. Please try again.";
+      setErrorMessage(errorText);
+      showToast(errorText, "error");
     }
   };
 
   const handleStudentSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!studentIdOrName.trim()) {
-      showToast("Please enter your Student ID or Full Name", "error");
+    setErrorMessage(null);
+
+    if (!studentIdentifier.trim() || !studentPassword.trim()) {
+      const msg = "Please enter your Student ID and Password.";
+      setErrorMessage(msg);
+      showToast(msg, "error");
       return;
     }
 
     setIsLoading(true);
 
     try {
-      const result = await login("student", studentIdOrName);
+      const result = await login("student", studentIdentifier.trim(), studentPassword.trim());
       setIsLoading(false);
 
       if (result.success) {
         showToast("Authenticated successfully. Welcome to your Dashboard!", "success");
         router.push("/student");
       } else {
-        showToast(result.error || "No student record matching that input", "error");
+        const errorText = result.error || "Invalid Student ID or password.";
+        setErrorMessage(errorText);
+        showToast(errorText, "error");
       }
     } catch {
       setIsLoading(false);
-      showToast("Database connection error", "error");
+      const errorText = "Database or network connection error. Please try again.";
+      setErrorMessage(errorText);
+      showToast(errorText, "error");
     }
   };
 
   return (
     <div className="relative min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col items-center justify-center p-6 overflow-hidden transition-colors duration-300">
+      {/* Background ambient glowing shapes */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[550px] h-[550px] bg-emerald-500/10 blur-[140px] rounded-full pointer-events-none" />
+      <div className="absolute top-[15%] right-[10%] w-[320px] h-[320px] bg-cyan-500/10 blur-[120px] rounded-full pointer-events-none" />
+      <div className="absolute bottom-[10%] left-[5%] w-[350px] h-[350px] bg-teal-500/10 blur-[130px] rounded-full pointer-events-none" />
 
-      {/* Background decorations */}
-      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-emerald-500/5 blur-[120px] rounded-full pointer-events-none" />
-      <div className="absolute top-[20%] right-[10%] w-[300px] h-[300px] bg-emerald-500/5 blur-[100px] rounded-full pointer-events-none" />
+      {/* Grid Pattern Overlay */}
+      <div className="absolute inset-0 bg-[linear-gradient(to_right,#e2e8f0_1px,transparent_1px),linear-gradient(to_bottom,#e2e8f0_1px,transparent_1px)] dark:bg-[linear-gradient(to_right,#0f172a_1px,transparent_1px),linear-gradient(to_bottom,#0f172a_1px,transparent_1px)] bg-[size:4rem_4rem] [mask-image:radial-gradient(ellipse_60%_50%_at_50%_50%,#000_70%,transparent_100%)] opacity-30 pointer-events-none" />
 
-      {/* Top Header bar with selector controls */}
-      <div className="absolute top-8 left-8 right-8 flex items-center justify-between pointer-events-auto">
+      {/* Top Header bar */}
+      <div className="absolute top-6 left-6 right-6 flex items-center justify-between pointer-events-auto z-20">
         <Link
           href="/"
-          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-450 flex items-center gap-2 transition-colors group"
+          className="text-sm font-semibold text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 flex items-center gap-2 transition-colors group"
         >
           <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
           {t("back_to_home")}
@@ -106,7 +132,7 @@ export default function LoginPage() {
           <select
             value={language}
             onChange={(e) => setLanguage(e.target.value as "en" | "ar" | "so")}
-            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 text-slate-700 dark:text-slate-300 text-xs rounded-lg px-2.5 py-1.5 focus:outline-none cursor-pointer font-semibold transition-all shadow-sm"
+            className="bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 text-slate-700 dark:text-slate-300 text-xs rounded-xl px-3 py-1.5 focus:outline-none cursor-pointer font-semibold transition-all shadow-sm"
           >
             <option value="en">English</option>
             <option value="ar">العربية (Arabic)</option>
@@ -117,7 +143,7 @@ export default function LoginPage() {
           <button
             type="button"
             onClick={toggleTheme}
-            className="p-2 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 rounded-lg text-slate-500 dark:text-slate-400 hover:text-emerald-550 dark:hover:text-emerald-450 transition-all shadow-sm"
+            className="p-2.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/30 rounded-xl text-slate-500 dark:text-slate-400 hover:text-emerald-500 dark:hover:text-emerald-400 transition-all shadow-sm"
             title="Toggle Light/Dark Theme"
           >
             {theme === "dark" ? (
@@ -138,58 +164,89 @@ export default function LoginPage() {
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
-        className="w-full max-w-md bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-8 backdrop-blur-md shadow-2xl relative mt-12 transition-all"
+        className="w-full max-w-md bg-white dark:bg-slate-900/80 border border-slate-200 dark:border-slate-800 rounded-3xl p-8 backdrop-blur-xl shadow-2xl relative z-10 my-12"
       >
-        {/* Border accent glows */}
-        <div className="absolute top-0 left-1/4 right-1/4 h-[2px] bg-gradient-to-r from-transparent via-emerald-500/55 to-transparent" />
+        {/* Top accent glow line */}
+        <div className="absolute top-0 left-1/4 right-1/4 h-[3px] bg-gradient-to-r from-transparent via-emerald-500 to-transparent rounded-full" />
 
         {/* Brand header */}
-        <div className="flex flex-col items-center gap-2 mb-8 text-center">
-          <div className="p-3 bg-slate-100 dark:bg-slate-850 border border-slate-200 dark:border-emerald-500/20 rounded-xl text-emerald-600 dark:text-emerald-450">
-            <MadrasaLogoIcon className="w-9 h-9" colorClass="text-emerald-500 dark:text-emerald-400" />
+        <div className="flex flex-col items-center gap-2 mb-6 text-center">
+          <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 rounded-2xl text-emerald-500 dark:text-emerald-400 shadow-inner">
+            <MadrasaLogoIcon className="w-10 h-10" colorClass="text-emerald-500 dark:text-emerald-400" />
           </div>
-          <h2 className="text-xl font-bold tracking-tight text-slate-800 dark:text-slate-100 mt-2">
-            {t("login_title")}
-          </h2>
-          <p className="text-xs text-slate-500 dark:text-slate-400">{t("select_role")}</p>
+          <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-50 mt-1">
+            Madarasah Badru-diin
+          </h1>
+          <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
+            <ShieldCheck className="w-3.5 h-3.5" />
+            Management Portal Login
+          </p>
         </div>
 
-        {/* Custom Tabs */}
-        <div className="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-950 rounded-xl border border-slate-200 dark:border-slate-850 mb-8 relative">
+        {/* Dynamic Error Alert */}
+        <AnimatePresence>
+          {errorMessage && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              className="mb-5 p-3.5 bg-rose-500/10 border border-rose-500/30 rounded-xl flex items-start gap-3 text-rose-600 dark:text-rose-400 text-xs font-medium"
+            >
+              <AlertCircle className="w-4 h-4 shrink-0 mt-0.5" />
+              <span>{errorMessage}</span>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Role Selector Tabs */}
+        <div className="grid grid-cols-2 p-1.5 bg-slate-100 dark:bg-slate-950 rounded-2xl border border-slate-200 dark:border-slate-800 mb-6 relative">
           <button
             type="button"
             onClick={() => {
-              if (!isLoading) setActiveTab("student");
+              if (!isLoading) {
+                setActiveTab("admin");
+                setErrorMessage(null);
+              }
             }}
             disabled={isLoading}
-            className={`py-2.5 text-xs md:text-sm font-bold rounded-lg transition-all relative z-10 flex items-center justify-center gap-2 ${activeTab === "student" ? "text-emerald-600 dark:text-emerald-400 font-extrabold" : "text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-200"
-              }`}
+            className={`py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all relative z-10 flex items-center justify-center gap-2 ${
+              activeTab === "admin"
+                ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
           >
-            <GraduationCap className="w-4 h-4" />
-            {t("student_login")}
-            {activeTab === "student" && (
+            <Lock className="w-4 h-4" />
+            Admin / Staff
+            {activeTab === "admin" && (
               <motion.div
                 layoutId="active-tab-glow"
-                className="absolute inset-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-emerald-500/20 rounded-lg -z-10 shadow-sm"
+                className="absolute inset-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-emerald-500/30 rounded-xl -z-10 shadow-sm"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
             )}
           </button>
+
           <button
             type="button"
             onClick={() => {
-              if (!isLoading) setActiveTab("admin");
+              if (!isLoading) {
+                setActiveTab("student");
+                setErrorMessage(null);
+              }
             }}
             disabled={isLoading}
-            className={`py-2.5 text-xs md:text-sm font-bold rounded-lg transition-all relative z-10 flex items-center justify-center gap-2 ${activeTab === "admin" ? "text-emerald-600 dark:text-emerald-400 font-extrabold" : "text-slate-500 dark:text-slate-400 hover:text-slate-850 dark:hover:text-slate-200"
-              }`}
+            className={`py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all relative z-10 flex items-center justify-center gap-2 ${
+              activeTab === "student"
+                ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
+                : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
+            }`}
           >
-            <Lock className="w-3.5 h-3.5" />
-            {t("admin_login")}
-            {activeTab === "admin" && (
+            <GraduationCap className="w-4 h-4" />
+            Student Login
+            {activeTab === "student" && (
               <motion.div
                 layoutId="active-tab-glow"
-                className="absolute inset-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-emerald-500/20 rounded-lg -z-10 shadow-sm"
+                className="absolute inset-0 bg-white dark:bg-slate-900 border border-slate-200 dark:border-emerald-500/30 rounded-xl -z-10 shadow-sm"
                 transition={{ type: "spring", stiffness: 380, damping: 30 }}
               />
             )}
@@ -198,115 +255,169 @@ export default function LoginPage() {
 
         {/* Forms Container */}
         <AnimatePresence mode="wait">
-          {activeTab === "student" ? (
+          {activeTab === "admin" ? (
             <motion.form
-              key="student-form"
+              key="admin-form"
               initial={{ opacity: 0, x: -10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: 10 }}
               transition={{ duration: 0.2 }}
-              onSubmit={handleStudentSubmit}
-              className="flex flex-col gap-5"
+              onSubmit={handleAdminSubmit}
+              className="flex flex-col gap-4"
             >
-              <div className="flex flex-col gap-2 text-left">
-                <label htmlFor="student-id" className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                  {t("student_id")} / {t("name")}
+              <div className="flex flex-col gap-1.5 text-left">
+                <label htmlFor="admin-email" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                  Email Address
                 </label>
                 <div className="relative flex items-center">
                   <User className="absolute left-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input
-                    id="student-id"
+                    id="admin-email"
                     type="text"
-                    placeholder="e.g. Alice Johnson or STU-1001"
-                    value={studentIdOrName}
-                    onChange={(e) => setStudentIdOrName(e.target.value)}
+                    placeholder="e.g. admin@madrasa.com"
+                    value={adminIdentifier}
+                    onChange={(e) => setAdminIdentifier(e.target.value)}
                     disabled={isLoading}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
                   />
                 </div>
-                <p className="text-[10px] text-slate-550">
-                  Tip: Use <code className="bg-slate-100 dark:bg-slate-950 px-1 py-0.5 rounded text-emerald-600 dark:text-emerald-450 font-bold font-mono">STU-1001</code> to view Alice Johnson&apos;s records.
-                </p>
+              </div>
+
+              <div className="flex flex-col gap-1.5 text-left">
+                <label htmlFor="admin-pass" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                  Password
+                </label>
+                <div className="relative flex items-center">
+                  <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <input
+                    id="admin-pass"
+                    type={showAdminPassword ? "text" : "password"}
+                    placeholder="••••••••"
+                    value={adminPassword}
+                    onChange={(e) => setAdminPassword(e.target.value)}
+                    disabled={isLoading}
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-10 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowAdminPassword(!showAdminPassword)}
+                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    title={showAdminPassword ? "Hide password" : "Show password"}
+                  >
+                    {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember me option */}
+              <div className="flex items-center justify-between text-xs my-1">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400 select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="rounded border-slate-300 dark:border-slate-800 text-emerald-500 focus:ring-emerald-500/30"
+                  />
+                  Remember me
+                </label>
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Secure Session</span>
               </div>
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl transition-all duration-300 shadow-md hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2"
+                className="w-full mt-2 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                    <span>{t("verifying")}</span>
+                    <span>Signing in...</span>
                   </>
                 ) : (
-                  <span>{t("access_dashboard")}</span>
+                  <span>Login to Admin Dashboard</span>
                 )}
               </button>
             </motion.form>
           ) : (
             <motion.form
-              key="admin-form"
+              key="student-form"
               initial={{ opacity: 0, x: 10 }}
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -10 }}
               transition={{ duration: 0.2 }}
-              onSubmit={handleAdminSubmit}
-              className="flex flex-col gap-5"
+              onSubmit={handleStudentSubmit}
+              className="flex flex-col gap-4"
             >
-              <div className="flex flex-col gap-2 text-left">
-                <label htmlFor="admin-username" className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                  {t("username")}
+              <div className="flex flex-col gap-1.5 text-left">
+                <label htmlFor="student-id-input" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                  Student ID
                 </label>
                 <div className="relative flex items-center">
                   <User className="absolute left-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input
-                    id="admin-username"
+                    id="student-id-input"
                     type="text"
-                    placeholder="admin"
-                    value={adminUsername}
-                    onChange={(e) => setAdminUsername(e.target.value)}
+                    placeholder="e.g. STU-1001"
+                    value={studentIdentifier}
+                    onChange={(e) => setStudentIdentifier(e.target.value)}
                     disabled={isLoading}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-2 text-left">
-                <div className="flex justify-between items-center">
-                  <label htmlFor="admin-password" className="text-xs font-bold text-slate-500 dark:text-slate-400 uppercase tracking-wide">
-                    {t("password")}
-                  </label>
-                </div>
+              <div className="flex flex-col gap-1.5 text-left">
+                <label htmlFor="student-pass-input" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
+                  Password
+                </label>
                 <div className="relative flex items-center">
                   <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input
-                    id="admin-password"
-                    type="password"
+                    id="student-pass-input"
+                    type={showStudentPassword ? "text" : "password"}
                     placeholder="••••••••"
-                    value={adminPassword}
-                    onChange={(e) => setAdminPassword(e.target.value)}
+                    value={studentPassword}
+                    onChange={(e) => setStudentPassword(e.target.value)}
                     disabled={isLoading}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-650 focus:outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-10 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
                   />
+                  <button
+                    type="button"
+                    onClick={() => setShowStudentPassword(!showStudentPassword)}
+                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    title={showStudentPassword ? "Hide password" : "Show password"}
+                  >
+                    {showStudentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
                 </div>
-                <p className="text-[10px] text-slate-500">
-                  Default credentials are <code className="bg-slate-100 dark:bg-slate-950 px-1 py-0.5 rounded text-emerald-600 dark:text-emerald-450 font-bold font-mono">admin</code> / <code className="bg-slate-100 dark:bg-slate-950 px-1 py-0.5 rounded text-emerald-600 dark:text-emerald-450 font-bold font-mono">admin123</code>.
-                </p>
+              </div>
+
+              {/* Remember me option */}
+              <div className="flex items-center justify-between text-xs my-1">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400 select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="rounded border-slate-300 dark:border-slate-800 text-emerald-500 focus:ring-emerald-500/30"
+                  />
+                  Remember me
+                </label>
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Student Portal</span>
               </div>
 
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full mt-2 py-3 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl transition-all duration-300 shadow-md hover:shadow-[0_0_20px_rgba(16,185,129,0.3)] flex items-center justify-center gap-2"
+                className="w-full mt-2 py-3.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl transition-all duration-300 shadow-lg hover:shadow-emerald-500/25 flex items-center justify-center gap-2 disabled:opacity-50"
               >
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                    <span>{t("signing_in")}</span>
+                    <span>Verifying credentials...</span>
                   </>
                 ) : (
-                  <span>{t("access_dashboard")}</span>
+                  <span>Access Student Dashboard</span>
                 )}
               </button>
             </motion.form>

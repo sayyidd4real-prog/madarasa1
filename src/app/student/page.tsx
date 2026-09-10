@@ -75,7 +75,11 @@ export default function StudentDashboard() {
   // Redirect if unauthorized once state has loaded
   useEffect(() => {
     if (isInitialized && (!currentUser || currentUser.role !== "student")) {
-      router.push("/login");
+      if (currentUser?.role === "admin" || currentUser?.role === "super_admin") {
+        router.push("/admin");
+      } else {
+        router.push("/login");
+      }
     }
   }, [currentUser, isInitialized, router]);
 
@@ -98,8 +102,8 @@ export default function StudentDashboard() {
   const totalDeductions = studentFees.reduce((sum, f) => sum + f.deductions, 0);
   const remainingBalance = totalAssignedFees - totalPaid - totalDeductions;
 
-  const handleLogout = () => {
-    logout();
+  const handleLogout = async () => {
+    await logout("student");
     showToast("Logged out from student session", "success");
     router.push("/login");
   };

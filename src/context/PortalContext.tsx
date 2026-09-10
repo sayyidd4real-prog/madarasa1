@@ -1,8 +1,21 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
 
 export type Language = "en" | "ar" | "so";
+
+export type UserRole = "super_admin" | "admin";
+export type AccountStatus = "active" | "inactive";
+
+export interface UserAccount {
+  id: string;
+  fullName: string;
+  email: string;
+  role: UserRole;
+  status: AccountStatus;
+  createdAt: string;
+}
 
 export interface Student {
   id: string;
@@ -10,6 +23,7 @@ export interface Student {
   email: string;
   gradeGroup: string;
   academicYear: string;
+  status?: string;
 }
 
 export interface ClassItem {
@@ -22,11 +36,19 @@ export interface ClassItem {
 export interface Fee {
   id: string;
   studentId: string;
+  studentName?: string;
+  className?: string;
   feeName: string;
   amount: number;
   paid: number;
   deductions: number;
-  status: "Paid" | "Unpaid" | "Partial";
+  status: string;
+  transactionType?: "Charge" | "Payment" | "Waiver" | "Credit";
+  date?: string;
+  referenceNumber?: string;
+  createdBy?: string;
+  paymentMethod?: string;
+  notes?: string;
   academicYear?: string;
 }
 
@@ -51,7 +73,9 @@ export interface Subject {
 }
 
 export type CurrentUser = {
-  role: "admin" | "student";
+  id?: string;
+  email?: string;
+  role: "super_admin" | "admin" | "student";
   studentId?: string;
   name?: string;
 } | null;
@@ -62,13 +86,44 @@ interface PortalContextType {
   fees: Fee[];
   exams: Exam[];
   subjects: Subject[];
+  userAccounts: UserAccount[];
   currentUser: CurrentUser;
   isInitialized: boolean;
   login: (role: "admin" | "student", identifier: string, password?: string) => Promise<{ success: boolean; error?: string }>;
-  logout: () => void;
-  addStudent: (name: string, email: string, gradeGroup: string, academicYear: string) => void;
-  deleteStudent: (id: string) => void;
-  addClass: (className: string, room: string, instructor: string) => void;
+  refreshData: (portal?: "admin" | "student") => Promise<void>;
+  logout: (portal?: "admin" | "student") => Promise<void>;
+  addUserAccount: (fullName: string, email: string, password: string, role: UserRole, status: AccountStatus) => Promise<{ success: boolean; error?: string }>;
+  editUserAccount: (id: string, fullName: string, email: string, password?: string, role?: UserRole, status?: AccountStatus) => Promise<{ success: boolean; error?: string }>;
+  deleteUserAccount: (id: string) => Promise<{ success: boolean; error?: string }>;
+  toggleUserAccountStatus: (id: string) => Promise<{ success: boolean; error?: string }>;
+  addStudent: (name: string, email: string, gradeGroup: string, academicYear: string, password?: string) => Promise<{ success: boolean; error?: string }>;
+  editStudent: (id: string, name: string, email: string, gradeGroup: string, academicYear: string, password?: string) => Promise<{ success: boolean; error?: string }>;
+  deleteStudent: (id: string) => Promise<{ success: boolean; error?: string }>;
+  addClass: (className: string, room: string, instructor: string) => Promise<{ success: boolean; error?: string }>;
+  editClass: (id: string, className: string, room: string, instructor: string) => Promise<{ success: boolean; error?: string }>;
+  deleteClass: (id: string) => Promise<{ success: boolean; error?: string }>;
+  addCharge: (
+    studentIds: string[],
+    description: string,
+    amount: number,
+    date: string,
+    referenceNumber: string,
+    createdBy: string,
+    notes?: string,
+    academicYear?: string
+  ) => Promise<{ success: boolean; error?: string }>;
+  recordPayment: (
+    studentId: string,
+    studentName: string,
+    className: string,
+    amount: number,
+    date: string,
+    paymentMethod: string,
+    referenceNumber: string,
+    receivedBy: string,
+    notes?: string,
+    academicYear?: string
+  ) => Promise<{ success: boolean; error?: string }>;
   assignFee: (
     studentId: string,
     feeName: string,
@@ -77,6 +132,8 @@ interface PortalContextType {
     paid?: number,
     academicYear?: string
   ) => void;
+  editFee: (id: string, feeName: string, amount: number) => Promise<{ success: boolean; error?: string }>;
+  deleteFee: (id: string) => Promise<{ success: boolean; error?: string }>;
   addPayment: (feeId: string, amount: number) => void;
   applyDeduction: (feeId: string, amount: number) => void;
   gradeStudent: (
@@ -89,43 +146,77 @@ interface PortalContextType {
     academicYear: string,
     maxPoints: number,
     studentName: string
-  ) => void;
-  gradeStudentBatch: (studentId: string, className: string, term: string, grades: { subject: string; score: number; feedback: string }[]) => void;
-  editStudent: (id: string, name: string, email: string, gradeGroup: string, academicYear: string) => void;
-  deleteExam: (id: string) => void;
-  editExam: (id: string, score: number, feedback: string) => void;
+  ) => Promise<{ success: boolean; error?: string }>;
+  gradeStudentBatch: (studentId: string, className: string, term: string, grades: { subject: string; score: number; feedback: string }[]) => Promise<{ success: boolean; error?: string }>;
+  deleteExam: (id: string) => Promise<{ success: boolean; error?: string }>;
+  editExam: (id: string, score: number, feedback: string) => Promise<{ success: boolean; error?: string }>;
+  addSubject: (subjectName: string, subjectCode: string, description: string) => Promise<{ success: boolean; error?: string }>;
+  deleteSubject: (id: string) => Promise<{ success: boolean; error?: string }>;
   language: Language;
   setLanguage: (lang: Language) => void;
   theme: "light" | "dark";
   toggleTheme: () => void;
-  editClass: (id: string, className: string, room: string, instructor: string) => void;
-  deleteClass: (id: string) => void;
-  editFee: (id: string, feeName: string, amount: number) => void;
-  deleteFee: (id: string) => void;
-  addSubject: (subjectName: string, subjectCode: string, description: string) => void;
-  deleteSubject: (id: string) => void;
 }
 
 const PortalContext = createContext<PortalContextType | undefined>(undefined);
 
 export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const router = useRouter();
+
   const [students, setStudents] = useState<Student[]>([]);
   const [classes, setClasses] = useState<ClassItem[]>([]);
   const [fees, setFees] = useState<Fee[]>([]);
   const [exams, setExams] = useState<Exam[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
+  const [userAccounts, setUserAccounts] = useState<UserAccount[]>([]);
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [language, setLanguageState] = useState<Language>("en");
   const [theme, setThemeState] = useState<"light" | "dark">("dark");
 
-  // Sync from localStorage on mount
+  const saveState = (key: string, data: unknown) => {
+    if (typeof window !== "undefined") {
+      localStorage.setItem(key, JSON.stringify(data));
+    }
+  };
+
+  const getActivePortalType = (): "admin" | "student" => {
+    if (typeof window !== "undefined") {
+      if (window.location.pathname.startsWith("/student")) return "student";
+      if (window.location.pathname.startsWith("/admin")) return "admin";
+    }
+    return "admin";
+  };
+
+  const refreshData = async (portalOverride?: "admin" | "student") => {
+    const portal = portalOverride || getActivePortalType();
+    try {
+      const res = await fetch(`/api/portal-data?portal=${portal}`);
+      if (res.ok) {
+        const json = await res.json();
+        if (json.success && json.data) {
+          setStudents(json.data.students || []);
+          setClasses(json.data.classes || []);
+          setFees(json.data.fees || []);
+          setExams(json.data.exams || []);
+          setSubjects(json.data.subjects || []);
+          setUserAccounts(json.data.userAccounts || []);
+        }
+      }
+    } catch (err) {
+      console.error("Failed to refresh portal data:", err);
+    } finally {
+      router.refresh();
+    }
+  };
+
+  // Sync session and settings on mount
   useEffect(() => {
-    const initPortal = () => {
+    const initPortal = async () => {
       try {
-        const storedLang = localStorage.getItem("portal_lang");
-        const storedTheme = localStorage.getItem("portal_theme");
-        const storedUser = localStorage.getItem("portal_user");
+        const portal = getActivePortalType();
+        const storedLang = localStorage.getItem(`${portal}_portal_lang`) || localStorage.getItem("portal_lang");
+        const storedTheme = localStorage.getItem(`${portal}_portal_theme`) || localStorage.getItem("portal_theme");
 
         if (storedLang) {
           try {
@@ -141,100 +232,20 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
             setThemeState(storedTheme as "light" | "dark");
           }
         }
-        if (storedUser) {
-          try {
-            setCurrentUser(JSON.parse(storedUser));
-          } catch {
+
+        // Fetch portal-specific session from server
+        const meRes = await fetch(`/api/auth/me?portal=${portal}`);
+        if (meRes.ok) {
+          const meData = await meRes.json();
+          if (meData.authenticated && meData.user) {
+            setCurrentUser(meData.user);
+            await refreshData(portal);
+          } else {
             setCurrentUser(null);
           }
+        } else {
+          setCurrentUser(null);
         }
-
-        // Try to load from LocalStorage first (frontend-first)
-        const storedStudents = localStorage.getItem("portal_students");
-        const storedClasses = localStorage.getItem("portal_classes");
-        const storedFees = localStorage.getItem("portal_fees");
-        const storedExams = localStorage.getItem("portal_exams");
-        const storedSubjects = localStorage.getItem("portal_subjects");
-
-        let loadedStudents = storedStudents ? JSON.parse(storedStudents) : null;
-        let loadedClasses = storedClasses ? JSON.parse(storedClasses) : null;
-        let loadedFees = storedFees ? JSON.parse(storedFees) : null;
-        let loadedExams = storedExams ? JSON.parse(storedExams) : null;
-        let loadedSubjects = storedSubjects ? JSON.parse(storedSubjects) : null;
-
-        // Apply fallback mock data if still unpopulated
-        if (!loadedClasses || loadedClasses.length === 0) {
-          loadedClasses = [
-            { id: "cls-1", className: "Class One", room: "Room 101", instructor: "Prof. Ahmed Ali" },
-            { id: "cls-2", className: "Class Two", room: "Room 102", instructor: "Dr. Fatima Omar" },
-            { id: "cls-3", className: "Biology Class", room: "Lab 204", instructor: "Prof. Alan Turing" },
-            { id: "cls-4", className: "Mathematics Class", room: "Room 105", instructor: "Dr. Ada Lovelace" }
-          ];
-        }
-
-        if (!loadedStudents || loadedStudents.length === 0) {
-          loadedStudents = [
-            { id: "STU-1001", name: "Ahmed Ali", email: "ahmed@example.com", gradeGroup: "Class One", academicYear: "2025–2026" },
-            { id: "STU-1002", name: "Fatima Omar", email: "fatima@example.com", gradeGroup: "Biology Class", academicYear: "2025–2026" }
-          ];
-        }
-
-        if (!loadedExams || loadedExams.length === 0) {
-          loadedExams = [
-            {
-              id: "EXM-101",
-              studentId: "STU-1001",
-              studentName: "Ahmed Ali",
-              className: "Class One",
-              academicYear: "2025–2026",
-              subject: "Mathematics",
-              term: "Term 1",
-              score: 92,
-              maxPoints: 100,
-              feedback: "Excellent work. Keep improving your problem-solving skills."
-            },
-            {
-              id: "EXM-102",
-              studentId: "STU-1001",
-              studentName: "Ahmed Ali",
-              className: "Class One",
-              academicYear: "2025–2026",
-              subject: "Islamic Studies",
-              term: "Term 1",
-              score: 88,
-              maxPoints: 100,
-              feedback: "Very good understanding of the topics."
-            }
-          ];
-        }
-
-        if (!loadedFees || loadedFees.length === 0) {
-          loadedFees = [
-            { id: "fee-1", studentId: "STU-1001", feeName: "Tuition Fee Term 1", amount: 500, paid: 400, deductions: 50, status: "Partial" },
-            { id: "fee-2", studentId: "STU-1002", feeName: "Tuition Fee Term 1", amount: 500, paid: 500, deductions: 0, status: "Paid" }
-          ];
-        }
-
-        if (!loadedSubjects || loadedSubjects.length === 0) {
-          loadedSubjects = [
-            { id: "SUB-101", subjectName: "English", subjectCode: "ENG-101", description: "Core English reading & grammar course" },
-            { id: "SUB-102", subjectName: "Arabic", subjectCode: "ARA-101", description: "Arabic grammar, literature and speaking" },
-            { id: "SUB-103", subjectName: "Biology", subjectCode: "BIO-101", description: "Introduction to cellular biology and genetics" },
-            { id: "SUB-104", subjectName: "Chemistry", subjectCode: "CHM-101", description: "General chemistry, bonding and atomic structure" },
-            { id: "SUB-105", subjectName: "Physics", subjectCode: "PHY-101", description: "Mechanics, kinematics and light properties" },
-            { id: "SUB-106", subjectName: "Mathematics", subjectCode: "MTH-101", description: "Calculus, equations and statistical methods" },
-            { id: "SUB-107", subjectName: "Islamic Studies", subjectCode: "ISL-101", description: "Islamic history, jurisprudence and Quran studies" },
-            { id: "SUB-108", subjectName: "Geography", subjectCode: "GEO-101", description: "Physical geography and human civilizations" },
-            { id: "SUB-109", subjectName: "History", subjectCode: "HIS-101", description: "Global world history and ancient eras" },
-          ];
-        }
-
-        setClasses(loadedClasses);
-        setStudents(loadedStudents);
-        setExams(loadedExams);
-        setFees(loadedFees);
-        setSubjects(loadedSubjects);
-
       } catch (err) {
         console.error("Portal Initialization Error:", err);
       } finally {
@@ -245,112 +256,340 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     initPortal();
   }, []);
 
-  // Synchronize state changes back to localStorage
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem("portal_students", JSON.stringify(students));
-    }
-  }, [students, isInitialized]);
-
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem("portal_classes", JSON.stringify(classes));
-    }
-  }, [classes, isInitialized]);
-
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem("portal_fees", JSON.stringify(fees));
-    }
-  }, [fees, isInitialized]);
-
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem("portal_exams", JSON.stringify(exams));
-    }
-  }, [exams, isInitialized]);
-
-  useEffect(() => {
-    if (isInitialized) {
-      localStorage.setItem("portal_subjects", JSON.stringify(subjects));
-    }
-  }, [subjects, isInitialized]);
-
-  // Save to localStorage helpers for theme/language client settings
-  const saveState = (key: string, data: unknown) => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(key, JSON.stringify(data));
-    }
-  };
-
   const login = async (role: "admin" | "student", identifier: string, password?: string) => {
-    if (role === "admin") {
-      if (identifier.trim() === "admin" && password === "admin123") {
-        const userObj: CurrentUser = { role: "admin", name: "System Admin" };
-        setCurrentUser(userObj);
-        saveState("portal_user", userObj);
-        return { success: true };
+    try {
+      const payload: any = { role, password };
+
+      if (role === "student") {
+        payload.studentId = identifier.trim().toUpperCase();
+      } else {
+        payload.identifier = identifier;
       }
-      return { success: false, error: "Invalid Admin username or password" };
-    } else {
-      const match = students.find(
-        (s) => s.id.toLowerCase() === identifier.trim().toLowerCase() ||
-               s.name.toLowerCase() === identifier.trim().toLowerCase()
-      );
-      if (match) {
-        const userObj: CurrentUser = { role: "student", studentId: match.id, name: match.name };
+
+      const response = await fetch("/api/auth/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+
+      if (data.success && data.user) {
+        const userObj: CurrentUser = data.user;
         setCurrentUser(userObj);
-        saveState("portal_user", userObj);
+        await refreshData(role === "student" ? "student" : "admin");
         return { success: true };
+      } else {
+        return { success: false, error: data.error || "Authentication failed." };
       }
-      return { success: false, error: "No student record matching that input" };
+    } catch {
+      return { success: false, error: "Network or database connection error." };
     }
   };
 
-  const logout = () => {
-    setCurrentUser(null);
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("portal_user");
+  const logout = async (portalOverride?: "admin" | "student") => {
+    const portal = portalOverride || getActivePortalType();
+    try {
+      await fetch(`/api/auth/logout?portal=${portal}`, { method: "POST" });
+    } catch (e) {
+      console.error("Logout error:", e);
+    } finally {
+      setCurrentUser(null);
+      setStudents([]);
+      setClasses([]);
+      setFees([]);
+      setExams([]);
+      setSubjects([]);
+      setUserAccounts([]);
+      if (typeof window !== "undefined") {
+        localStorage.removeItem(`${portal}_portal_user`);
+        localStorage.removeItem(`${portal}_portal_session`);
+      }
+      router.push("/login");
+      router.refresh();
     }
   };
 
-  const addStudent = (name: string, email: string, gradeGroup: string, academicYear: string) => {
-    const numIds = students.map((s) => {
-      const match = s.id.match(/STU-(\d+)/);
-      return match ? parseInt(match[1], 10) : 1000;
-    });
-    const maxIdNum = numIds.length > 0 ? Math.max(...numIds) : 1000;
-    const newId = `STU-${maxIdNum + 1}`;
-
-    const newStudent: Student = { id: newId, name, email, gradeGroup, academicYear };
-    setStudents((prev) => [...prev, newStudent]);
+  // User Accounts Management
+  const addUserAccount = async (
+    fullName: string,
+    email: string,
+    password: string,
+    role: UserRole,
+    status: AccountStatus
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/user-accounts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ fullName, email, password, role, status }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to add user account." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const editStudent = (id: string, name: string, email: string, gradeGroup: string, academicYear: string) => {
-    setStudents((prev) =>
-      prev.map((s) => (s.id === id ? { ...s, name, email, gradeGroup, academicYear } : s))
-    );
+  const editUserAccount = async (
+    id: string,
+    fullName: string,
+    email: string,
+    password?: string,
+    role?: UserRole,
+    status?: AccountStatus
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/user-accounts", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, fullName, email, password, role, status }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to edit user account." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const deleteStudent = (id: string) => {
-    setStudents((prev) => prev.filter((s) => s.id !== id));
-    setFees((prev) => prev.filter((f) => f.studentId !== id));
-    setExams((prev) => prev.filter((e) => e.studentId !== id));
+  const deleteUserAccount = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`/api/user-accounts?id=${id}`, {
+        method: "DELETE"
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to delete user account." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const addClass = (className: string, room: string, instructor: string) => {
-    const classId = `cls-${Date.now()}`;
-    setClasses((prev) => [...prev, { id: classId, className, room, instructor }]);
+  const toggleUserAccountStatus = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`/api/user-accounts?id=${id}`, {
+        method: "PATCH"
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to toggle status." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const editClass = (id: string, className: string, room: string, instructor: string) => {
-    setClasses((prev) =>
-      prev.map((c) => (c.id === id ? { ...c, className, room, instructor } : c))
-    );
+  // Student CRUD operations
+  const addStudent = async (
+    name: string,
+    email: string,
+    gradeGroup: string,
+    academicYear: string,
+    password?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/students", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name, email, gradeGroup, academicYear, password }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to register student." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const deleteClass = (id: string) => {
-    setClasses((prev) => prev.filter((c) => c.id !== id));
+  const editStudent = async (
+    id: string,
+    name: string,
+    email: string,
+    gradeGroup: string,
+    academicYear: string,
+    password?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/students", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, name, email, gradeGroup, academicYear, password }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to update student details." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
+  };
+
+  const deleteStudent = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`/api/students?id=${id}`, {
+        method: "DELETE"
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to delete student." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
+  };
+
+  // Class CRUD operations
+  const addClass = async (className: string, room: string, instructor: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/classes", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ className, room, instructor }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to create class." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
+  };
+
+  const editClass = async (id: string, className: string, room: string, instructor: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/classes", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, className, room, instructor }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to edit class." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
+  };
+
+  const deleteClass = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`/api/classes?id=${id}`, {
+        method: "DELETE"
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to delete class." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
+  };
+
+  // Charge/Payment CRUD
+  const addCharge = async (
+    studentIds: string[],
+    description: string,
+    amount: number,
+    date: string,
+    referenceNumber: string,
+    createdBy: string,
+    notes?: string,
+    academicYear?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/finance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "charge",
+          studentIds,
+          description,
+          amount,
+          date,
+          referenceNumber,
+          createdBy,
+          notes,
+          academicYear
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      } else {
+        return { success: false, error: data.error || "Failed to add charge." };
+      }
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
+  };
+
+  const recordPayment = async (
+    studentId: string,
+    studentName: string,
+    className: string,
+    amount: number,
+    date: string,
+    paymentMethod: string,
+    referenceNumber: string,
+    receivedBy: string,
+    notes?: string,
+    academicYear?: string
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/finance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "payment",
+          studentId,
+          studentName,
+          className,
+          amount,
+          date,
+          paymentMethod,
+          referenceNumber,
+          receivedBy,
+          notes,
+          academicYear
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      } else {
+        return { success: false, error: data.error || "Failed to record payment." };
+      }
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
   const assignFee = (
@@ -361,66 +600,53 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     paid: number = 0,
     academicYear?: string
   ) => {
-    const feeId = `fee-${Date.now() + Math.floor(Math.random() * 1000)}`;
-    const newFee: Fee = {
-      id: feeId,
-      studentId,
-      feeName,
-      amount,
-      paid,
-      deductions: 0,
-      status,
-      academicYear
-    };
-    setFees((prev) => [...prev, newFee]);
+    // Stub for backward compatibility
   };
 
-  const editFee = (id: string, feeName: string, amount: number) => {
-    setFees((prev) =>
-      prev.map((f) => {
-        if (f.id === id) {
-          const remaining = amount - f.deductions - f.paid;
-          const status = remaining <= 0 ? "Paid" : f.paid === 0 ? "Unpaid" : "Partial";
-          return { ...f, feeName, amount, status };
-        }
-        return f;
-      })
-    );
+  const editFee = async (id: string, feeName: string, amount: number): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/finance", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, feeName, amount }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to update fee record." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const deleteFee = (id: string) => {
-    setFees((prev) => prev.filter((f) => f.id !== id));
+  const deleteFee = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`/api/finance?id=${id}`, {
+        method: "DELETE"
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to delete fee record." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
   const addPayment = (feeId: string, amount: number) => {
-    setFees((prev) =>
-      prev.map((f) => {
-        if (f.id === feeId) {
-          const newPaid = Math.min(f.paid + amount, f.amount - f.deductions);
-          const remaining = f.amount - f.deductions - newPaid;
-          const status = remaining <= 0 ? "Paid" : newPaid === 0 ? "Unpaid" : "Partial";
-          return { ...f, paid: newPaid, status };
-        }
-        return f;
-      })
-    );
+    // Stub for backward compatibility
   };
 
   const applyDeduction = (feeId: string, amount: number) => {
-    setFees((prev) =>
-      prev.map((f) => {
-        if (f.id === feeId) {
-          const newDeductions = Math.min(f.deductions + amount, f.amount - f.paid);
-          const remaining = f.amount - newDeductions - f.paid;
-          const status = remaining <= 0 ? "Paid" : f.paid === 0 ? "Unpaid" : "Partial";
-          return { ...f, deductions: newDeductions, status };
-        }
-        return f;
-      })
-    );
+    // Stub for backward compatibility
   };
 
-  const gradeStudent = (
+  // Exam Grading CRUD
+  const gradeStudent = async (
     studentId: string,
     className: string,
     subject: string,
@@ -428,106 +654,132 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     score: number,
     feedback: string,
     academicYear: string,
-    maxPoints: number,
-    studentName: string
-  ) => {
-    const examId = `EXM-${Math.floor(100000 + Math.random() * 900000)}`;
-    const newExam: Exam = {
-      id: examId,
-      studentId,
-      studentName,
-      className,
-      academicYear,
-      subject,
-      term,
-      score,
-      maxPoints,
-      feedback: feedback || "",
-    };
-
-    setExams((prev) => {
-      const idx = prev.findIndex(
-        (e) => e.studentId === studentId &&
-               e.className === className &&
-               e.subject === subject &&
-               e.term === term &&
-               e.academicYear === academicYear
-      );
-      if (idx > -1) {
-        const copy = [...prev];
-        copy[idx] = newExam;
-        return copy;
+    maxPoints: number = 100,
+    studentName: string = ""
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/exams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          studentId,
+          className,
+          subject,
+          term,
+          score,
+          maxPoints,
+          feedback,
+          academicYear,
+          studentName
+        }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
       }
-      return [...prev, newExam];
-    });
+      return { success: false, error: data.error || "Failed to record exam grade." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const gradeStudentBatch = (
+  const gradeStudentBatch = async (
     studentId: string,
     className: string,
     term: string,
     grades: { subject: string; score: number; feedback: string }[]
-  ) => {
-    const studentObj = students.find((s) => s.id === studentId);
-    const studentName = studentObj ? studentObj.name : "";
-    const academicYear = studentObj ? studentObj.academicYear : "2025–2026";
-
-    const newExams = grades.map((g) => ({
-      id: `EXM-${Math.floor(100000 + Math.random() * 900000)}`,
-      studentId,
-      studentName,
-      className,
-      academicYear,
-      subject: g.subject,
-      term,
-      score: g.score,
-      maxPoints: 100,
-      feedback: g.feedback,
-    }));
-
-    setExams((prev) => {
-      const current = [...prev];
-      newExams.forEach((ne) => {
-        const idx = current.findIndex(
-          (e) => e.studentId === ne.studentId &&
-                 e.className === ne.className &&
-                 e.subject === ne.subject &&
-                 e.term === ne.term &&
-                 e.academicYear === ne.academicYear
-        );
-        if (idx > -1) {
-          current[idx] = ne;
-        } else {
-          current.push(ne);
-        }
+  ): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/exams", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          isBatch: true,
+          studentId,
+          className,
+          term,
+          grades
+        }),
       });
-      return current;
-    });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to submit batch exam grades." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const editExam = (id: string, score: number, feedback: string) => {
-    setExams((prev) =>
-      prev.map((e) => (e.id === id ? { ...e, score, feedback } : e))
-    );
+  const deleteExam = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`/api/exams?id=${id}`, {
+        method: "DELETE"
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to delete exam record." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const deleteExam = (id: string) => {
-    setExams((prev) => prev.filter((e) => e.id !== id));
+  const editExam = async (id: string, score: number, feedback: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/exams", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, score, feedback }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to edit exam record." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const addSubject = (subjectName: string, subjectCode: string, description: string) => {
-    const nextNum = subjects.map(s => {
-      const match = s.id.match(/SUB-(\d+)/);
-      return match ? parseInt(match[1], 10) : 100;
-    });
-    const maxNum = nextNum.length > 0 ? Math.max(...nextNum) : 100;
-    const newId = `SUB-${maxNum + 1}`;
-    const newSub: Subject = { id: newId, subjectName, subjectCode, description };
-    setSubjects((prev) => [...prev, newSub]);
+  // Subjects Registry CRUD
+  const addSubject = async (subjectName: string, subjectCode: string, description: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/subjects", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ subjectName, subjectCode, description }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to register subject." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
-  const deleteSubject = (id: string) => {
-    setSubjects((prev) => prev.filter(s => s.id !== id));
+  const deleteSubject = async (id: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch(`/api/subjects?id=${id}`, {
+        method: "DELETE"
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to delete subject." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
   };
 
   const setLanguage = (lang: Language) => {
@@ -536,18 +788,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const toggleTheme = () => {
-    const nextTheme = theme === "dark" ? "light" : "dark";
-    setThemeState(nextTheme);
-    saveState("portal_theme", nextTheme);
+    setThemeState((prev) => {
+      const nextTheme = prev === "dark" ? "light" : "dark";
+      saveState("portal_theme", nextTheme);
+      return nextTheme;
+    });
   };
-
-  // RTL layout effect when language changes
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      document.documentElement.dir = language === "ar" ? "rtl" : "ltr";
-      document.documentElement.lang = language;
-    }
-  }, [language]);
 
   // Dark/Light theme class effect
   useEffect(() => {
@@ -571,6 +817,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         fees,
         exams,
         subjects,
+        userAccounts,
         currentUser,
         isInitialized,
         language,
@@ -579,11 +826,17 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         toggleTheme,
         login,
         logout,
+        addUserAccount,
+        editUserAccount,
+        deleteUserAccount,
+        toggleUserAccountStatus,
         addStudent,
         deleteStudent,
         addClass,
         editClass,
         deleteClass,
+        addCharge,
+        recordPayment,
         assignFee,
         editFee,
         deleteFee,
@@ -596,6 +849,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         editExam,
         addSubject,
         deleteSubject,
+        refreshData,
       }}
     >
       {children}
