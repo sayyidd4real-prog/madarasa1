@@ -538,15 +538,22 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           academicYear
         }),
       });
-      const data = await response.json();
-      if (data.success) {
+      let data: any;
+      try {
+        data = await response.json();
+      } catch (jsonErr) {
+        console.error("addCharge json parse error:", jsonErr);
+        return { success: false, error: `Server error (${response.status})` };
+      }
+      if (response.ok && data.success) {
         await refreshData();
         return { success: true };
       } else {
         return { success: false, error: data.error || "Failed to add charge." };
       }
-    } catch {
-      return { success: false, error: "Network or server connection error." };
+    } catch (err: any) {
+      console.error("addCharge error:", err);
+      return { success: false, error: err.message || "Network or server connection error." };
     }
   };
 
@@ -580,15 +587,22 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           academicYear
         }),
       });
-      const data = await response.json();
-      if (data.success) {
+      let data: any;
+      try {
+        data = await response.json();
+      } catch (jsonErr) {
+        console.error("recordPayment json parse error:", jsonErr);
+        return { success: false, error: `Server error (${response.status})` };
+      }
+      if (response.ok && data.success) {
         await refreshData();
         return { success: true };
       } else {
         return { success: false, error: data.error || "Failed to record payment." };
       }
-    } catch {
-      return { success: false, error: "Network or server connection error." };
+    } catch (err: any) {
+      console.error("recordPayment error:", err);
+      return { success: false, error: err.message || "Network or server connection error." };
     }
   };
 
@@ -610,14 +624,19 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id, feeName, amount }),
       });
-      const data = await response.json();
-      if (data.success) {
+      let data: any;
+      try {
+        data = await response.json();
+      } catch {
+        return { success: false, error: `Server error (${response.status})` };
+      }
+      if (response.ok && data.success) {
         await refreshData();
         return { success: true };
       }
       return { success: false, error: data.error || "Failed to update fee record." };
-    } catch {
-      return { success: false, error: "Network or server connection error." };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network or server connection error." };
     }
   };
 
@@ -626,14 +645,19 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
       const response = await fetch(`/api/finance?id=${id}`, {
         method: "DELETE"
       });
-      const data = await response.json();
-      if (data.success) {
+      let data: any;
+      try {
+        data = await response.json();
+      } catch {
+        return { success: false, error: `Server error (${response.status})` };
+      }
+      if (response.ok && data.success) {
         await refreshData();
         return { success: true };
       }
       return { success: false, error: data.error || "Failed to delete fee record." };
-    } catch {
-      return { success: false, error: "Network or server connection error." };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network or server connection error." };
     }
   };
 
@@ -641,8 +665,32 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     // Stub for backward compatibility
   };
 
-  const applyDeduction = (feeId: string, amount: number) => {
-    // Stub for backward compatibility
+  const applyDeduction = async (studentId: string, amount: number, description?: string) => {
+    try {
+      const response = await fetch("/api/finance", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          action: "waiver",
+          studentId,
+          amount,
+          description: description || "Fee Waiver / Credit"
+        }),
+      });
+      let data: any;
+      try {
+        data = await response.json();
+      } catch {
+        return { success: false, error: `Server error (${response.status})` };
+      }
+      if (response.ok && data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to apply waiver/credit." };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network or server connection error." };
+    }
   };
 
   // Exam Grading CRUD

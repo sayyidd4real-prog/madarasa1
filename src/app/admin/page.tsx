@@ -857,7 +857,10 @@ export default function AdminDashboard() {
     const totalPayments = studentTx
       .filter((t) => t.transactionType === "Payment")
       .reduce((sum, t) => sum + (t.paid || 0), 0);
-    const outstandingBalance = Math.max(0, totalCharges - totalPayments);
+    const totalDeductions = studentTx
+      .filter((t) => t.transactionType === "Waiver" || t.transactionType === "Credit")
+      .reduce((sum, t) => sum + (t.deductions || 0), 0);
+    const outstandingBalance = Math.max(0, totalCharges - totalPayments - totalDeductions);
 
     if (parsedAmount > outstandingBalance) {
       showToast("Payment amount cannot exceed the outstanding balance.", "error");
@@ -938,7 +941,10 @@ export default function AdminDashboard() {
     const totalPayments = studentTx
       .filter((t) => t.transactionType === "Payment")
       .reduce((sum, t) => sum + (t.paid || 0), 0);
-    const outstandingBalance = Math.max(0, totalCharges - totalPayments);
+    const totalDeductions = studentTx
+      .filter((t) => t.transactionType === "Waiver" || t.transactionType === "Credit")
+      .reduce((sum, t) => sum + (t.deductions || 0), 0);
+    const outstandingBalance = Math.max(0, totalCharges - totalPayments - totalDeductions);
 
     if (amountVal > outstandingBalance) {
       showToast("Payment amount cannot exceed the outstanding balance.", "error");
