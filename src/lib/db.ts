@@ -19,20 +19,47 @@ if (fs.existsSync(envPath)) {
   });
 }
 
-// Global MySQL connection pool instance
-const pool = mysql.createPool({
-  host: process.env.DB_HOST || "localhost",
-  port: parseInt(process.env.DB_PORT || "3306", 10),
-  user: process.env.DB_USER || "root",
-  password: process.env.DB_PASSWORD || "",
-  database: process.env.DB_NAME || "madarasa_db",
-  waitForConnections: true,
-  connectionLimit: 10,
-  queueLimit: 0,
-});
+// Global MySQL connection pool instance (lazy singleton)
+let poolInstance: mysql.Pool | null = null;
+
+function getPool(): mysql.Pool {
+  if (poolInstance) {
+    return poolInstance;
+  }
+
+  const isProduction = process.env.NODE_ENV === "production" || Boolean(process.env.VERCEL);
+  const dbUrl = process.env.DATABASE_URL;
+
+  if (dbUrl) {
+    poolInstance = mysql.createPool(dbUrl);
+    return poolInstance;
+  }
+
+  if (isProduction) {
+    throw new Error(
+      "DATABASE_URL environment variable is missing in production environment. " +
+      "Please set DATABASE_URL in Vercel environment variables with your Railway MySQL connection string."
+    );
+  }
+
+  // Local development fallback only
+  poolInstance = mysql.createPool({
+    host: process.env.DB_HOST || "localhost",
+    port: parseInt(process.env.DB_PORT || "3306", 10),
+    user: process.env.DB_USER || "root",
+    password: process.env.DB_PASSWORD || "",
+    database: process.env.DB_NAME || "madarasa_db",
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0,
+  });
+
+  return poolInstance;
+}
 
 export async function queryDb<T = any>(sql: string, params: any[] = []): Promise<[T, any]> {
-  return pool.query(sql, params) as Promise<[T, any]>;
+  const p = getPool();
+  return p.query(sql, params) as Promise<[T, any]>;
 }
 
 let isInitialized = false;
@@ -40,8 +67,10 @@ let isInitialized = false;
 export async function initMysqlDb() {
   if (isInitialized) return;
   try {
+    const p = getPool();
+
     // 1. Ensure subjects table exists
-    await pool.query(`
+    await p.query(`
       CREATE TABLE IF NOT EXISTS subjects (
         id VARCHAR(50) PRIMARY KEY,
         subjectName VARCHAR(255) NOT NULL,
@@ -51,7 +80,7 @@ export async function initMysqlDb() {
     `);
 
     // 2. Ensure classes table exists
-    await pool.query(`
+    await p.query(`
       CREATE TABLE IF NOT EXISTS classes (
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -61,7 +90,7 @@ export async function initMysqlDb() {
     `);
 
     // 3. Ensure students table exists
-    await pool.query(`
+    await p.query(`
       CREATE TABLE IF NOT EXISTS students (
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
@@ -71,7 +100,7 @@ export async function initMysqlDb() {
     `);
 
     // 4. Ensure users table exists
-    await pool.query(`
+    await p.query(`
       CREATE TABLE IF NOT EXISTS users (
         id INT AUTO_INCREMENT PRIMARY KEY,
         username VARCHAR(255) UNIQUE NOT NULL,
@@ -82,7 +111,7 @@ export async function initMysqlDb() {
     `);
 
     // 5. Ensure exams table exists
-    await pool.query(`
+    await p.query(`
       CREATE TABLE IF NOT EXISTS exams (
         id VARCHAR(50) PRIMARY KEY,
         student_id VARCHAR(50) NOT NULL,
@@ -97,7 +126,7 @@ export async function initMysqlDb() {
     `);
 
     // 6. Ensure fees table exists
-    await pool.query(`
+    await p.query(`
       CREATE TABLE IF NOT EXISTS fees (
         id VARCHAR(50) PRIMARY KEY,
         student_id VARCHAR(50) NOT NULL,
@@ -111,9 +140,9 @@ export async function initMysqlDb() {
     `);
 
     // Seed default admin user if empty
-    const [uRows] = await pool.query("SELECT COUNT(*) AS count FROM users WHERE role IN ('admin', 'super_admin');");
+    const [uRows] = await p.query("SELECT COUNT(*) AS count FROM users WHERE role IN ('admin', 'super_admin');");
     if ((uRows as any[])[0].count === 0) {
-      await pool.query(
+      await p.query(
         "INSERT INTO users (username, password, role) VALUES ('admin', 'admin123', 'super_admin');"
       );
     }
@@ -121,8 +150,21 @@ export async function initMysqlDb() {
     isInitialized = true;
   } catch (err) {
     console.error("MySQL initDb error:", err);
+    throw err;
   }
 }
 
-export default pool;
+// Default export proxy delegating to lazy pool instance
+const poolProxy = new Proxy({} as mysql.Pool, {
+  get(_target, prop) {
+    const p = getPool();
+    const val = (p as any)[prop];
+    if (typeof val === "function") {
+      return val.bind(p);
+    }
+    return val;
+  },
+});
+
+export default poolProxy;
 
