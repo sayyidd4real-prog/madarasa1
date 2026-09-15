@@ -36,6 +36,7 @@ import { usePortal, Student, Exam, ClassItem, Fee, UserAccount, UserRole, Accoun
 import { useToast } from "@/context/ToastContext";
 import { translations } from "@/context/translations";
 import { MadrasaLogoIcon, MadrasaLoader } from "@/components/MadrasaLogo";
+import { formatCurrency, formatDisplayNumber, formatCount, stripLeadingZeros } from "@/lib/formatters";
 
 type AdminSection = "overview" | "students" | "classes" | "fees" | "exams" | "subjects" | "users";
 
@@ -1234,9 +1235,9 @@ export default function AdminDashboard() {
     let csvContent = "Date,Reference Number,Student ID,Student Name,Class,Transaction Type,Description,Charge Amount,Payment Amount,Status,Payment Method,Created/Received By\n";
     filteredFeesList.forEach((f) => {
       const dateStr = new Date(f.date || "").toLocaleDateString();
-      const chargeAmt = f.transactionType === "Charge" ? `$${f.amount}` : "—";
-      const paymentAmt = f.transactionType === "Payment" ? `$${f.paid}` : "—";
-      csvContent += `"${dateStr}","${f.referenceNumber || ""}","${f.studentId}","${f.studentName || getStudentName(f.studentId)}","${f.className || "Unassigned"}","${f.transactionType}","${f.feeName}","${chargeAmt}","${paymentAmt}","${f.status}","${f.paymentMethod || "—"}","${f.createdBy || ""}"\n`;
+      const chargeAmt = f.transactionType === "Charge" ? formatCurrency(f.amount) : "—";
+      const paymentAmt = f.transactionType === "Payment" ? formatCurrency(f.paid) : "—";
+      csvContent += `"${dateStr}","${f.referenceNumber || ""}","${stripLeadingZeros(f.studentId)}","${f.studentName || getStudentName(f.studentId)}","${f.className || "Unassigned"}","${f.transactionType}","${f.feeName}","${chargeAmt}","${paymentAmt}","${f.status}","${f.paymentMethod || "—"}","${f.createdBy || ""}"\n`;
     });
     const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -1251,9 +1252,9 @@ export default function AdminDashboard() {
     let excelContent = "Date\tReference Number\tStudent ID\tStudent Name\tClass\tTransaction Type\tDescription\tCharge Amount\tPayment Amount\tStatus\tPayment Method\tCreated/Received By\n";
     filteredFeesList.forEach((f) => {
       const dateStr = new Date(f.date || "").toLocaleDateString();
-      const chargeAmt = f.transactionType === "Charge" ? `$${f.amount}` : "—";
-      const paymentAmt = f.transactionType === "Payment" ? `$${f.paid}` : "—";
-      excelContent += `${dateStr}\t${f.referenceNumber || ""}\t${f.studentId}\t${f.studentName || getStudentName(f.studentId)}\t${f.className || "Unassigned"}\t${f.transactionType}\t${f.feeName}\t${chargeAmt}\t${paymentAmt}\t${f.status}\t${f.paymentMethod || "—"}\t${f.createdBy || ""}\n`;
+      const chargeAmt = f.transactionType === "Charge" ? formatCurrency(f.amount) : "—";
+      const paymentAmt = f.transactionType === "Payment" ? formatCurrency(f.paid) : "—";
+      excelContent += `${dateStr}\t${f.referenceNumber || ""}\t${stripLeadingZeros(f.studentId)}\t${f.studentName || getStudentName(f.studentId)}\t${f.className || "Unassigned"}\t${f.transactionType}\t${f.feeName}\t${chargeAmt}\t${paymentAmt}\t${f.status}\t${f.paymentMethod || "—"}\t${f.createdBy || ""}\n`;
     });
     const blob = new Blob([excelContent], { type: "application/vnd.ms-excel;charset=utf-8;" });
     const url = URL.createObjectURL(blob);
@@ -1274,13 +1275,13 @@ export default function AdminDashboard() {
     let tableRows = "";
     filteredFeesList.forEach((f) => {
       const dateStr = new Date(f.date || "").toLocaleDateString();
-      const chargeAmt = f.transactionType === "Charge" ? `$${f.amount}` : "—";
-      const paymentAmt = f.transactionType === "Payment" ? `$${f.paid}` : "—";
+      const chargeAmt = f.transactionType === "Charge" ? formatCurrency(f.amount) : "—";
+      const paymentAmt = f.transactionType === "Payment" ? formatCurrency(f.paid) : "—";
       tableRows += `
         <tr style="border-bottom: 1px solid #334155; font-size: 11px;">
           <td style="padding: 8px 10px; color: #94a3b8;">${dateStr}</td>
           <td style="padding: 8px 10px; font-family: monospace; color: #cbd5e1;">${f.referenceNumber || ""}</td>
-          <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">${f.studentId}</td>
+          <td style="padding: 8px 10px; font-family: monospace; color: #38bdf8;">${stripLeadingZeros(f.studentId)}</td>
           <td style="padding: 8px 10px; font-weight: bold; color: #f1f5f9;">${f.studentName || getStudentName(f.studentId)}</td>
           <td style="padding: 8px 10px; color: #cbd5e1;">${f.className || "Unassigned"}</td>
           <td style="padding: 8px 10px; font-weight: bold; color: ${f.transactionType === 'Charge' ? '#fbbf24' : '#34d399'};">${f.transactionType}</td>
@@ -1319,15 +1320,15 @@ export default function AdminDashboard() {
           <div class="summary-container">
             <div class="summary-card">
               <div class="summary-title">Total Charges</div>
-              <div class="summary-val" style="color: #cbd5e1;">$${feeSummaryTotal}</div>
+              <div class="summary-val" style="color: #cbd5e1;">${formatCurrency(feeSummaryTotal)}</div>
             </div>
             <div class="summary-card">
               <div class="summary-title">Total Payments</div>
-              <div class="summary-val" style="color: #34d399;">$${feeSummaryCollected}</div>
+              <div class="summary-val" style="color: #34d399;">${formatCurrency(feeSummaryCollected)}</div>
             </div>
             <div class="summary-card">
               <div class="summary-title">Outstanding Balance</div>
-              <div class="summary-val" style="color: #f87171;">$${feeSummaryOutstanding}</div>
+              <div class="summary-val" style="color: #f87171;">${formatCurrency(feeSummaryOutstanding)}</div>
             </div>
           </div>
 
@@ -1618,29 +1619,29 @@ export default function AdminDashboard() {
                   <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 relative overflow-hidden">
                     <Users className="w-10 h-10 text-emerald-500/20 absolute right-4 top-4" />
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("enrolled_students")}</span>
-                    <span className="block text-3xl font-bold font-mono text-slate-100 mt-2">{totalStudents}</span>
+                    <span className="block text-3xl font-bold font-mono text-slate-100 mt-2">{formatDisplayNumber(totalStudents)}</span>
                     <span className="text-[10px] text-slate-500 block mt-1">{t("active_enrollments")}</span>
                   </div>
 
                   <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 relative overflow-hidden">
                     <BookOpen className="w-10 h-10 text-emerald-500/20 absolute right-4 top-4" />
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("classes_mgmt")}</span>
-                    <span className="block text-3xl font-bold font-mono text-slate-100 mt-2">{totalClasses}</span>
+                    <span className="block text-3xl font-bold font-mono text-slate-100 mt-2">{formatDisplayNumber(totalClasses)}</span>
                     <span className="text-[10px] text-slate-500 block mt-1">{t("curriculum_registered")}</span>
                   </div>
 
                   <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 relative overflow-hidden">
                     <DollarSign className="w-10 h-10 text-emerald-500/20 absolute right-4 top-4" />
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("fees_collected")}</span>
-                    <span className="block text-3xl font-bold font-mono text-emerald-400 mt-2">${totalPaidFees}</span>
-                    <span className="text-[10px] text-slate-500 block mt-1">{t("assigned")}: ${totalAssignedFees}</span>
+                    <span className="block text-3xl font-bold font-mono text-emerald-400 mt-2">{formatCurrency(totalPaidFees)}</span>
+                    <span className="text-[10px] text-slate-500 block mt-1">{t("assigned")}: {formatCurrency(totalAssignedFees)}</span>
                   </div>
 
                   <div className="bg-slate-900/60 border border-slate-800/80 rounded-2xl p-6 relative overflow-hidden">
                     <Coins className="w-10 h-10 text-emerald-500/20 absolute right-4 top-4" />
                     <span className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("outstanding_fees")}</span>
-                    <span className="block text-3xl font-bold font-mono text-rose-400 mt-2">${totalOutstanding}</span>
-                    <span className="text-[10px] text-slate-500 block mt-1">{t("credits_applied")}: ${totalDeductions}</span>
+                    <span className="block text-3xl font-bold font-mono text-rose-400 mt-2">{formatCurrency(totalOutstanding)}</span>
+                    <span className="text-[10px] text-slate-500 block mt-1">{t("credits_applied")}: {formatCurrency(totalDeductions)}</span>
                   </div>
                 </div>
 
@@ -1797,7 +1798,7 @@ export default function AdminDashboard() {
                       <h3 className="font-bold text-base text-slate-200">Enrolled Student Registry</h3>
                       <p className="text-xs text-slate-500 mt-0.5">
                         {selectedClassFilter
-                          ? `Class: ${selectedClassFilter} (${sortedStudents.length} student${sortedStudents.length === 1 ? "" : "s"})`
+                          ? `Class: ${selectedClassFilter} (${formatDisplayNumber(sortedStudents.length)} student${sortedStudents.length === 1 ? "" : "s"})`
                           : "Select a class to view enrolled students"}
                       </p>
                     </div>
@@ -1982,7 +1983,7 @@ export default function AdminDashboard() {
                             </tr>
                           ) : (
                             <tr key={student.id} className="hover:bg-slate-850/30 transition-colors">
-                              <td className="py-4 px-6 font-mono text-emerald-400">{student.id}</td>
+                              <td className="py-4 px-6 font-mono text-emerald-400">{stripLeadingZeros(student.id)}</td>
                               <td className="py-4 px-6 text-slate-100 font-bold">{student.name}</td>
                               <td className="py-4 px-6 text-slate-400">{student.email}</td>
                               <td className="py-4 px-6">
@@ -2044,7 +2045,7 @@ export default function AdminDashboard() {
                         <div key={student.id} className="bg-slate-950 border border-slate-850 p-5 rounded-2xl flex flex-col gap-4">
                           {isEditing ? (
                             <div className="flex flex-col gap-3">
-                              <span className="text-[10px] text-emerald-400 font-mono font-bold">{student.id}</span>
+                              <span className="text-[10px] text-emerald-400 font-mono font-bold">{stripLeadingZeros(student.id)}</span>
                               <div className="flex flex-col gap-1">
                                 <label className="text-[9px] uppercase font-bold text-slate-500">Full Name</label>
                                 <input
@@ -2639,9 +2640,9 @@ export default function AdminDashboard() {
                                 >
                                   <div>
                                     <span className="font-bold text-slate-100 block">{res.name}</span>
-                                    <span className="text-[10px] text-slate-500 font-mono">ID: {res.id} | Class: {res.className || "None"}</span>
+                                    <span className="text-[10px] text-slate-500 font-mono">ID: {stripLeadingZeros(res.id)} | Class: {res.className || "None"}</span>
                                   </div>
-                                  <span className="text-[10px] font-mono font-bold text-rose-450">Owed: ${res.outstandingBalance}</span>
+                                  <span className="text-[10px] font-mono font-bold text-rose-450">Owed: {formatCurrency(res.outstandingBalance)}</span>
                                 </div>
                               ))}
                             </div>
@@ -2658,7 +2659,7 @@ export default function AdminDashboard() {
                         {selectedPaymentStudent ? (
                           <div className="bg-slate-950/60 border border-slate-850 p-4 rounded-xl flex flex-col gap-2.5 text-xs">
                             <div className="flex justify-between items-center border-b border-slate-900/60 pb-1.5">
-                              <span className="font-mono text-emerald-450 font-bold">{selectedPaymentStudent.id}</span>
+                              <span className="font-mono text-emerald-455 font-bold">{stripLeadingZeros(selectedPaymentStudent.id)}</span>
                               <span className="text-[10px] text-slate-500 font-semibold">{selectedPaymentStudent.className || "Unassigned"}</span>
                             </div>
                             <div className="grid grid-cols-2 gap-2">
@@ -2668,7 +2669,7 @@ export default function AdminDashboard() {
                               </div>
                               <div className="text-right">
                                 <span className="text-slate-500 block text-[9px] uppercase tracking-wide">Outstanding Balance</span>
-                                <span className="text-rose-400 font-bold font-mono">${selectedPaymentStudent.outstandingBalance}</span>
+                                <span className="text-rose-400 font-bold font-mono">{formatCurrency(selectedPaymentStudent.outstandingBalance)}</span>
                               </div>
                             </div>
                           </div>
@@ -2757,7 +2758,7 @@ export default function AdminDashboard() {
                   <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-lg hover:border-slate-700 transition-all duration-300">
                     <div>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Charges</p>
-                      <h3 className="text-2xl font-bold text-slate-100 font-mono mt-1">${feeSummaryTotal.toLocaleString()}</h3>
+                      <h3 className="text-2xl font-bold text-slate-100 font-mono mt-1">{formatCurrency(feeSummaryTotal)}</h3>
                     </div>
                     <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
                       <DollarSign className="w-6 h-6 text-amber-500" />
@@ -2767,7 +2768,7 @@ export default function AdminDashboard() {
                   <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-lg hover:border-slate-700 transition-all duration-300">
                     <div>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Payments</p>
-                      <h3 className="text-2xl font-bold text-emerald-400 font-mono mt-1">${feeSummaryCollected.toLocaleString()}</h3>
+                      <h3 className="text-2xl font-bold text-emerald-400 font-mono mt-1">{formatCurrency(feeSummaryCollected)}</h3>
                     </div>
                     <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
                       <Coins className="w-6 h-6 text-emerald-400" />
@@ -2777,7 +2778,7 @@ export default function AdminDashboard() {
                   <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-lg hover:border-slate-700 transition-all duration-300">
                     <div>
                       <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Outstanding Balance</p>
-                      <h3 className="text-2xl font-bold text-rose-400 font-mono mt-1">${feeSummaryOutstanding.toLocaleString()}</h3>
+                      <h3 className="text-2xl font-bold text-rose-400 font-mono mt-1">{formatCurrency(feeSummaryOutstanding)}</h3>
                     </div>
                     <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
                       <CreditCard className="w-6 h-6 text-rose-400" />
@@ -3049,7 +3050,7 @@ export default function AdminDashboard() {
                               <td className="py-3.5 px-5 font-mono text-slate-400 font-semibold">
                                 {tx.referenceNumber || "—"}
                               </td>
-                              <td className="py-3.5 px-5 font-mono text-emerald-400">{tx.studentId}</td>
+                              <td className="py-3.5 px-5 font-mono text-emerald-400">{stripLeadingZeros(tx.studentId)}</td>
                               <td className="py-3.5 px-5 text-slate-200 font-bold">
                                 {tx.studentName || getStudentName(tx.studentId)}
                               </td>
@@ -3064,10 +3065,10 @@ export default function AdminDashboard() {
                                 {tx.feeName}
                               </td>
                               <td className="py-3.5 px-5 font-mono text-slate-200">
-                                {tx.transactionType === "Charge" ? `$${tx.amount}` : "—"}
+                                {tx.transactionType === "Charge" ? formatCurrency(tx.amount) : "—"}
                               </td>
                               <td className="py-3.5 px-5 font-mono text-emerald-400 font-bold">
-                                {tx.transactionType === "Payment" ? `$${tx.paid}` : "—"}
+                                {tx.transactionType === "Payment" ? formatCurrency(tx.paid) : "—"}
                               </td>
                               <td className="py-3.5 px-5">
                                 <span className={`inline-flex px-2.5 py-0.5 text-[9px] font-extrabold uppercase rounded border ${tx.status === "Paid"
@@ -4523,15 +4524,15 @@ export default function AdminDashboard() {
                           <div className="grid grid-cols-3 gap-2 text-center p-3 bg-slate-950 border border-slate-850 rounded-2xl text-xs font-mono font-bold">
                             <div className="flex flex-col gap-0.5">
                               <span className="text-[9px] uppercase font-bold text-slate-500">Total Charges</span>
-                              <span className="text-slate-200">${totalCharges}</span>
+                              <span className="text-slate-200">{formatCurrency(totalCharges)}</span>
                             </div>
                             <div className="flex flex-col gap-0.5">
                               <span className="text-[9px] uppercase font-bold text-slate-500">Total Payments</span>
-                              <span className="text-emerald-400">${totalPayments}</span>
+                              <span className="text-emerald-400">{formatCurrency(totalPayments)}</span>
                             </div>
                             <div className="flex flex-col gap-0.5">
                               <span className="text-[9px] uppercase font-bold text-slate-500">Outstanding Balance</span>
-                              <span className="text-rose-400">${outstandingBalance}</span>
+                              <span className="text-rose-400">{formatCurrency(outstandingBalance)}</span>
                             </div>
                           </div>
 
@@ -4717,7 +4718,7 @@ export default function AdminDashboard() {
                                     <span className="text-[10px] text-slate-500 font-mono mt-0.5">Date: {new Date(f.date || "").toLocaleDateString()}</span>
                                   </div>
                                   <div className="text-right">
-                                    <span className="font-mono text-slate-200 font-bold">${f.amount}</span>
+                                    <span className="font-mono text-slate-200 font-bold">{formatCurrency(f.amount)}</span>
                                     <span className="text-[9px] text-slate-500 font-mono block mt-0.5">Ref: {f.referenceNumber}</span>
                                   </div>
                                 </div>
@@ -4741,7 +4742,7 @@ export default function AdminDashboard() {
                                     <span className="text-[10px] text-slate-500 font-mono mt-0.5">Date: {new Date(f.date || "").toLocaleDateString()}</span>
                                   </div>
                                   <div className="text-right">
-                                    <span className="font-mono text-emerald-400 font-bold">${f.paid}</span>
+                                    <span className="font-mono text-emerald-400 font-bold">{formatCurrency(f.paid)}</span>
                                     <span className="text-[9px] text-slate-500 font-mono block mt-0.5">Ref: {f.referenceNumber}</span>
                                   </div>
                                 </div>

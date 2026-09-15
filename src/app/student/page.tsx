@@ -19,6 +19,7 @@ import { usePortal, Exam } from "@/context/PortalContext";
 import { useToast } from "@/context/ToastContext";
 import { translations } from "@/context/translations";
 import { MadrasaLoader } from "@/components/MadrasaLogo";
+import { formatCurrency, formatDisplayNumber, stripLeadingZeros } from "@/lib/formatters";
 
 type StudentTab = "results" | "fees";
 
@@ -155,7 +156,7 @@ export default function StudentDashboard() {
               <h1 className="text-base font-bold text-slate-800 dark:text-slate-100">{studentProfile?.name || currentUser.name}</h1>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                ID: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{studentId}</span>
+                ID: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{stripLeadingZeros(studentId)}</span>
               </span>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -293,7 +294,7 @@ export default function StudentDashboard() {
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
-                      <span className="block text-2xl font-bold font-mono text-slate-800 dark:text-slate-100">{studentExams.length}</span>
+                      <span className="block text-2xl font-bold font-mono text-slate-800 dark:text-slate-100">{formatDisplayNumber(studentExams.length)}</span>
                       <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("completed_exams")}</span>
                     </div>
                   </div>
@@ -528,18 +529,18 @@ export default function StudentDashboard() {
                             <tr key={fee.id} className="hover:bg-slate-50 dark:hover:bg-slate-850/30 transition-colors">
                               <td className="py-4 px-6">
                                 <span className="block font-semibold text-slate-800 dark:text-slate-200">{fee.feeName}</span>
-                                <span className="block text-[10px] text-slate-400 font-mono">Statement ID: {fee.id}</span>
+                                <span className="block text-[10px] text-slate-400 font-mono">Statement ID: {stripLeadingZeros(fee.id)}</span>
                               </td>
-                              <td className="py-4 px-6 font-mono text-center text-slate-800 dark:text-slate-100">${fee.amount}</td>
-                              <td className="py-4 px-6 font-mono text-center text-slate-500 dark:text-slate-400">${fee.deductions}</td>
-                              <td className="py-4 px-6 font-mono text-center text-emerald-600 dark:text-emerald-400">${fee.paid}</td>
+                              <td className="py-4 px-6 font-mono text-center text-slate-800 dark:text-slate-100">{formatCurrency(fee.amount)}</td>
+                              <td className="py-4 px-6 font-mono text-center text-slate-500 dark:text-slate-400">{formatCurrency(fee.deductions)}</td>
+                              <td className="py-4 px-6 font-mono text-center text-emerald-600 dark:text-emerald-400">{formatCurrency(fee.paid)}</td>
                               <td className="py-4 px-6 text-right">
                                 <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold font-mono rounded ${
                                   remaining > 0
                                     ? "bg-rose-100/50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-455 border border-rose-200 dark:border-rose-500/10"
                                     : "bg-emerald-100/50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/10"
                                 }`}>
-                                  ${remaining}
+                                  {formatCurrency(remaining)}
                                 </span>
                               </td>
                             </tr>
@@ -567,15 +568,15 @@ export default function StudentDashboard() {
                   <div className="flex flex-col gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 text-sm">
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 dark:text-slate-400">Total Invoiced</span>
-                      <span className="font-mono text-slate-800 dark:text-slate-200 font-bold">${totalAssignedFees}</span>
+                      <span className="font-mono text-slate-800 dark:text-slate-200 font-bold">{formatCurrency(totalAssignedFees)}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 dark:text-slate-400">Total Credits/Waivers</span>
-                      <span className="font-mono text-slate-500 dark:text-slate-400">-${totalDeductions}</span>
+                      <span className="font-mono text-slate-500 dark:text-slate-400">-{formatCurrency(totalDeductions)}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 dark:text-slate-400">Total Payments Logged</span>
-                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">-${totalPaid}</span>
+                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">-{formatCurrency(totalPaid)}</span>
                     </div>
                   </div>
 
@@ -584,7 +585,7 @@ export default function StudentDashboard() {
                     <span className={`text-3xl font-extrabold font-mono tracking-tight ${
                       remainingBalance > 0 ? "text-rose-500 dark:text-rose-400" : "text-emerald-500 dark:text-emerald-400"
                     }`}>
-                      ${remainingBalance}
+                      {formatCurrency(remainingBalance)}
                     </span>
                   </div>
 
