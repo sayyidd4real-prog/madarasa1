@@ -104,6 +104,13 @@ export async function GET(request: Request) {
       fees = fRows as any[];
     }
 
+    fees = (fees || []).map((f: any) => ({
+      ...f,
+      amount: parseFloat(f.amount) || 0,
+      paid: parseFloat(f.paid) || 0,
+      deductions: parseFloat(f.deductions) || 0,
+    }));
+
     return NextResponse.json({
       success: true,
       data: {

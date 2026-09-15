@@ -82,20 +82,21 @@ export function formatCurrency(
 ): string {
   if (value === null || value === undefined || value === "") return `${symbol}0.00`;
 
+  let num: number;
   if (typeof value === "number") {
-    return `${symbol}${value.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+    num = value;
+  } else {
+    const strVal = String(value).trim();
+    const rawNumStr = strVal.replace(/^\$/, "").trim();
+    num = parseFloat(rawNumStr);
+    if (isNaN(num)) {
+      num = parseFloat(rawNumStr.replace(/[^0-9.-]/g, "")) || 0;
+    }
   }
 
-  const strVal = String(value).trim();
-  const rawNumStr = strVal.replace(/^\$/, "").trim();
-  const parsed = parseFloat(rawNumStr);
+  if (isNaN(num)) return `${symbol}0.00`;
 
-  if (!isNaN(parsed) && /^-?\d*(\.\d+)?$/.test(rawNumStr)) {
-    return `${symbol}${parsed.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
-  }
-
-  const stripped = stripLeadingZeros(rawNumStr);
-  return `${symbol}${stripped}`;
+  return `${symbol}${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
 }
 
 export function formatCount(

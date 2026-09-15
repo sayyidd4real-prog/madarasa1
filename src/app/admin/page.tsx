@@ -854,13 +854,13 @@ export default function AdminDashboard() {
     const studentTx = fees.filter((t) => t.studentId === studentObj.id);
     const totalCharges = studentTx
       .filter((t) => t.transactionType === "Charge")
-      .reduce((sum, t) => sum + (t.amount || 0), 0);
+      .reduce((sum, t) => sum + (parseFloat(String(t.amount)) || 0), 0);
     const totalPayments = studentTx
       .filter((t) => t.transactionType === "Payment")
-      .reduce((sum, t) => sum + (t.paid || 0), 0);
+      .reduce((sum, t) => sum + (parseFloat(String(t.paid)) || 0), 0);
     const totalDeductions = studentTx
       .filter((t) => t.transactionType === "Waiver" || t.transactionType === "Credit")
-      .reduce((sum, t) => sum + (t.deductions || 0), 0);
+      .reduce((sum, t) => sum + (parseFloat(String(t.deductions)) || 0), 0);
     const outstandingBalance = Math.max(0, totalCharges - totalPayments - totalDeductions);
 
     if (parsedAmount > outstandingBalance) {
@@ -938,13 +938,13 @@ export default function AdminDashboard() {
     const studentTx = fees.filter((t) => t.studentId === selectedStudentDetail.id);
     const totalCharges = studentTx
       .filter((t) => t.transactionType === "Charge")
-      .reduce((sum, t) => sum + (t.amount || 0), 0);
+      .reduce((sum, t) => sum + (parseFloat(String(t.amount)) || 0), 0);
     const totalPayments = studentTx
       .filter((t) => t.transactionType === "Payment")
-      .reduce((sum, t) => sum + (t.paid || 0), 0);
+      .reduce((sum, t) => sum + (parseFloat(String(t.paid)) || 0), 0);
     const totalDeductions = studentTx
       .filter((t) => t.transactionType === "Waiver" || t.transactionType === "Credit")
-      .reduce((sum, t) => sum + (t.deductions || 0), 0);
+      .reduce((sum, t) => sum + (parseFloat(String(t.deductions)) || 0), 0);
     const outstandingBalance = Math.max(0, totalCharges - totalPayments - totalDeductions);
 
     if (amountVal > outstandingBalance) {
@@ -1187,11 +1187,11 @@ export default function AdminDashboard() {
 
   const feeSummaryTotal = filteredFeesList
     .filter((f) => f.transactionType === "Charge")
-    .reduce((sum, f) => sum + (f.amount || 0), 0);
+    .reduce((sum, f) => sum + (parseFloat(String(f.amount)) || 0), 0);
 
   const feeSummaryCollected = filteredFeesList
     .filter((f) => f.transactionType === "Payment")
-    .reduce((sum, f) => sum + (f.paid || 0), 0);
+    .reduce((sum, f) => sum + (parseFloat(String(f.paid)) || 0), 0);
 
   const feeSummaryOutstanding = Math.max(0, feeSummaryTotal - feeSummaryCollected);
 
@@ -1369,13 +1369,13 @@ export default function AdminDashboard() {
   const totalClasses = classes.length;
   const totalAssignedFees = fees
     .filter((f) => f.transactionType === "Charge")
-    .reduce((sum, f) => sum + (f.amount || 0), 0);
+    .reduce((sum, f) => sum + (parseFloat(String(f.amount)) || 0), 0);
   const totalPaidFees = fees
     .filter((f) => f.transactionType === "Payment")
-    .reduce((sum, f) => sum + (f.paid || 0), 0);
+    .reduce((sum, f) => sum + (parseFloat(String(f.paid)) || 0), 0);
   const totalDeductions = fees
     .filter((f) => f.transactionType === "Waiver" || f.transactionType === "Credit")
-    .reduce((sum, f) => sum + (f.deductions || 0), 0);
+    .reduce((sum, f) => sum + (parseFloat(String(f.deductions)) || 0), 0);
   const totalOutstanding = Math.max(0, totalAssignedFees - totalPaidFees);
 
   // If loading or unauthorized, show loading state
@@ -4512,10 +4512,10 @@ export default function AdminDashboard() {
                       const studentFees = fees.filter((f) => f.studentId === selectedStudentDetail.id);
                       const totalCharges = studentFees
                         .filter((f) => f.transactionType === "Charge")
-                        .reduce((sum, f) => sum + (f.amount || 0), 0);
+                        .reduce((sum, f) => sum + (parseFloat(String(f.amount)) || 0), 0);
                       const totalPayments = studentFees
                         .filter((f) => f.transactionType === "Payment")
-                        .reduce((sum, f) => sum + (f.paid || 0), 0);
+                        .reduce((sum, f) => sum + (parseFloat(String(f.paid)) || 0), 0);
                       const outstandingBalance = Math.max(0, totalCharges - totalPayments);
 
                       return (

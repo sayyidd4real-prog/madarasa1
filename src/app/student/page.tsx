@@ -98,10 +98,10 @@ export default function StudentDashboard() {
   const studentFees = fees.filter((f) => f.studentId === studentId);
 
   // Fee ledger summaries
-  const totalAssignedFees = studentFees.reduce((sum, f) => sum + f.amount, 0);
-  const totalPaid = studentFees.reduce((sum, f) => sum + f.paid, 0);
-  const totalDeductions = studentFees.reduce((sum, f) => sum + f.deductions, 0);
-  const remainingBalance = totalAssignedFees - totalPaid - totalDeductions;
+  const totalAssignedFees = studentFees.reduce((sum, f) => sum + (parseFloat(String(f.amount)) || 0), 0);
+  const totalPaid = studentFees.reduce((sum, f) => sum + (parseFloat(String(f.paid)) || 0), 0);
+  const totalDeductions = studentFees.reduce((sum, f) => sum + (parseFloat(String(f.deductions)) || 0), 0);
+  const remainingBalance = Math.max(0, totalAssignedFees - totalPaid - totalDeductions);
 
   const handleLogout = async () => {
     await logout("student");

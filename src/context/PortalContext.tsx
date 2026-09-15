@@ -197,7 +197,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         if (json.success && json.data) {
           setStudents(json.data.students || []);
           setClasses(json.data.classes || []);
-          setFees(json.data.fees || []);
+          setFees(
+            (json.data.fees || []).map((f: Fee) => ({
+              ...f,
+              amount: typeof f.amount === "number" ? f.amount : (parseFloat(f.amount as any) || 0),
+              paid: typeof f.paid === "number" ? f.paid : (parseFloat(f.paid as any) || 0),
+              deductions: typeof f.deductions === "number" ? f.deductions : (parseFloat(f.deductions as any) || 0),
+            }))
+          );
           setExams(json.data.exams || []);
           setSubjects(json.data.subjects || []);
           setUserAccounts(json.data.userAccounts || []);
