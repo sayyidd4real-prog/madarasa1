@@ -70,14 +70,14 @@ export async function GET(request: Request) {
     let exams: any[] = [];
     if (session.role === "super_admin" || session.role === "admin") {
       const [eRows] = await queryDb(`
-        SELECT e.id, e.student_id AS studentId, s.name AS studentName, s.grade AS className, '2025–2026' AS academicYear, e.subject, e.term, e.score, 100 AS maxPoints, COALESCE(e.feedback, '') AS feedback
+        SELECT e.id, e.student_id AS studentId, s.name AS studentName, s.grade AS className, COALESCE(e.academic_year, '2025–2026') AS academicYear, e.subject, e.term, e.score, 100 AS maxPoints, COALESCE(e.feedback, '') AS feedback
         FROM exams e
         JOIN students s ON e.student_id = s.id
       `);
       exams = eRows as any[];
     } else if (session.role === "student" && session.studentId) {
       const [eRows] = await queryDb(`
-        SELECT e.id, e.student_id AS studentId, s.name AS studentName, s.grade AS className, '2025–2026' AS academicYear, e.subject, e.term, e.score, 100 AS maxPoints, COALESCE(e.feedback, '') AS feedback
+        SELECT e.id, e.student_id AS studentId, s.name AS studentName, s.grade AS className, COALESCE(e.academic_year, '2025–2026') AS academicYear, e.subject, e.term, e.score, 100 AS maxPoints, COALESCE(e.feedback, '') AS feedback
         FROM exams e
         JOIN students s ON e.student_id = s.id
         WHERE e.student_id = ?

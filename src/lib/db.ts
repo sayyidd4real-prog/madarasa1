@@ -120,10 +120,17 @@ export async function initMysqlDb() {
         term VARCHAR(50) NOT NULL,
         score INT NOT NULL DEFAULT 0,
         feedback TEXT,
+        academic_year VARCHAR(50) NOT NULL DEFAULT '2025–2026',
         FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE,
         FOREIGN KEY (class_id) REFERENCES classes(id) ON DELETE CASCADE
       );
     `);
+
+    try {
+      await p.query("ALTER TABLE exams ADD COLUMN academic_year VARCHAR(50) NOT NULL DEFAULT '2025–2026';");
+    } catch {
+      // Column may already exist
+    }
 
     // 6. Ensure fees table exists
     await p.query(`
