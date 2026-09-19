@@ -3227,9 +3227,9 @@ export default function AdminDashboard() {
                             className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-500/50 rounded-lg py-2 px-3 text-xs text-slate-100 focus:outline-none cursor-pointer"
                           >
                             <option value="Term 1">Term 1</option>
+                            <option value="Mid-term">Mid-term</option>
                             <option value="Term 2">Term 2</option>
-                            <option value="Term 3">Term 3</option>
-                            <option value="Term 4">Term 4</option>
+                            <option value="Final Exam">Final Exam</option>
                           </select>
                         </div>
 
@@ -3580,9 +3580,9 @@ export default function AdminDashboard() {
                                     className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-500/50 rounded-lg py-2 px-3 text-xs text-slate-100 focus:outline-none cursor-pointer">
                                     <option value="">All Terms</option>
                                     <option value="Term 1">Term 1</option>
+                                    <option value="Mid-term">Mid-term</option>
                                     <option value="Term 2">Term 2</option>
-                                    <option value="Term 3">Term 3</option>
-                                    <option value="Term 4">Term 4</option>
+                                    <option value="Final Exam">Final Exam</option>
                                   </select>
                                 </div>
                                 <div className="flex flex-col gap-1.5">
@@ -4466,9 +4466,16 @@ export default function AdminDashboard() {
                         examsByTerm[e.term].push(e);
                       });
 
+                      const termSequence = ["Term 1", "Mid-term", "Term 2", "Term 3", "Term 4", "Final Exam"];
+                      const sortedTerms = Object.keys(examsByTerm).sort((a, b) => {
+                        const ia = termSequence.indexOf(a) !== -1 ? termSequence.indexOf(a) : 99;
+                        const ib = termSequence.indexOf(b) !== -1 ? termSequence.indexOf(b) : 99;
+                        return ia - ib;
+                      });
+
                       return (
                         <div className="flex flex-col gap-4">
-                          {Object.keys(examsByTerm).sort().map((term) => {
+                          {sortedTerms.map((term) => {
                             const termExams = examsByTerm[term];
                             const total = termExams.reduce((sum, e) => sum + parseInt(e.score.toString() || "0", 10), 0);
                             const average = termExams.length > 0 ? total / termExams.length : 0;

@@ -349,11 +349,35 @@ export default function StudentDashboard() {
                           <div className="h-px bg-slate-200 dark:bg-slate-900/60 flex-1" />
                         </div>
 
-                        {/* Terms List */}
+                        {/* Terms List - Display only latest uploaded term */}
                         <div className="flex flex-col gap-8 pl-1 md:pl-3">
-                          {Object.keys(terms).sort().map((term) => {
-                            const classesInTerm = terms[term];
-                            return (
+                          {(() => {
+                            const termSequence = ["Term 1", "Mid-term", "Term 2", "Term 3", "Term 4", "Final Exam"];
+                            const sortedTerms = Object.keys(terms).sort((a, b) => {
+                              const rankA = termSequence.indexOf(a) !== -1 ? termSequence.indexOf(a) : 99;
+                              const rankB = termSequence.indexOf(b) !== -1 ? termSequence.indexOf(b) : 99;
+                              if (rankA !== rankB) return rankA - rankB;
+
+                              const getMaxTs = (t: string) => {
+                                let max = 0;
+                                Object.values(terms[t]).forEach((examList) => {
+                                  examList.forEach((e) => {
+                                    const match = e.id?.match(/EXM-(\d+)/);
+                                    if (match) {
+                                      const ts = parseInt(match[1], 10);
+                                      if (ts > max) max = ts;
+                                    }
+                                  });
+                                });
+                                return max;
+                              };
+                              return getMaxTs(a) - getMaxTs(b);
+                            });
+
+                            const latestTermList = sortedTerms.length > 0 ? [sortedTerms[sortedTerms.length - 1]] : [];
+                            return latestTermList.map((term) => {
+                              const classesInTerm = terms[term];
+                              return (
                               <div key={term} className="flex flex-col gap-4">
                                 {/* Term title */}
                                 <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
@@ -476,7 +500,8 @@ export default function StudentDashboard() {
                                 </div>
                               </div>
                             );
-                          })}
+                          });
+                        })()}
                         </div>
                       </div>
                     );
