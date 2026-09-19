@@ -313,18 +313,42 @@ export default function AdminDashboard() {
     // Filter students belonging to this class
     const classStudents = students.filter((s) => s.gradeGroup === selectedClassName);
     classStudents.forEach((student) => {
-      // Find all exams for this student
-      const studentExams = classExams.filter((e) => e.studentId === student.id);
+      // Find all exams for this student in current term
+      const studentTermExams = classExams.filter((e) => e.studentId === student.id);
+
+      // Find all prior exams for this student in this class & academic year across all terms
+      const allStudentClassExams = exams.filter(
+        (e) => e.studentId === student.id &&
+               e.className === selectedClassName &&
+               e.academicYear === examAcademicYear
+      );
+
       const scores: { [subj: string]: string } = {};
 
-      // Initialize all subjects with empty string or existing score
+      // Initialize all subjects with saved term score or prefilled sum for Final Exam
       subjects.forEach((sub) => {
-        const found = studentExams.find((e) => e.subject === sub.subjectName);
-        scores[sub.subjectName] = found ? found.score.toString() : "";
+        const found = studentTermExams.find((e) => e.subject === sub.subjectName);
+        if (found) {
+          scores[sub.subjectName] = found.score.toString();
+        } else if (examTerm === "Final Exam") {
+          const priorExams = allStudentClassExams.filter(
+            (e) => e.subject === sub.subjectName &&
+                   (e.term === "Term 1" || e.term === "Mid-term" || e.term === "Term 2")
+          );
+          if (priorExams.length > 0) {
+            const rawSum = priorExams.reduce((sum, e) => sum + (e.score || 0), 0);
+            const cappedSum = Math.min(100, Math.max(0, rawSum));
+            scores[sub.subjectName] = cappedSum.toString();
+          } else {
+            scores[sub.subjectName] = "";
+          }
+        } else {
+          scores[sub.subjectName] = "";
+        }
       });
 
       // Find feedback
-      const foundFeedback = studentExams.find((e) => e.feedback && e.feedback.trim() !== "");
+      const foundFeedback = studentTermExams.find((e) => e.feedback && e.feedback.trim() !== "");
       const feedback = foundFeedback ? foundFeedback.feedback : "";
 
       newRowInputs[student.id] = {
