@@ -147,7 +147,7 @@ interface PortalContextType {
     maxPoints: number,
     studentName: string
   ) => Promise<{ success: boolean; error?: string }>;
-  gradeStudentBatch: (studentId: string, className: string, term: string, grades: { subject: string; score: number; feedback: string }[], academicYear?: string) => Promise<{ success: boolean; error?: string }>;
+  gradeStudentBatch: (studentId: string, className: string, term: string, grades: { subject: string; score: number; feedback: string }[]) => Promise<{ success: boolean; error?: string }>;
   deleteExam: (id: string) => Promise<{ success: boolean; error?: string }>;
   editExam: (id: string, score: number, feedback: string) => Promise<{ success: boolean; error?: string }>;
   addSubject: (subjectName: string, subjectCode: string, description: string) => Promise<{ success: boolean; error?: string }>;
@@ -743,8 +743,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     studentId: string,
     className: string,
     term: string,
-    grades: { subject: string; score: number; feedback: string }[],
-    academicYear: string = "2025–2026"
+    grades: { subject: string; score: number; feedback: string }[]
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch("/api/exams", {
@@ -755,7 +754,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           studentId,
           className,
           term,
-          academicYear,
           grades
         }),
       });

@@ -351,18 +351,8 @@ export default function StudentDashboard() {
 
                         {/* Terms List */}
                         <div className="flex flex-col gap-8 pl-1 md:pl-3">
-                          {(() => {
-                            const termOrder = ["Term 1", "Term 2", "Term 3", "Final Exam"];
-                            const sortedTerms = Object.keys(terms).sort((a, b) => {
-                              const ia = termOrder.indexOf(a);
-                              const ib = termOrder.indexOf(b);
-                              if (ia !== -1 && ib !== -1) return ia - ib;
-                              if (ia !== -1) return -1;
-                              if (ib !== -1) return 1;
-                              return a.localeCompare(b);
-                            });
-                            return sortedTerms.map((term) => {
-                              const classesInTerm = terms[term];
+                          {Object.keys(terms).sort().map((term) => {
+                            const classesInTerm = terms[term];
                             return (
                               <div key={term} className="flex flex-col gap-4">
                                 {/* Term title */}
@@ -486,8 +476,7 @@ export default function StudentDashboard() {
                                 </div>
                               </div>
                             );
-                          });
-                        })()}
+                          })}
                         </div>
                       </div>
                     );

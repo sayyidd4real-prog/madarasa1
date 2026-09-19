@@ -23,9 +23,7 @@ export async function POST(request: Request) {
   try {
     await initMysqlDb();
     const body = await request.json();
-    const { studentId, className, subject, term, score, feedback, isBatch, grades, academicYear } = body;
-
-    const acYear = academicYear || "2025–2026";
+    const { studentId, className, subject, term, score, feedback, isBatch, grades } = body;
 
     // 1. Batch Exam Grading
     if (isBatch && Array.isArray(grades)) {
@@ -45,28 +43,12 @@ export async function POST(request: Request) {
 
       for (let idx = 0; idx < grades.length; idx++) {
         const g = grades[idx];
+        const examId = `EXM-${timestamp}-${idx}`;
         const scoreVal = parseFloat(g.score) || 0;
-
-        // Check if an exam for this exact student, subject, term, and academic_year already exists
-        const [existing] = await queryDb(
-          "SELECT id FROM exams WHERE student_id = ? AND subject = ? AND term = ? AND academic_year = ?",
-          [studentId, g.subject, term, acYear]
+        await queryDb(
+          "INSERT INTO exams (id, student_id, class_id, subject, term, score, feedback) VALUES (?, ?, ?, ?, ?, ?, ?)",
+          [examId, studentId, classId, g.subject, term, scoreVal, g.feedback || ""]
         );
-
-        let examId: string;
-        if ((existing as any[]).length > 0) {
-          examId = (existing as any[])[0].id;
-          await queryDb(
-            "UPDATE exams SET score = ?, feedback = ?, class_id = ? WHERE id = ?",
-            [scoreVal, g.feedback || "", classId, examId]
-          );
-        } else {
-          examId = `EXM-${timestamp}-${idx}`;
-          await queryDb(
-            "INSERT INTO exams (id, student_id, class_id, subject, term, score, feedback, academic_year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-            [examId, studentId, classId, g.subject, term, scoreVal, g.feedback || "", acYear]
-          );
-        }
 
         createdExams.push({
           id: examId,
@@ -75,7 +57,6 @@ export async function POST(request: Request) {
           className,
           subject: g.subject,
           term,
-          academicYear: acYear,
           score: scoreVal,
           maxPoints: 100,
           feedback: g.feedback || ""
@@ -96,28 +77,14 @@ export async function POST(request: Request) {
     }
     const studentName = (sRows as any[])[0].name;
     const classId = await resolveClassId(className);
+
+    const examId = `EXM-${Date.now()}`;
     const scoreVal = parseFloat(score);
 
-    // Check if an exam for this exact student, subject, term, and academic_year already exists
-    const [existing] = await queryDb(
-      "SELECT id FROM exams WHERE student_id = ? AND subject = ? AND term = ? AND academic_year = ?",
-      [studentId, subject, term, acYear]
+    await queryDb(
+      "INSERT INTO exams (id, student_id, class_id, subject, term, score, feedback) VALUES (?, ?, ?, ?, ?, ?, ?)",
+      [examId, studentId, classId, subject, term, scoreVal, feedback || ""]
     );
-
-    let examId: string;
-    if ((existing as any[]).length > 0) {
-      examId = (existing as any[])[0].id;
-      await queryDb(
-        "UPDATE exams SET score = ?, feedback = ?, class_id = ? WHERE id = ?",
-        [scoreVal, feedback || "", classId, examId]
-      );
-    } else {
-      examId = `EXM-${Date.now()}`;
-      await queryDb(
-        "INSERT INTO exams (id, student_id, class_id, subject, term, score, feedback, academic_year) VALUES (?, ?, ?, ?, ?, ?, ?, ?)",
-        [examId, studentId, classId, subject, term, scoreVal, feedback || "", acYear]
-      );
-    }
 
     return NextResponse.json({
       success: true,
@@ -128,7 +95,6 @@ export async function POST(request: Request) {
         className,
         subject,
         term,
-        academicYear: acYear,
         score: scoreVal,
         maxPoints: 100,
         feedback: feedback || ""

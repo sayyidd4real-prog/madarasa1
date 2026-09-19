@@ -3229,7 +3229,7 @@ export default function AdminDashboard() {
                             <option value="Term 1">Term 1</option>
                             <option value="Term 2">Term 2</option>
                             <option value="Term 3">Term 3</option>
-                            <option value="Final Exam">Final Exam</option>
+                            <option value="Term 4">Term 4</option>
                           </select>
                         </div>
 
@@ -3582,7 +3582,7 @@ export default function AdminDashboard() {
                                     <option value="Term 1">Term 1</option>
                                     <option value="Term 2">Term 2</option>
                                     <option value="Term 3">Term 3</option>
-                                    <option value="Final Exam">Final Exam</option>
+                                    <option value="Term 4">Term 4</option>
                                   </select>
                                 </div>
                                 <div className="flex flex-col gap-1.5">
