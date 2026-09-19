@@ -396,7 +396,7 @@ export default function AdminDashboard() {
     subjects.forEach((sub) => {
       const val = inputState.scores[sub.subjectName];
       if (val !== undefined && val.trim() !== "") {
-        const score = parseInt(val, 10);
+        const score = Math.min(100, Math.max(0, parseInt(val, 10)));
         if (!isNaN(score)) {
           total += score;
           count++;
@@ -4477,7 +4477,7 @@ export default function AdminDashboard() {
                         <div className="flex flex-col gap-4">
                           {sortedTerms.map((term) => {
                             const termExams = examsByTerm[term];
-                            const total = termExams.reduce((sum, e) => sum + parseInt(e.score.toString() || "0", 10), 0);
+                            const total = termExams.reduce((sum, e) => sum + Math.min(100, Math.max(0, parseInt(e.score.toString() || "0", 10))), 0);
                             const average = termExams.length > 0 ? total / termExams.length : 0;
                             const grade = calculateGrade(average);
 
@@ -4493,7 +4493,7 @@ export default function AdminDashboard() {
                                   {termExams.map((e) => (
                                     <div key={e.id} className="flex justify-between items-center p-2 bg-slate-900/50 rounded-lg">
                                       <span className="text-slate-400 font-semibold">{e.subject}</span>
-                                      <span className="font-mono text-emerald-400 font-bold">{e.score}%</span>
+                                      <span className="font-mono text-emerald-400 font-bold">{Math.min(100, Math.max(0, e.score))}%</span>
                                     </div>
                                   ))}
                                 </div>

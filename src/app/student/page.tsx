@@ -394,9 +394,15 @@ export default function StudentDashboard() {
 
                                     // Build map of subject -> score from classExams
                                     const examMap: { [subj: string]: number } = {};
-                                    classExams.forEach((e) => {
-                                      examMap[e.subject] = e.score;
-                                    });
+                                     subjects.forEach((sub) => {
+                                       const subjectExams = studentExams.filter(
+                                         (e) => (e.academicYear || "2025–2026") === year && e.subject === sub.subjectName
+                                       );
+                                       if (subjectExams.length > 0) {
+                                         const rawSum = subjectExams.reduce((sum, e) => sum + (e.score || 0), 0);
+                                         examMap[sub.subjectName] = Math.min(100, Math.max(0, rawSum));
+                                       }
+                                     });
 
                                     // Calculate total and grade
                                     let total = 0;

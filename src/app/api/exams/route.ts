@@ -44,7 +44,8 @@ export async function POST(request: Request) {
       for (let idx = 0; idx < grades.length; idx++) {
         const g = grades[idx];
         const examId = `EXM-${timestamp}-${idx}`;
-        const scoreVal = parseFloat(g.score) || 0;
+        const rawScore = parseFloat(g.score) || 0;
+        const scoreVal = Math.min(100, Math.max(0, rawScore));
         await queryDb(
           "INSERT INTO exams (id, student_id, class_id, subject, term, score, feedback) VALUES (?, ?, ?, ?, ?, ?, ?)",
           [examId, studentId, classId, g.subject, term, scoreVal, g.feedback || ""]
@@ -79,7 +80,8 @@ export async function POST(request: Request) {
     const classId = await resolveClassId(className);
 
     const examId = `EXM-${Date.now()}`;
-    const scoreVal = parseFloat(score);
+    const rawScore = parseFloat(score);
+    const scoreVal = Math.min(100, Math.max(0, isNaN(rawScore) ? 0 : rawScore));
 
     await queryDb(
       "INSERT INTO exams (id, student_id, class_id, subject, term, score, feedback) VALUES (?, ?, ?, ?, ?, ?, ?)",
@@ -116,10 +118,11 @@ export async function PUT(request: Request) {
       return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
     }
 
-    const scoreVal = parseFloat(score);
-    if (isNaN(scoreVal)) {
+    const parsedScore = parseFloat(score);
+    if (isNaN(parsedScore)) {
       return NextResponse.json({ success: false, error: "Invalid score value." }, { status: 400 });
     }
+    const scoreVal = Math.min(100, Math.max(0, parsedScore));
 
     await queryDb("UPDATE exams SET score = ?, feedback = ? WHERE id = ?", [scoreVal, feedback || "", id]);
 
