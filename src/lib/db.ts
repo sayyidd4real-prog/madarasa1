@@ -95,9 +95,16 @@ export async function initMysqlDb() {
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         email VARCHAR(255) NOT NULL,
+        phoneNumber VARCHAR(50) NULL,
         grade VARCHAR(50) NOT NULL
       );
     `);
+
+    try {
+      await p.query("ALTER TABLE students ADD COLUMN phoneNumber VARCHAR(50) NULL;");
+    } catch {
+      // Column may already exist
+    }
 
     // 4. Ensure users table exists
     await p.query(`

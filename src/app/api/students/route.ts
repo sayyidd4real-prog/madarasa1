@@ -5,10 +5,15 @@ export async function POST(request: Request) {
   try {
     await initMysqlDb();
     const body = await request.json();
-    const { name, email, gradeGroup, academicYear, password } = body;
+    const { name, email, phoneNumber, gradeGroup, academicYear, password } = body;
 
-    if (!name || !email || !gradeGroup) {
+    if (!name || !email || !phoneNumber || !gradeGroup) {
       return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
+    }
+
+    const [existingPhone] = await queryDb("SELECT id FROM students WHERE phoneNumber = ?", [phoneNumber.trim()]);
+    if ((existingPhone as any[]).length > 0) {
+      return NextResponse.json({ success: false, error: "Phone number already exists for another student." }, { status: 400 });
     }
 
     // Generate unique STU-xxxx ID
@@ -16,10 +21,11 @@ export async function POST(request: Request) {
     const count = (countRows as any[])[0].c || 0;
     const generatedId = `STU-${1000 + count + 1}`;
 
-    await queryDb("INSERT INTO students (id, name, email, grade) VALUES (?, ?, ?, ?)", [
+    await queryDb("INSERT INTO students (id, name, email, phoneNumber, grade) VALUES (?, ?, ?, ?, ?)", [
       generatedId,
       name.trim(),
       email.trim(),
+      phoneNumber.trim(),
       gradeGroup.trim()
     ]);
 
@@ -36,6 +42,7 @@ export async function POST(request: Request) {
         id: generatedId,
         name: name.trim(),
         email: email.trim(),
+        phoneNumber: phoneNumber.trim(),
         gradeGroup: gradeGroup.trim(),
         academicYear: academicYear || "2025–2026",
         status: "active"
@@ -51,15 +58,21 @@ export async function PUT(request: Request) {
   try {
     await initMysqlDb();
     const body = await request.json();
-    const { id, name, email, gradeGroup, password } = body;
+    const { id, name, email, phoneNumber, gradeGroup, password } = body;
 
-    if (!id || !name || !email || !gradeGroup) {
+    if (!id || !name || !email || !phoneNumber || !gradeGroup) {
       return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
     }
 
-    await queryDb("UPDATE students SET name = ?, email = ?, grade = ? WHERE id = ?", [
+    const [existingPhone] = await queryDb("SELECT id FROM students WHERE phoneNumber = ? AND id != ?", [phoneNumber.trim(), id]);
+    if ((existingPhone as any[]).length > 0) {
+      return NextResponse.json({ success: false, error: "Phone number already exists for another student." }, { status: 400 });
+    }
+
+    await queryDb("UPDATE students SET name = ?, email = ?, phoneNumber = ?, grade = ? WHERE id = ?", [
       name.trim(),
       email.trim(),
+      phoneNumber.trim(),
       gradeGroup.trim(),
       id
     ]);

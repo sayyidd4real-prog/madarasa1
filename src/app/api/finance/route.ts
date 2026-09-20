@@ -33,8 +33,8 @@ export async function POST(request: Request) {
       }
       const q = `%${searchQuery.trim().toLowerCase()}%`;
       const [matched] = await queryDb(
-        "SELECT id, name, grade AS className, '2025–2026' AS academicYear FROM students WHERE LOWER(id) LIKE ? OR LOWER(name) LIKE ? LIMIT 8",
-        [q, q]
+        "SELECT id, name, email, COALESCE(phoneNumber, '') AS phoneNumber, grade AS className, '2025–2026' AS academicYear FROM students WHERE LOWER(id) LIKE ? OR LOWER(name) LIKE ? OR LOWER(email) LIKE ? OR LOWER(COALESCE(phoneNumber, '')) LIKE ? LIMIT 8",
+        [q, q, q, q]
       );
 
       const results = [];

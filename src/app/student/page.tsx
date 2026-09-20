@@ -174,6 +174,14 @@ export default function StudentDashboard() {
                   </span>
                 </>
               )}
+              {studentProfile?.phoneNumber && (
+                <>
+                  <span className="text-slate-300 dark:text-slate-700">|</span>
+                  <span className="text-xs text-slate-500 dark:text-slate-400">
+                    Phone: <span className="text-slate-800 dark:text-slate-200 font-mono">{studentProfile.phoneNumber}</span>
+                  </span>
+                </>
+              )}
             </div>
           </div>
 

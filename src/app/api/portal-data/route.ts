@@ -55,12 +55,12 @@ export async function GET(request: Request) {
     let students: any[] = [];
     if (session.role === "super_admin" || session.role === "admin") {
       const [sRows] = await queryDb(
-        "SELECT id, name, email, grade AS gradeGroup, '2025–2026' AS academicYear, 'active' AS status FROM students"
+        "SELECT id, name, email, COALESCE(phoneNumber, '') AS phoneNumber, grade AS gradeGroup, '2025–2026' AS academicYear, 'active' AS status FROM students"
       );
       students = sRows as any[];
     } else if (session.role === "student" && session.studentId) {
       const [sRows] = await queryDb(
-        "SELECT id, name, email, grade AS gradeGroup, '2025–2026' AS academicYear, 'active' AS status FROM students WHERE id = ?",
+        "SELECT id, name, email, COALESCE(phoneNumber, '') AS phoneNumber, grade AS gradeGroup, '2025–2026' AS academicYear, 'active' AS status FROM students WHERE id = ?",
         [session.studentId]
       );
       students = sRows as any[];

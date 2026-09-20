@@ -21,6 +21,7 @@ export interface Student {
   id: string;
   name: string;
   email: string;
+  phoneNumber?: string;
   gradeGroup: string;
   academicYear: string;
   status?: string;
@@ -96,8 +97,8 @@ interface PortalContextType {
   editUserAccount: (id: string, fullName: string, email: string, password?: string, role?: UserRole, status?: AccountStatus) => Promise<{ success: boolean; error?: string }>;
   deleteUserAccount: (id: string) => Promise<{ success: boolean; error?: string }>;
   toggleUserAccountStatus: (id: string) => Promise<{ success: boolean; error?: string }>;
-  addStudent: (name: string, email: string, gradeGroup: string, academicYear: string, password?: string) => Promise<{ success: boolean; error?: string }>;
-  editStudent: (id: string, name: string, email: string, gradeGroup: string, academicYear: string, password?: string) => Promise<{ success: boolean; error?: string }>;
+  addStudent: (name: string, email: string, gradeGroup: string, academicYear: string, password?: string, phoneNumber?: string) => Promise<{ success: boolean; error?: string }>;
+  editStudent: (id: string, name: string, email: string, gradeGroup: string, academicYear: string, password?: string, phoneNumber?: string) => Promise<{ success: boolean; error?: string }>;
   deleteStudent: (id: string) => Promise<{ success: boolean; error?: string }>;
   addClass: (className: string, room: string, instructor: string) => Promise<{ success: boolean; error?: string }>;
   editClass: (id: string, className: string, room: string, instructor: string) => Promise<{ success: boolean; error?: string }>;
@@ -406,13 +407,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     email: string,
     gradeGroup: string,
     academicYear: string,
-    password?: string
+    password?: string,
+    phoneNumber?: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch("/api/students", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name, email, gradeGroup, academicYear, password }),
+        body: JSON.stringify({ name, email, gradeGroup, academicYear, password, phoneNumber }),
       });
       const data = await response.json();
       if (data.success) {
@@ -431,13 +433,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     email: string,
     gradeGroup: string,
     academicYear: string,
-    password?: string
+    password?: string,
+    phoneNumber?: string
   ): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch("/api/students", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, name, email, gradeGroup, academicYear, password }),
+        body: JSON.stringify({ id, name, email, gradeGroup, academicYear, password, phoneNumber }),
       });
       const data = await response.json();
       if (data.success) {

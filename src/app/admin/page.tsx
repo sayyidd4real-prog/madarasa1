@@ -119,6 +119,7 @@ export default function AdminDashboard() {
   // Student Form
   const [studentName, setStudentName] = useState("");
   const [studentEmail, setStudentEmail] = useState("");
+  const [studentPhoneNumber, setStudentPhoneNumber] = useState("");
   const [studentGrade, setStudentGrade] = useState(""); // Stores selected class name
   const [studentAcademicYear, setStudentAcademicYear] = useState("2025–2026");
   const [studentPassword, setStudentPassword] = useState("");
@@ -478,6 +479,7 @@ export default function AdminDashboard() {
   const [editingStudentId, setEditingStudentId] = useState<string | null>(null);
   const [editStudentName, setEditStudentName] = useState("");
   const [editStudentEmail, setEditStudentEmail] = useState("");
+  const [editStudentPhoneNumber, setEditStudentPhoneNumber] = useState("");
   const [editStudentGrade, setEditStudentGrade] = useState("");
   const [editStudentAcademicYear, setEditStudentAcademicYear] = useState("");
   const [editStudentPassword, setEditStudentPassword] = useState("");
@@ -487,6 +489,7 @@ export default function AdminDashboard() {
     setEditingStudentId(student.id);
     setEditStudentName(student.name);
     setEditStudentEmail(student.email);
+    setEditStudentPhoneNumber(student.phoneNumber || "");
     setEditStudentGrade(student.gradeGroup);
     setEditStudentAcademicYear(student.academicYear || "2025–2026");
     setEditStudentPassword("");
@@ -494,22 +497,27 @@ export default function AdminDashboard() {
   };
 
   const handleSaveStudentEdit = async (id: string) => {
-    if (!editStudentName.trim() || !editStudentEmail.trim() || !editStudentGrade || !editStudentAcademicYear) {
-      showToast("Please fill in all student details", "error");
+    if (!editStudentName.trim() || !editStudentEmail.trim() || !editStudentPhoneNumber.trim() || !editStudentGrade || !editStudentAcademicYear) {
+      showToast("Please fill in all student details including phone number", "error");
       return;
     }
     if (editStudentPassword && editStudentPassword !== editStudentConfirmPassword) {
       showToast("Passwords do not match", "error");
       return;
     }
-    await editStudent(
+    const res = await editStudent(
       id,
       editStudentName.trim(),
       editStudentEmail.trim(),
       editStudentGrade,
       editStudentAcademicYear,
-      editStudentPassword || undefined
+      editStudentPassword || undefined,
+      editStudentPhoneNumber.trim()
     );
+    if (res && !res.success) {
+      showToast(res.error || "Failed to update student", "error");
+      return;
+    }
     showToast("Student details updated successfully", "success");
     setEditingStudentId(null);
   };
@@ -672,15 +680,15 @@ export default function AdminDashboard() {
       showToast("No classes registered yet. Please create a class first.", "error");
       return;
     }
-    if (!studentName.trim() || !studentEmail.trim() || !studentGrade || !studentAcademicYear || !studentPassword) {
-      showToast("Please fill all student details including password", "error");
+    if (!studentName.trim() || !studentEmail.trim() || !studentPhoneNumber.trim() || !studentGrade || !studentAcademicYear || !studentPassword) {
+      showToast("Please fill all student details including phone number and password", "error");
       return;
     }
     if (studentPassword !== studentConfirmPassword) {
       showToast("Student passwords do not match", "error");
       return;
     }
-    const res = await addStudent(studentName.trim(), studentEmail.trim(), studentGrade, studentAcademicYear, studentPassword);
+    const res = await addStudent(studentName.trim(), studentEmail.trim(), studentGrade, studentAcademicYear, studentPassword, studentPhoneNumber.trim());
     if (res && !res.success) {
       showToast(res.error || "Failed to register student", "error");
       return;
@@ -689,6 +697,7 @@ export default function AdminDashboard() {
     setSelectedClassFilter(studentGrade);
     setStudentName("");
     setStudentEmail("");
+    setStudentPhoneNumber("");
     setStudentPassword("");
     setStudentConfirmPassword("");
   };
@@ -1172,7 +1181,8 @@ export default function AdminDashboard() {
     return (
       student.id.toLowerCase().includes(q) ||
       student.name.toLowerCase().includes(q) ||
-      student.email.toLowerCase().includes(q)
+      student.email.toLowerCase().includes(q) ||
+      (student.phoneNumber && student.phoneNumber.toLowerCase().includes(q))
     );
   });
 
@@ -1777,6 +1787,18 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Phone Number</label>
+                      <input
+                        type="tel"
+                        placeholder="e.g. +252 61 500 0000"
+                        value={studentPhoneNumber}
+                        onChange={(e) => setStudentPhoneNumber(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
+                        required
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
                       <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Class</label>
                       {classes.length === 0 ? (
                         <div className="text-xs text-amber-400 font-semibold bg-amber-950/20 border border-amber-900/30 p-3.5 rounded-xl">
@@ -1927,6 +1949,7 @@ export default function AdminDashboard() {
                             </div>
                           </th>
                           <th className="py-4 px-6">Email</th>
+                          <th className="py-4 px-6">Phone Number</th>
                           <th className="py-4 px-6 cursor-pointer hover:text-emerald-400 select-none transition-colors" onClick={() => handleSort("gradeGroup")}>
                             <div className="flex items-center gap-1.5">
                               Class
@@ -1951,7 +1974,7 @@ export default function AdminDashboard() {
                           const isEditing = editingStudentId === student.id;
                           return isEditing ? (
                             <tr key={student.id} className="bg-slate-900/90 border-b border-emerald-500/20">
-                              <td colSpan={6} className="p-4 bg-slate-900/90 border-b border-emerald-500/30">
+                              <td colSpan={7} className="p-4 bg-slate-900/90 border-b border-emerald-500/30">
                                 <div className="flex flex-col gap-4">
                                   <div className="flex items-center justify-between">
                                     <span className="font-bold text-xs text-emerald-400 uppercase tracking-wide flex items-center gap-2">
@@ -1977,6 +2000,16 @@ export default function AdminDashboard() {
                                         value={editStudentEmail}
                                         onChange={(e) => setEditStudentEmail(e.target.value)}
                                         className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded py-1.5 px-2.5 text-xs text-slate-100 focus:outline-none"
+                                      />
+                                    </div>
+                                    <div>
+                                      <label className="text-[10px] font-bold text-slate-400 uppercase block mb-1">Phone Number</label>
+                                      <input
+                                        type="tel"
+                                        value={editStudentPhoneNumber}
+                                        onChange={(e) => setEditStudentPhoneNumber(e.target.value)}
+                                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded py-1.5 px-2.5 text-xs text-slate-100 focus:outline-none"
+                                        required
                                       />
                                     </div>
                                     <div>
@@ -2050,6 +2083,7 @@ export default function AdminDashboard() {
                               <td className="py-4 px-6 font-mono text-emerald-400">{stripLeadingZeros(student.id)}</td>
                               <td className="py-4 px-6 text-slate-100 font-bold">{student.name}</td>
                               <td className="py-4 px-6 text-slate-400">{student.email}</td>
+                              <td className="py-4 px-6 text-slate-400 font-mono text-xs">{student.phoneNumber || "—"}</td>
                               <td className="py-4 px-6">
                                 <span className="px-2.5 py-0.5 bg-slate-950 border border-slate-800 text-[11px] rounded text-slate-350">
                                   {student.gradeGroup}
@@ -2088,7 +2122,7 @@ export default function AdminDashboard() {
                         })}
                         {paginatedStudents.length === 0 && (
                           <tr>
-                            <td colSpan={6} className="py-8 px-6 text-center text-slate-500 font-medium">
+                            <td colSpan={7} className="py-8 px-6 text-center text-slate-500 font-medium">
                               {!selectedClassFilter ? (
                                 <span className="text-amber-500/80">Please select a class from the dropdown above to view enrolled students.</span>
                               ) : (
@@ -2126,6 +2160,16 @@ export default function AdminDashboard() {
                                   value={editStudentEmail}
                                   onChange={(e) => setEditStudentEmail(e.target.value)}
                                   className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-100"
+                                />
+                              </div>
+                              <div className="flex flex-col gap-1">
+                                <label className="text-[9px] uppercase font-bold text-slate-500">Phone Number</label>
+                                <input
+                                  type="tel"
+                                  value={editStudentPhoneNumber}
+                                  onChange={(e) => setEditStudentPhoneNumber(e.target.value)}
+                                  className="w-full bg-slate-900 border border-slate-800 rounded px-2.5 py-1.5 text-xs text-slate-100"
+                                  required
                                 />
                               </div>
                               <div className="grid grid-cols-2 gap-2">
@@ -2188,6 +2232,10 @@ export default function AdminDashboard() {
                                 <div>
                                   <span className="text-[9px] uppercase font-bold text-slate-600 block">Email:</span>
                                   <span className="truncate max-w-[120px] block">{student.email}</span>
+                                </div>
+                                <div>
+                                  <span className="text-[9px] uppercase font-bold text-slate-600 block">Phone:</span>
+                                  <span className="truncate max-w-[120px] block font-mono">{student.phoneNumber || "—"}</span>
                                 </div>
                                 <div>
                                   <span className="text-[9px] uppercase font-bold text-slate-600 block">Academic Year:</span>
@@ -4486,7 +4534,7 @@ export default function AdminDashboard() {
                       Student Audit Profile
                     </span>
                     <h3 className="text-xl font-bold text-slate-100 mt-1">{selectedStudentDetail.name}</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">ID: {selectedStudentDetail.id} | {selectedStudentDetail.email}</p>
+                    <p className="text-xs text-slate-500 mt-0.5">ID: {selectedStudentDetail.id} | {selectedStudentDetail.email}{selectedStudentDetail.phoneNumber ? ` | ${selectedStudentDetail.phoneNumber}` : ""}</p>
                   </div>
                   <button
                     type="button"
