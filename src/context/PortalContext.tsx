@@ -151,6 +151,7 @@ interface PortalContextType {
   deleteExam: (id: string) => Promise<{ success: boolean; error?: string }>;
   editExam: (id: string, score: number, feedback: string) => Promise<{ success: boolean; error?: string }>;
   addSubject: (subjectName: string, subjectCode: string, description: string) => Promise<{ success: boolean; error?: string }>;
+  editSubject: (id: string, subjectName: string, subjectCode: string, description: string) => Promise<{ success: boolean; error?: string }>;
   deleteSubject: (id: string) => Promise<{ success: boolean; error?: string }>;
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -821,6 +822,24 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const editSubject = async (id: string, subjectName: string, subjectCode: string, description: string): Promise<{ success: boolean; error?: string }> => {
+    try {
+      const response = await fetch("/api/subjects", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id, subjectName, subjectCode, description }),
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData();
+        return { success: true };
+      }
+      return { success: false, error: data.error || "Failed to update subject." };
+    } catch {
+      return { success: false, error: "Network or server connection error." };
+    }
+  };
+
   const deleteSubject = async (id: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch(`/api/subjects?id=${id}`, {
@@ -903,6 +922,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         deleteExam,
         editExam,
         addSubject,
+        editSubject,
         deleteSubject,
         refreshData,
       }}

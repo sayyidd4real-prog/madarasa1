@@ -9,6 +9,7 @@ import {
   DollarSign,
   Award,
   Plus,
+  Pencil,
   Trash2,
   LogOut,
   LayoutDashboard,
@@ -95,6 +96,7 @@ export default function AdminDashboard() {
     editFee,
     deleteFee,
     addSubject,
+    editSubject,
     deleteSubject,
     language,
     setLanguage,
@@ -379,6 +381,44 @@ export default function AdminDashboard() {
   const [deductAmount, setDeductAmount] = useState("");
 
   // Subject Form
+    // Edit Subject Modal State
+  const [isEditSubjectModalOpen, setIsEditSubjectModalOpen] = useState(false);
+  const [editSubjectId, setEditSubjectId] = useState("");
+  const [editSubjectName, setEditSubjectName] = useState("");
+  const [editSubjectCode, setEditSubjectCode] = useState("");
+  const [editSubjectDescription, setEditSubjectDescription] = useState("");
+  const [isSavingSubject, setIsSavingSubject] = useState(false);
+
+  const handleEditSubjectClick = (subject: { id: string; subjectName: string; subjectCode: string; description: string }) => {
+    setEditSubjectId(subject.id);
+    setEditSubjectName(subject.subjectName || "");
+    setEditSubjectCode(subject.subjectCode || "");
+    setEditSubjectDescription(subject.description || "");
+    setIsEditSubjectModalOpen(true);
+  };
+
+  const handleSaveSubjectSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!editSubjectName.trim() || !editSubjectCode.trim()) {
+      showToast("Subject name and code are required", "error");
+      return;
+    }
+    setIsSavingSubject(true);
+    const res = await editSubject(
+      editSubjectId,
+      editSubjectName.trim(),
+      editSubjectCode.trim(),
+      editSubjectDescription.trim()
+    );
+    setIsSavingSubject(false);
+    if (res.success) {
+      showToast("Subject details updated successfully", "success");
+      setIsEditSubjectModalOpen(false);
+    } else {
+      showToast(res.error || "Failed to update subject", "error");
+    }
+  };
+
   const [newSubjectName, setNewSubjectName] = useState("");
   const [newSubjectCode, setNewSubjectCode] = useState("");
   const [newSubjectDescription, setNewSubjectDescription] = useState("");
@@ -3954,25 +3994,35 @@ export default function AdminDashboard() {
                               {subject.description || "No description provided."}
                             </td>
                             <td className="py-4 px-6 text-right whitespace-nowrap">
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  setDeleteConfirmMessage(`Deleting subject "${subject.subjectName}" (ID: ${subject.id}) will permanently remove it from active academic listings.`);
-                                  setOnConfirmDeleteAction(() => async () => {
-                                    const res = await deleteSubject(subject.id);
-                                    if (res.success) {
-                                      showToast(`Subject "${subject.subjectName}" deleted successfully`, "success");
-                                    } else {
-                                      showToast(res.error || "Failed to delete subject", "error");
-                                    }
-                                  });
-                                  setDeleteModalOpen(true);
-                                }}
-                                className="p-1.5 hover:bg-rose-950/30 text-slate-500 hover:text-rose-400 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
-                                title="Remove subject"
-                              >
-                                <Trash2 className="w-4 h-4" />
-                              </button>
+                              <div className="flex items-center justify-end gap-1.5">
+                                <button
+                                  type="button"
+                                  onClick={() => handleEditSubjectClick(subject)}
+                                  className="p-1.5 hover:bg-emerald-950/30 text-slate-500 hover:text-emerald-400 rounded-lg transition-colors border border-transparent hover:border-emerald-500/20"
+                                  title="Edit subject"
+                                >
+                                  <Pencil className="w-4 h-4" />
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    setDeleteConfirmMessage(`Deleting subject "${subject.subjectName}" (ID: ${subject.id}) will permanently remove it from active academic listings.`);
+                                    setOnConfirmDeleteAction(() => async () => {
+                                      const res = await deleteSubject(subject.id);
+                                      if (res.success) {
+                                        showToast(`Subject "${subject.subjectName}" deleted successfully`, "success");
+                                      } else {
+                                        showToast(res.error || "Failed to delete subject", "error");
+                                      }
+                                    });
+                                    setDeleteModalOpen(true);
+                                  }}
+                                  className="p-1.5 hover:bg-rose-950/30 text-slate-500 hover:text-rose-400 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
+                                  title="Remove subject"
+                                >
+                                  <Trash2 className="w-4 h-4" />
+                                </button>
+                              </div>
                             </td>
                           </tr>
                         ))}
@@ -4804,6 +4854,106 @@ export default function AdminDashboard() {
               </motion.div>
             </div>
           )}
+        
+        {/* EDIT SUBJECT MODAL */}
+        <AnimatePresence>
+          {isEditSubjectModalOpen && (
+            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ duration: 0.2 }}
+                className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-5"
+              >
+                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                      <Pencil className="w-5 h-5 text-emerald-400" />
+                      Edit Subject Details
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Update curriculum subject properties
+                    </p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => setIsEditSubjectModalOpen(false)}
+                    className="p-1 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <form onSubmit={handleSaveSubjectSubmit} className="flex flex-col gap-4">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject ID (Read-only)</label>
+                    <input
+                      type="text"
+                      value={editSubjectId}
+                      readOnly
+                      disabled
+                      className="w-full bg-slate-950/50 border border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-400 font-mono cursor-not-allowed select-none opacity-80"
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject Name</label>
+                    <input
+                      type="text"
+                      value={editSubjectName}
+                      onChange={(e) => setEditSubjectName(e.target.value)}
+                      placeholder="e.g. Mathematics"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-100 focus:outline-none transition-colors"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject Code</label>
+                    <input
+                      type="text"
+                      value={editSubjectCode}
+                      onChange={(e) => setEditSubjectCode(e.target.value)}
+                      placeholder="e.g. MTH-101"
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-100 focus:outline-none transition-colors"
+                      required
+                    />
+                  </div>
+
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Description <span className="text-slate-500 font-normal">(Optional)</span></label>
+                    <textarea
+                      value={editSubjectDescription}
+                      onChange={(e) => setEditSubjectDescription(e.target.value)}
+                      rows={3}
+                      placeholder="Course summary..."
+                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-200 focus:outline-none resize-none leading-relaxed"
+                    />
+                  </div>
+
+                  <div className="flex justify-end gap-3 pt-3 border-t border-slate-800 mt-2">
+                    <button
+                      type="button"
+                      onClick={() => setIsEditSubjectModalOpen(false)}
+                      className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      disabled={isSavingSubject}
+                      className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
+                    >
+                      {isSavingSubject ? "Saving..." : "Save Changes"}
+                    </button>
+                  </div>
+                </form>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
         </AnimatePresence>
       </div>
 

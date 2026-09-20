@@ -54,3 +54,35 @@ export async function DELETE(request: Request) {
   }
 }
 
+export async function PUT(request: Request) {
+  try {
+    await initMysqlDb();
+    const body = await request.json();
+    const { id, subjectName, subjectCode, description } = body;
+
+    if (!id || !subjectName || !subjectCode) {
+      return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
+    }
+
+    const [existing] = await queryDb(
+      "SELECT id FROM subjects WHERE id != ? AND (LOWER(subjectName) = LOWER(?) OR LOWER(subjectCode) = LOWER(?))",
+      [id, subjectName.trim(), subjectCode.trim()]
+    );
+    if ((existing as any[]).length > 0) {
+      return NextResponse.json({ success: false, error: "Another subject with this name or code already exists." }, { status: 400 });
+    }
+
+    await queryDb("UPDATE subjects SET subjectName = ?, subjectCode = ?, description = ? WHERE id = ?", [
+      subjectName.trim(),
+      subjectCode.trim(),
+      (description || "").trim(),
+      id
+    ]);
+
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error("Subjects PUT Error:", error);
+    return NextResponse.json({ success: false, error: error.message || "Server Error" }, { status: 500 });
+  }
+}
+
