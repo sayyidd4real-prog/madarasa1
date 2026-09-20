@@ -156,21 +156,21 @@ export default function StudentDashboard() {
               <h1 className="text-base font-bold text-slate-800 dark:text-slate-100">{studentProfile?.name || currentUser.name}</h1>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                ID: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{stripLeadingZeros(studentId)}</span>
+                {t("student_id")}: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{stripLeadingZeros(studentId)}</span>
               </span>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                Class: <span className="text-slate-800 dark:text-slate-200 font-semibold">{studentProfile?.gradeGroup || "Unassigned"}</span>
+                {t("class_name")}: <span className="text-slate-800 dark:text-slate-200 font-semibold">{studentProfile?.gradeGroup || "Unassigned"}</span>
               </span>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                Academic Year: <span className="text-slate-800 dark:text-slate-200 font-semibold">{studentProfile?.academicYear || "Unassigned"}</span>
+                {t("academic_year")}: <span className="text-slate-800 dark:text-slate-200 font-semibold">{studentProfile?.academicYear || "Unassigned"}</span>
               </span>
               {studentProfile?.email && (
                 <>
                   <span className="text-slate-300 dark:text-slate-700">|</span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">
-                    Email: <span className="text-slate-800 dark:text-slate-200">{studentProfile.email}</span>
+                    {t("email")}: <span className="text-slate-800 dark:text-slate-200">{studentProfile.email}</span>
                   </span>
                 </>
               )}
@@ -178,7 +178,7 @@ export default function StudentDashboard() {
                 <>
                   <span className="text-slate-300 dark:text-slate-700">|</span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">
-                    Phone: <span className="text-slate-800 dark:text-slate-200 font-mono">{studentProfile.phoneNumber}</span>
+                    {t("phone_number")}: <span className="text-slate-800 dark:text-slate-200 font-mono">{studentProfile.phoneNumber}</span>
                   </span>
                 </>
               )}
@@ -450,7 +450,7 @@ export default function StudentDashboard() {
 
                                         {/* Professional Marksheet Table */}
                                         <div className="overflow-x-auto">
-                                          <table className="w-full text-xs min-w-max">
+                                          <table className="w-full ltr:text-left rtl:text-right text-xs min-w-max">
                                             <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                                               <tr>
                                                 {subjects.map((sub) => (
@@ -458,9 +458,9 @@ export default function StudentDashboard() {
                                                     {sub.subjectName}
                                                   </th>
                                                 ))}
-                                                <th className="py-3 px-4 text-center whitespace-nowrap text-emerald-600 dark:text-emerald-400 text-[10px]">Total</th>
-                                                <th className="py-3 px-4 text-center whitespace-nowrap text-emerald-600 dark:text-emerald-300 text-[10px]">Average</th>
-                                                <th className="py-3 px-4 text-center whitespace-nowrap text-[10px]">Grade</th>
+                                                <th className="py-3 px-4 text-center whitespace-nowrap text-emerald-600 dark:text-emerald-400 text-[10px]">{t("total_amount")}</th>
+                                                <th className="py-3 px-4 text-center whitespace-nowrap text-emerald-600 dark:text-emerald-300 text-[10px]">{t("avg_score")}</th>
+                                                <th className="py-3 px-4 text-center whitespace-nowrap text-[10px]">{t("grade")}</th>
                                               </tr>
                                             </thead>
                                             <tbody>
@@ -551,7 +551,7 @@ export default function StudentDashboard() {
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full text-left text-sm">
+                    <table className="w-full ltr:text-left rtl:text-right text-sm">
                       <thead className="bg-slate-100 dark:bg-slate-950 text-slate-550 dark:text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-200 dark:border-slate-800">
                         <tr>
                           <th className="py-4 px-6">{t("fee_item")}</th>
