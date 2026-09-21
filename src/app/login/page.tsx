@@ -175,11 +175,11 @@ export default function LoginPage() {
             <MadrasaLogoIcon className="w-10 h-10" colorClass="text-emerald-500 dark:text-emerald-400" />
           </div>
           <h1 className="text-2xl font-black tracking-tight text-slate-900 dark:text-slate-50 mt-1">
-            {t("academy_name")}
+            Madarasah Badru-diin
           </h1>
           <p className="text-xs font-semibold text-emerald-600 dark:text-emerald-400 uppercase tracking-widest flex items-center gap-1.5">
             <ShieldCheck className="w-3.5 h-3.5" />
-            {t("login_title")}
+            Management Portal Login
           </p>
         </div>
 
@@ -209,14 +209,13 @@ export default function LoginPage() {
               }
             }}
             disabled={isLoading}
-            className={`py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all relative z-10 flex items-center justify-center gap-2 ${
-              activeTab === "admin"
+            className={`py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all relative z-10 flex items-center justify-center gap-2 ${activeTab === "admin"
                 ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
+              }`}
           >
             <Lock className="w-4 h-4" />
-            {t("admin_login")}
+            Admin / Staff
             {activeTab === "admin" && (
               <motion.div
                 layoutId="active-tab-glow"
@@ -235,14 +234,13 @@ export default function LoginPage() {
               }
             }}
             disabled={isLoading}
-            className={`py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all relative z-10 flex items-center justify-center gap-2 ${
-              activeTab === "student"
+            className={`py-2.5 text-xs md:text-sm font-bold rounded-xl transition-all relative z-10 flex items-center justify-center gap-2 ${activeTab === "student"
                 ? "text-emerald-600 dark:text-emerald-400 font-extrabold"
                 : "text-slate-500 dark:text-slate-400 hover:text-slate-800 dark:hover:text-slate-200"
-            }`}
+              }`}
           >
             <GraduationCap className="w-4 h-4" />
-            {t("student_login")}
+            Student Login
             {activeTab === "student" && (
               <motion.div
                 layoutId="active-tab-glow"
@@ -265,30 +263,30 @@ export default function LoginPage() {
               onSubmit={handleAdminSubmit}
               className="flex flex-col gap-4"
             >
-              <div className="flex flex-col gap-1.5 ltr:text-left rtl:text-right">
+              <div className="flex flex-col gap-1.5 text-left">
                 <label htmlFor="admin-email" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                  {t("email")}
+                  Email Address
                 </label>
                 <div className="relative flex items-center">
-                  <User className="absolute ltr:left-3.5 rtl:right-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <User className="absolute left-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input
                     id="admin-email"
                     type="text"
-                    placeholder="admin@madrasa.com"
+                    placeholder="e.g. admin@madrasa.com"
                     value={adminIdentifier}
                     onChange={(e) => setAdminIdentifier(e.target.value)}
                     disabled={isLoading}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5 ltr:text-left rtl:text-right">
+              <div className="flex flex-col gap-1.5 text-left">
                 <label htmlFor="admin-pass" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                  {t("password")}
+                  Password
                 </label>
                 <div className="relative flex items-center">
-                  <Lock className="absolute ltr:left-3.5 rtl:right-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input
                     id="admin-pass"
                     type={showAdminPassword ? "text" : "password"}
@@ -296,17 +294,31 @@ export default function LoginPage() {
                     value={adminPassword}
                     onChange={(e) => setAdminPassword(e.target.value)}
                     disabled={isLoading}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 ltr:pl-10 ltr:pr-10 rtl:pr-10 rtl:pl-10 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-10 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowAdminPassword(!showAdminPassword)}
-                    className="absolute ltr:right-3.5 rtl:left-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                     title={showAdminPassword ? "Hide password" : "Show password"}
                   >
                     {showAdminPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+              </div>
+
+              {/* Remember me option */}
+              <div className="flex items-center justify-between text-xs my-1">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400 select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="rounded border-slate-300 dark:border-slate-800 text-emerald-500 focus:ring-emerald-500/30"
+                  />
+                  Remember me
+                </label>
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Secure Session</span>
               </div>
 
               <button
@@ -317,10 +329,10 @@ export default function LoginPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                    <span>{t("signing_in")}</span>
+                    <span>Signing in...</span>
                   </>
                 ) : (
-                  <span>{t("access_dashboard")}</span>
+                  <span>Login to Admin Dashboard</span>
                 )}
               </button>
             </motion.form>
@@ -334,12 +346,12 @@ export default function LoginPage() {
               onSubmit={handleStudentSubmit}
               className="flex flex-col gap-4"
             >
-              <div className="flex flex-col gap-1.5 ltr:text-left rtl:text-right">
+              <div className="flex flex-col gap-1.5 text-left">
                 <label htmlFor="student-id-input" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                  {t("student_id")}
+                  Student ID
                 </label>
                 <div className="relative flex items-center">
-                  <User className="absolute ltr:left-3.5 rtl:right-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <User className="absolute left-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input
                     id="student-id-input"
                     type="text"
@@ -347,17 +359,17 @@ export default function LoginPage() {
                     value={studentIdentifier}
                     onChange={(e) => setStudentIdentifier(e.target.value)}
                     disabled={isLoading}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 ltr:pl-10 ltr:pr-4 rtl:pr-10 rtl:pl-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-4 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
                   />
                 </div>
               </div>
 
-              <div className="flex flex-col gap-1.5 ltr:text-left rtl:text-right">
+              <div className="flex flex-col gap-1.5 text-left">
                 <label htmlFor="student-pass-input" className="text-xs font-bold text-slate-600 dark:text-slate-400 uppercase tracking-wide">
-                  {t("password")}
+                  Password
                 </label>
                 <div className="relative flex items-center">
-                  <Lock className="absolute ltr:left-3.5 rtl:right-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
+                  <Lock className="absolute left-3.5 w-4 h-4 text-slate-400 dark:text-slate-500" />
                   <input
                     id="student-pass-input"
                     type={showStudentPassword ? "text" : "password"}
@@ -365,17 +377,31 @@ export default function LoginPage() {
                     value={studentPassword}
                     onChange={(e) => setStudentPassword(e.target.value)}
                     disabled={isLoading}
-                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 ltr:pl-10 ltr:pr-10 rtl:pr-10 rtl:pl-10 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
+                    className="w-full bg-slate-50 dark:bg-slate-950 border border-slate-200 dark:border-slate-800 focus:border-emerald-500/50 rounded-xl py-3 pl-10 pr-10 text-sm text-slate-900 dark:text-slate-100 placeholder-slate-400 dark:placeholder-slate-600 focus:outline-none transition-all"
                   />
                   <button
                     type="button"
                     onClick={() => setShowStudentPassword(!showStudentPassword)}
-                    className="absolute ltr:right-3.5 rtl:left-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
+                    className="absolute right-3.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-300"
                     title={showStudentPassword ? "Hide password" : "Show password"}
                   >
                     {showStudentPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                   </button>
                 </div>
+              </div>
+
+              {/* Remember me option */}
+              <div className="flex items-center justify-between text-xs my-1">
+                <label className="flex items-center gap-2 cursor-pointer text-slate-600 dark:text-slate-400 select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="rounded border-slate-300 dark:border-slate-800 text-emerald-500 focus:ring-emerald-500/30"
+                  />
+                  Remember me
+                </label>
+                <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">Student Portal</span>
               </div>
 
               <button
@@ -386,10 +412,10 @@ export default function LoginPage() {
                 {isLoading ? (
                   <>
                     <Loader2 className="w-4 h-4 animate-spin text-slate-950" />
-                    <span>{t("signing_in")}</span>
+                    <span>Verifying credentials...</span>
                   </>
                 ) : (
-                  <span>{t("access_dashboard")}</span>
+                  <span>Access Student Dashboard</span>
                 )}
               </button>
             </motion.form>

@@ -862,8 +862,6 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     saveState("portal_lang", lang);
-    const portal = getActivePortalType();
-    saveState(`${portal}_portal_lang`, lang);
   };
 
   const toggleTheme = () => {
@@ -874,7 +872,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     });
   };
 
-  // Dark/Light theme and RTL direction effect
+  // Dark/Light theme class effect
   useEffect(() => {
     if (typeof window !== "undefined") {
       const root = document.documentElement;
@@ -885,10 +883,8 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         root.classList.add("light");
         root.classList.remove("dark");
       }
-      root.dir = language === "ar" ? "rtl" : "ltr";
-      root.lang = language;
     }
-  }, [theme, language]);
+  }, [theme]);
 
   return (
     <PortalContext.Provider

@@ -4,11 +4,11 @@ export const translations = {
   en: {
     // Branding
     academy_name: "Madarasah Badru-diin",
-    arabic_subtitle: "مدرسة بدر الدين",
+    arabic_subtitle: "ددرست بدر الدين",
     portal_subtitle: "Learning & Science Portal",
     admin_hub: "Admin Hub",
     student_portal: "Student Portal",
-    
+
     // Auth & Navigation
     enter_system: "Enter System",
     login_title: "Badru-diin Secure Access",
@@ -22,7 +22,7 @@ export const translations = {
     verifying: "Verifying...",
     logout: "Logout",
     back_to_home: "Back to Home",
-    
+
     // Landing Page
     hero_title: "Next-Gen School Portal",
     hero_highlight: "Powered by Antigravity",
@@ -36,22 +36,22 @@ export const translations = {
     curriculum_classes: "Curriculum Classes",
     passing_rate: "Academic Passing Rate",
     test_physics: "Test Physics Lab",
-    
+
     // About Section
     about_us_title: "Empowering Faith & Science",
     about_us_subtitle: "Our Mission & Vision",
     about_us_desc: "Madarasah Badru-diin is dedicated to fostering academic excellence by integrating traditional Islamic scholarship with contemporary sciences. Our mission is to raise virtuous leaders equipped with state-of-the-art physics laboratories, computer science academies, and core moral guidance. We believe in bridging intellectual borders.",
     academic_focus: "Academic Focus Areas",
-    
+
     quran_studies: "Islamic & Quran Studies",
     quran_desc: "Memorization, rules of recitation, and interpretation of sacred texts guided by professional scholars in a disciplined environment.",
-    
+
     modern_science: "Modern Sciences & Tech",
     science_desc: "Physics labs, advanced algebra, web programming, and robotic engineering tracks designed for high-achieving minds.",
-    
+
     admission_process: "Admission & Enrollment",
     admission_desc: "Applications are open for enrollment. Register a student through the admin portal to get an institutional ID, choose classes, and track grades.",
-    
+
     facilities_title: "Premium School Facilities",
     facility_1: "Smart Physics Lab",
     facility_1_desc: "Simulate gravity shields and study mechanical forces.",
@@ -59,7 +59,7 @@ export const translations = {
     facility_2_desc: "Immersive lectures and 3D visual learning charts.",
     facility_3: "Automated Finance Ledgers",
     facility_3_desc: "Seamless invoicing, waiver credits, and fee tracking.",
-    
+
     faq_title: "Frequently Asked Questions",
     faq_q1: "How does the portal sync data?",
     faq_a1: "The portal uses React Context synchronized with localStorage to immediately display admin updates (grades, classes, fee balances) on student dashboards.",
@@ -67,7 +67,7 @@ export const translations = {
     faq_a2: "We natively support English, Arabic (featuring a native right-to-left RTL layout alignment), and Somali interfaces.",
     faq_q3: "How do I access the dashboards?",
     faq_a3: "Admins use the credentials admin / admin123. Students can input any registered name (e.g., Alice Johnson) or ID (e.g., STU-1001) from the students registry.",
-    
+
     // Simulator
     sim_title: "Antigravity Physics Lab Simulator",
     sim_subtitle: "Standard Module: Electrogravitic Suspension",
@@ -78,7 +78,7 @@ export const translations = {
     sim_engine_toggle: "Engine Core Initialization",
     sim_shield_power: "Magnetron Shield Power",
     sim_threshold: "Antigravity Threshold",
-    
+
     // Dashboard Tabs & Headings
     overview: "Control Overview",
     students_mgmt: "Student Management",
@@ -87,7 +87,8 @@ export const translations = {
     exams_mgmt: "Exam Management",
     subjects_mgmt: "Subjects Management",
     users_mgmt: "User Accounts",
-    
+    super_admin: "Super Admin",
+
     // Overview Details
     welcome_admin: "Welcome back, Systems Admin",
     health_check: "Here is a visual health check of Madarasah Badru-diin statistics.",
@@ -101,44 +102,53 @@ export const translations = {
     guideline_student: "Adding a student automatically assigns a unique ID. Keep records updated.",
     guideline_fees: "Assign tuition costs. Log student payments or apply discounts (deductions) instantly.",
     guideline_grader: "Input subject scores and term details. Provide descriptive feedback.",
-    
+
     // Tables & Forms Labels
-    student_id: "Student ID",
-    name: "Full Name",
     full_name: "Full Name",
-    email: "Email Address",
     phone_number: "Phone Number",
     academic_year: "Academic Year",
     login_password: "Login Password",
     confirm_password: "Confirm Password",
+    role: "Role",
+    add_user: "Add User Account",
+    add_subject: "Register Subject",
+    subject_code: "Subject Code",
+    description: "Description",
+    reference_number: "Reference Number",
+    date: "Date",
+    payment_method: "Payment Method",
+    notes: "Notes",
+    charge_description: "Charge Description",
+    amount: "Amount ($)",
+    record_payment: "Record Payment",
+    add_charge: "Add Fee Charge",
+    financial_ledger: "Financial Ledger",
+    search_student: "Search Student...",
+    user_accounts_registry: "User Accounts Registry",
+    student_audit_profile: "Student Audit Profile",
+    close_profile: "Close Profile Audit",
+    edit_subject: "Edit Subject Details",
+    save_changes: "Save Changes",
+    confirm_delete: "Confirm Deletion",
+    student_id: "Student ID",
+    name: "Full Name",
+    email: "Email Address",
     grade: "Grade Group",
     actions: "Actions",
     edit: "Edit",
     delete: "Delete",
     save: "Save",
-    save_changes: "Save Changes",
     cancel: "Cancel",
     add_student: "Register New Student",
     add_class: "Register Class Room",
-    add_subject: "Register Subject",
-    add_user: "Add User Account",
-    edit_user: "Edit User Account",
-    edit_subject: "Edit Subject Details",
     class_name: "Class Name",
     room: "Room Location",
     instructor: "Instructor Name",
-    subject_code: "Subject Code",
-    description: "Description",
     fee_item: "Fee Statement",
     total_amount: "Total Amount",
     paid: "Paid",
     remaining: "Remaining",
     status: "Status",
-    role: "Role",
-    admin: "Admin",
-    super_admin: "Super Admin",
-    active: "Active",
-    inactive: "Inactive",
     assign_fee_title: "Assign Fee to Student",
     record_payment_title: "Add Payment Record",
     apply_deduction_title: "Apply Credit / Deduction",
@@ -149,46 +159,17 @@ export const translations = {
     registered_grades: "Registered Grades & Evaluations",
     subject: "Subject",
     term: "Term",
-    select_class: "Select Class",
-    all: "All",
-    term_1: "Term 1",
-    mid_term: "Mid-term",
-    term_2: "Term 2",
-    final_exam: "Final Exam",
-    add_charge: "Add Fee Charge",
-    record_payment: "Record Payment",
-    charge_description: "Charge Description",
-    amount: "Amount ($)",
-    payment_method: "Payment Method",
-    notes: "Notes",
-    reference_number: "Reference Number",
-    date: "Date",
-    user_accounts_registry: "User Accounts Registry",
-    student_audit_profile: "Student Audit Profile",
-    close_profile: "Close Profile Audit",
-    search_student: "Search Student...",
-    view_details: "View Details",
-    no_students_found: "No students found.",
-    no_classes_found: "No classes created yet.",
-    no_subjects_found: "No subjects registered yet.",
-    no_exams_found: "No exam records found.",
-    previous: "Previous",
-    next: "Next",
-    page: "Page",
-    of: "of",
-    
+
     // Student Dashboard
     completed_exams: "Completed Exams",
     avg_score: "Average Score",
     academic_standing: "Academic Standing",
     academic_transcript: "Academic Transcript",
-    financial_ledger: "Financial Ledger",
     term_summary: "Term Summary",
     final_grade: "Final Grade",
     outstanding_balance: "Outstanding Balance",
-    
+
     // Notifications & Deletions
-    confirm_delete: "Confirm Deletion",
     delete_review: "You can review or edit the deletion statement below before confirming the action:",
   },
   ar: {
@@ -198,7 +179,7 @@ export const translations = {
     portal_subtitle: "بوابة التعلم والعلوم",
     admin_hub: "مركز الإدارة",
     student_portal: "بوابة الطالب",
-    
+
     // Auth & Navigation
     enter_system: "دخول النظام",
     login_title: "بوابة الدخول الآمن",
@@ -212,7 +193,7 @@ export const translations = {
     verifying: "جاري التحقق...",
     logout: "تسجيل الخروج",
     back_to_home: "العودة للرئيسية",
-    
+
     // Landing Page
     hero_title: "بوابة التعليم الحديثة",
     hero_highlight: "مدعومة بمحاكي الجاذبية المضادة",
@@ -226,22 +207,22 @@ export const translations = {
     curriculum_classes: "الصفوف الدراسية",
     passing_rate: "نسبة النجاح الأكاديمي",
     test_physics: "تجربة مختبر الفيزياء",
-    
+
     // About Section
     about_us_title: "تمكين العقيدة والعلوم",
     about_us_subtitle: "رسالتنا ورؤيتنا الأكاديمية",
     about_us_desc: "تلتزم مدرسة بدر الدين بتعزيز التميز الأكاديمي من خلال دمج التعليم الإسلامي التقليدي مع العلوم المعاصرة والحديثة. مهمتنا هي تنشئة قادة فضلاء مجهزين بمختبرات فيزياء حديثة، وأكاديميات علوم الحاسب، والتربية الأخلاقية الأساسية.",
     academic_focus: "مجالات التركيز الأكاديمي",
-    
+
     quran_studies: "الدراسات الإسلامية والقرآنية",
     quran_desc: "حفظ القرآن الكريم، وأحكام الترتيل والتجويد، وتفسير النصوص الشرعية تحت إشراف نخبة من المعلمين والعلماء المتخصصين.",
-    
+
     modern_science: "العلوم المعاصرة والتكنولوجيا",
     science_desc: "مختبرات الفيزياء، الجبر المتقدم، برمجة وتصميم مواقع الويب، ومسارات هندسة الروبوتات المصممة للعقول المتفوقة.",
-    
+
     admission_process: "القبول والتسجيل",
     admission_desc: "باب التسجيل والقبول مفتوح الآن للطلاب الجدد. يمكن تسجيل الطالب عبر بوابة المسؤول للحصول على رقم تعريفي واختيار الصفوف الدراسية وتتبع الدرجات.",
-    
+
     facilities_title: "المرافق المتميزة للمدرسة",
     facility_1: "مختبر الفيزياء الذكي",
     facility_1_desc: "محاكاة دروع الجاذبية ودراسة القوى الميكانيكية.",
@@ -249,7 +230,7 @@ export const translations = {
     facility_2_desc: "محاضرات تفاعلية ورسوم توضيحية ثلاثية الأبعاد.",
     facility_3: "دفاتر الحسابات المؤتمتة",
     facility_3_desc: "فواتير سلسة وتتبع المدفوعات والخصومات الأكاديمية.",
-    
+
     faq_title: "الأسئلة الشائعة",
     faq_q1: "كيف تتم مزامنة بيانات البوابة؟",
     faq_a1: "تستخدم البوابة نظام React Context متزامناً مع localStorage لعرض تحديثات المسؤول (مثل الدرجات والصفوف والرسوم) فوراً على بوابة الطالب.",
@@ -257,7 +238,7 @@ export const translations = {
     faq_a2: "نحن ندعم واجهات اللغات الإنجليزية، والعربية (مع محاذاة تلقائية كاملة للاتجاه من اليمين إلى اليسار RTL)، والصومالية.",
     faq_q3: "كيف يمكنني الوصول إلى لوحات التحكم؟",
     faq_a3: "يستخدم المسؤولون اسم الدخول admin وكلمة المرور admin123. بينما يستطيع الطلاب إدخال أي اسم مسجل (مثل Alice Johnson) أو رقم الطالب (STU-1001).",
-    
+
     // Simulator
     sim_title: "محاكي الجاذبية المضادة لفيزياء بدر الدين",
     sim_subtitle: "الوحدة القياسية: التعليق المغناطيسي والجاذبية",
@@ -268,67 +249,77 @@ export const translations = {
     sim_engine_toggle: "تشغيل محرك الطاقة",
     sim_shield_power: "قوة درع المغناطيس",
     sim_threshold: "عتبة الجاذبية المضادة",
-    
+
     // Dashboard Tabs & Headings
-    overview: "لوحة النظرة العامة",
+    overview: "نظرة عامة",
     students_mgmt: "إدارة الطلاب",
     classes_mgmt: "إدارة الصفوف",
-    fees_mgmt: "إدارة الرسوم والمالية",
-    exams_mgmt: "إدارة الامتحانات والنتائج",
+    fees_mgmt: "إدارة الرسوم",
+    exams_mgmt: "إدارة الامتحانات",
     subjects_mgmt: "إدارة المواد الدراسية",
     users_mgmt: "حسابات المستخدمين",
-    
+    super_admin: "المسؤول الأعلى",
+
     // Overview Details
     welcome_admin: "مرحباً بك مجدداً، مسؤول النظام",
     health_check: "هنا عرض سريع للمؤشرات والإحصائيات الخاصة بمدرسة بدر الدين.",
     active_enrollments: "قاعدة بيانات الطلاب النشطين",
     curriculum_registered: "المناهج المسجلة",
     fees_collected: "إجمالي الرسوم المحصلة",
-    outstanding_fees: "الرسوم المتبقية المستحقة",
+    outstanding_fees: "الرسوم المتبقية",
     assigned: "المخصصة",
-    credits_applied: "الخصومات والمنح",
+    credits_applied: "الخصومات",
     admin_guidelines: "إرشادات الإدارة",
     guideline_student: "إضافة طالب تنشئ رقماً تعريفياً فريداً تلقائياً. يرجى إبقاء البيانات محدثة.",
     guideline_fees: "تخصيص الرسوم الدراسية. تسجيل الدفعات أو تطبيق الخصومات يظهر فوراً للطالب.",
     guideline_grader: "إدخال درجات المواد واختيار الفصل الدراسي مع التعليقات التوجيهية للطلاب.",
-    
+
     // Tables & Forms Labels
+    full_name: "الاسم الكامل",
+    phone_number: "رقم الهاتف",
+    academic_year: "العام الدراسي",
+    login_password: "كلمة مرور الدخول",
+    confirm_password: "تأكيد كلمة المرور",
+    role: "الدور والصلاحية",
+    add_user: "إضافة حساب مستخدم",
+    add_subject: "تسجيل مادة دراسية",
+    subject_code: "رمز المادة",
+    description: "الوصف",
+    reference_number: "رقم المرجع",
+    date: "التاريخ",
+    payment_method: "طريقة الدفع",
+    notes: "ملاحظات",
+    charge_description: "وصف الرسوم",
+    amount: "المبلغ ($)",
+    record_payment: "تسجيل عملية دفع",
+    add_charge: "إضافة رسوم دراسية",
+    financial_ledger: "السجل المالي للحسابات",
+    search_student: "البحث عن طالب...",
+    user_accounts_registry: "سجل حسابات المستخدمين",
+    student_audit_profile: "الملف الأكاديمي الشامل للطالب",
+    close_profile: "إغلاق السجل",
+    edit_subject: "تعديل تفاصيل المادة",
+    save_changes: "حفظ التغييرات",
+    confirm_delete: "تأكيد الحذف",
     student_id: "رقم الطالب",
     name: "الاسم الكامل",
-    full_name: "الاسم الكامل",
     email: "البريد الإلكتروني",
-    phone_number: "رقم الهاتف",
-    academic_year: "السنة الدراسية",
-    login_password: "كلمة المرور للدخول",
-    confirm_password: "تأكيد كلمة المرور",
     grade: "الصف الدراسي",
     actions: "الإجراءات",
     edit: "تعديل",
     delete: "حذف",
     save: "حفظ",
-    save_changes: "حفظ التغييرات",
     cancel: "إلغاء",
     add_student: "تسجيل طالب جديد",
     add_class: "تسجيل صف دراسي جديد",
-    add_subject: "تسجيل مادة جديدة",
-    add_user: "إضافة حساب مستخدم جديد",
-    edit_user: "تعديل حساب المستخدم",
-    edit_subject: "تعديل تفاصيل المادة",
     class_name: "اسم الصف",
     room: "موقع القاعة",
     instructor: "اسم المعلم",
-    subject_code: "رمز المادة",
-    description: "الوصف",
     fee_item: "بيان الرسوم",
     total_amount: "المبلغ الإجمالي",
     paid: "المدفوع",
     remaining: "المتبقي",
     status: "الحالة",
-    role: "الصلاحية",
-    admin: "مسؤول",
-    super_admin: "مسؤول ممتاز",
-    active: "نشط",
-    inactive: "غير نشط",
     assign_fee_title: "تخصيص رسوم لطالب",
     record_payment_title: "تسجيل دفعة مالية",
     apply_deduction_title: "تطبيق خصم / منحة",
@@ -339,56 +330,27 @@ export const translations = {
     registered_grades: "الدرجات والتقييمات المسجلة",
     subject: "المادة",
     term: "الفصل الدراسي",
-    select_class: "اختر الصف الدراسي",
-    all: "الكل",
-    term_1: "الفصل الأول",
-    mid_term: "منتصف الفصل",
-    term_2: "الفصل الثاني",
-    final_exam: "الامتحان النهائي",
-    add_charge: "إضافة رسوم ماليّة",
-    record_payment: "تسجيل دفعة مالية",
-    charge_description: "وصف الرسوم",
-    amount: "المبلغ ($)",
-    payment_method: "طريقة الدفع",
-    notes: "ملاحظات",
-    reference_number: "رقم المرجع",
-    date: "التاريخ",
-    user_accounts_registry: "سجل حسابات المستخدمين",
-    student_audit_profile: "الملف السجلي للطالب",
-    close_profile: "إغلاق الملف",
-    search_student: "البحث عن طالب...",
-    view_details: "عرض التفاصيل",
-    no_students_found: "لم يتم العثور على طلاب.",
-    no_classes_found: "لم يتم إنشاء صفوف حتى الآن.",
-    no_subjects_found: "لم يتم تسجيل مواد حتى الآن.",
-    no_exams_found: "لم يتم العثور على سجلات امتحانات.",
-    previous: "السابق",
-    next: "التالي",
-    page: "صفحة",
-    of: "من",
-    
+
     // Student Dashboard
     completed_exams: "الامتحانات المنجزة",
     avg_score: "معدل الدرجات",
     academic_standing: "الحالة الأكاديمية",
     academic_transcript: "كشف الدرجات الأكاديمي",
-    financial_ledger: "السجل المالي للرسوم",
     term_summary: "ملخص الفصل الدراسي",
     final_grade: "التقدير النهائي",
     outstanding_balance: "الرصيد المتبقي المستحق",
-    
+
     // Notifications & Deletions
-    confirm_delete: "تأكيد عملية الحذف",
     delete_review: "يمكنك مراجعة أو تعديل نص رسالة تأكيد الحذف أدناه قبل التنفيذ:",
   },
   so: {
     // Branding
     academy_name: "Madarasah Badru-diin",
-    arabic_subtitle: "مدرسة بدر الدين",
+    arabic_subtitle: "ددرست بدر الدين",
     portal_subtitle: "Bogga Waxbarashada & Sayniska",
     admin_hub: "Maamulka Sare",
     student_portal: "Bogga Ardayga",
-    
+
     // Auth & Navigation
     enter_system: "Geli Nidaamka",
     login_title: "Badru-diin Galitaanka Amniga",
@@ -402,7 +364,7 @@ export const translations = {
     verifying: "Hubinaya...",
     logout: "Ka Bax Portal-ka",
     back_to_home: "Ku laabo Bogga Hore",
-    
+
     // Landing Page
     hero_title: "Madal Waxbarasho oo Casri ah",
     hero_highlight: "Ku Shaqaynaya Antigravity",
@@ -416,22 +378,22 @@ export const translations = {
     curriculum_classes: "Fasalada Manhajka",
     passing_rate: "Boqolkiiba Gudubka",
     test_physics: "Tijaabi Fiisigiska",
-    
+
     // About Section
     about_us_title: "Xoojinta Diinta iyo Sayniska",
     about_us_subtitle: "Hadafkayaga iyo Aragtidayada",
     about_us_desc: "Madarasah Badru-diin waxay u heellan tahay kobcinta tacliinta sare iyadoo laysku darayo aqoonta Islaamiga ah iyo sayniska casriga ah. Hadafkayagu waa inaan kor u qaadno hoggaamiyayaal akhlaaq leh oo ku qalabaysan shaybaaro fiisigiska ah, barashada culuumta kombuyuutarka, iyo hagid akhlaaqeed.",
     academic_focus: "Qaybaha Diiradda la Saaro",
-    
+
     quran_studies: "Barashada Islaamka iyo Quraanka",
     quran_desc: "Xifdinta Quraanka Kariimka ah, tajwiidka, iyo tafsiirka diinta oo ay hagayaan culimo khubaro ah oo ku takhasusay qaybahan.",
-    
+
     modern_science: "Sayniska Casriga ah & Tiknoolajiyada",
     science_desc: "Shaybaarka fiisigiska, aljebra, barashada codaynta webka, iyo injineernimada robotics-ka ee loo qaabeeyey ardayda maskaxda furan.",
-    
+
     admission_process: "Diiwaangelinta & Quboolka",
     admission_desc: "Codsiyada hadda waa furan yihiin. Ka diiwaangeli ardayga dashboard-ka maamulka si uu u helo ID u gaar ah oo uu u bilaabo fasallada.",
-    
+
     facilities_title: "Adeegyada Gaarka ah ee Dugsiga",
     facility_1: "Shaybaarka Fiisigiska",
     facility_1_desc: "Tijaabi cuf-jiidadka suspension-ka iyo xoogagga kala duwan.",
@@ -439,7 +401,7 @@ export const translations = {
     facility_2_desc: "Casharo la daawanayo iyo jaantusyo 3D ah oo waxbarashada ah.",
     facility_3: "Xisaabaadka Lacagaha ee Tooska ah",
     facility_3_desc: "Fatureyaal sax ah, qiimo dhimis fudud, iyo la socodka lacag bixinta.",
-    
+
     faq_title: "Su'aalaha Badanaa La Weydiiyo",
     faq_q1: "Sidee nidaamku u shaqeeyaa?",
     faq_a1: "Nidaamku wuxuu isticmaalaa React Context iyo localStorage si uu u diiwaangeliya xogta maamulka una tuso ardayda isla markaas.",
@@ -447,7 +409,7 @@ export const translations = {
     faq_a2: "Waxaan si toos ah u taageernaa luqadaha English, Arabic (oo leh RTL laysla simayo), iyo Somali.",
     faq_q3: "Sideen ku geli karaa dashboards-ka?",
     faq_a3: "Maamuluhu wuxuu isticmaalaa admin / admin123. Ardayduna waxay isticmaali karaan magac kasta oo diiwaangashan ama ID-ga (sida STU-1001).",
-    
+
     // Simulator
     sim_title: "Fiisigiska Badru-diin Antigravity Simulator",
     sim_subtitle: "Qaybta Caadiga ah: Joojinta Korontada iyo Cuf-jiidadka",
@@ -458,7 +420,7 @@ export const translations = {
     sim_engine_toggle: "Daar Matoorka",
     sim_shield_power: "Awooda Gaashaanka",
     sim_threshold: "Xadka Antigravity-ga",
-    
+
     // Dashboard Tabs & Headings
     overview: "Guud-mar",
     students_mgmt: "Maamulka Ardayda",
@@ -466,8 +428,9 @@ export const translations = {
     fees_mgmt: "Maamulka Lacagaha",
     exams_mgmt: "Maamulka Imtixaanada",
     subjects_mgmt: "Maamulka Maadooyinka",
-    users_mgmt: "Xisaabaadka Isticmaalayaasha",
-    
+    users_mgmt: "Akauntiga Isticmaalayaasha",
+    super_admin: "Maamulaha Sare",
+
     // Overview Details
     welcome_admin: "Ku soo dhawaad maamule sare",
     health_check: "Halkaan ka eeg xaaladda guud iyo tirakoobka Madarasah Badru-diin.",
@@ -481,44 +444,53 @@ export const translations = {
     guideline_student: "Markaad arday ku darto nidaamka wuxuu si toos ah u helayaa ID u gaar ah.",
     guideline_fees: "Qoondee lacagaha tushinka. Lacag bixinta ama dhimista ayaa isla markiiba u muuqanaysa ardayga.",
     guideline_grader: "Geli buundooyinka iyo faallooyinka caawinaya ardayda fasal kasta.",
-    
+
     // Tables & Forms Labels
+    full_name: "Magaca Buuxa",
+    phone_number: "Nambarka Taleefanka",
+    academic_year: "Sannad Dugsiyadeedka",
+    login_password: "Ereyga Sirta ah",
+    confirm_password: "Xaqiiji Ereyga Sirta",
+    role: "Dajinta Habka",
+    add_user: "Kudar Akaunti",
+    add_subject: "Diiwaangeli Maado",
+    subject_code: "Koodhka Maadada",
+    description: "Faahfaahin",
+    reference_number: "Nambarka Tixraaca",
+    date: "Taariikhda",
+    payment_method: "Habka Bixinta",
+    notes: "Xusuusin",
+    charge_description: "Faahfaahinta Kharashka",
+    amount: "Lacagta ($)",
+    record_payment: "Diiwaangeli Bixin",
+    add_charge: "Kudar Kharash",
+    financial_ledger: "Diiwaanka Lacagaha",
+    search_student: "Raadi Arday...",
+    user_accounts_registry: "Diiwaanka Akauntiyada",
+    student_audit_profile: "Xogta Ardayga",
+    close_profile: "Xir Xogta",
+    edit_subject: "Wax ka baddal Maadada",
+    save_changes: "Keydi Baddalida",
+    confirm_delete: "Xaqiiji Tirida",
     student_id: "ID-ga Ardayga",
     name: "Magaca Buuxa",
-    full_name: "Magaca Buuxa",
     email: "Email-ka",
-    phone_number: "Nambarka Taleefanka",
-    academic_year: "Sannad Dugsiyeedka",
-    login_password: "Fure-sirta Galitaanka",
-    confirm_password: "Xaqiiji Fure-sirta",
     grade: "Fasalka",
     actions: "Ficilada",
     edit: "Wax ka beddel",
     delete: "Tirtir",
     save: "Keydi",
-    save_changes: "Keydi Beddelka",
     cancel: "Ka noqo",
     add_student: "Diiwaangeli Arday Cusub",
     add_class: "Diiwaangeli Fasal Cusub",
-    add_subject: "Diiwaangeli Maaddo Cusub",
-    add_user: "Ku dar Isticmaale",
-    edit_user: "Wax ka beddel Isticmaalaha",
-    edit_subject: "Wax ka beddel maaddada",
     class_name: "Magaca Fasalka",
     room: "Qolka/Qaybta",
     instructor: "Magaca Macallinka",
-    subject_code: "Koodhka Maaddada",
-    description: "Sharaxaad",
     fee_item: "Nooca Lacagta",
     total_amount: "Lacagta Guud",
     paid: "La bixiyey",
     remaining: "Hadhaaga",
     status: "Xaaladda",
-    role: "Shaqada/Sare",
-    admin: "Maamule",
-    super_admin: "Maamule Sare",
-    active: "Shaqaynaya",
-    inactive: "Maanu Shaqaynayn",
     assign_fee_title: "Qoondee Lacag cusub",
     record_payment_title: "Geli Lacag Bixinta",
     apply_deduction_title: "Geli Qiimo Dhimis / Deeq",
@@ -529,46 +501,17 @@ export const translations = {
     registered_grades: "Buundooyinka Diiwaangashan",
     subject: "Madooyinka",
     term: "Muddada/Simistarka",
-    select_class: "Dooro Fasalka",
-    all: "Dhamaan",
-    term_1: "Term 1",
-    mid_term: "Mid-term",
-    term_2: "Term 2",
-    final_exam: "Imtixaanka Ugu Danbeeya",
-    add_charge: "Kudar Lacag",
-    record_payment: "Geli Bixin Lacag",
-    charge_description: "Sharaxaada Lacagta",
-    amount: "Lacagta ($)",
-    payment_method: "Haddii Bixinta",
-    notes: "Xusuusin",
-    reference_number: "Nambarka Tixraaca",
-    date: "Taariikhda",
-    user_accounts_registry: "Diiwaanka Isticmaalayaasha",
-    student_audit_profile: "Xogta Ardayga",
-    close_profile: "Xir Xogta",
-    search_student: "Raadi Arday...",
-    view_details: "Eeg Faahfaahinta",
-    no_students_found: "Wax arday ah ma la helin.",
-    no_classes_found: "Weli fasallo ma la samayn.",
-    no_subjects_found: "Weli maaddooyin ma diiwaangashana.",
-    no_exams_found: "Ma jiro diiwaan imtixaan.",
-    previous: "Hore",
-    next: "Xiga",
-    page: "Bogga",
-    of: "ka mid ah",
-    
+
     // Student Dashboard
     completed_exams: "Imtixaanada La Galay",
     avg_score: "Celceliska Buundada",
     academic_standing: "Heerka Waxbarashada",
     academic_transcript: "Buundooyinka Ardayga",
-    financial_ledger: "Xisaabaadka Lacagaha",
     term_summary: "Guud-marka Muddada",
     final_grade: "Darajada Koowaad",
     outstanding_balance: "Hadhaaga Guud ee Lugu Leeyahay",
-    
+
     // Notifications & Deletions
-    confirm_delete: "Xaqiiji Tirtirista",
     delete_review: "Waad wax ka beddeli kartaa farriinta xaqiijinta tirtirista ee hoose inta aadan fulin:",
   },
 };

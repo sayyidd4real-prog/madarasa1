@@ -322,8 +322,8 @@ export default function AdminDashboard() {
       // Find all prior exams for this student in this class & academic year across all terms
       const allStudentClassExams = exams.filter(
         (e) => e.studentId === student.id &&
-               e.className === selectedClassName &&
-               e.academicYear === examAcademicYear
+          e.className === selectedClassName &&
+          e.academicYear === examAcademicYear
       );
 
       const scores: { [subj: string]: string } = {};
@@ -336,7 +336,7 @@ export default function AdminDashboard() {
         } else if (examTerm === "Final Exam") {
           const priorExams = allStudentClassExams.filter(
             (e) => e.subject === sub.subjectName &&
-                   (e.term === "Term 1" || e.term === "Mid-term" || e.term === "Term 2")
+              (e.term === "Term 1" || e.term === "Mid-term" || e.term === "Term 2")
           );
           if (priorExams.length > 0) {
             const rawSum = priorExams.reduce((sum, e) => sum + (e.score || 0), 0);
@@ -382,7 +382,7 @@ export default function AdminDashboard() {
   const [deductAmount, setDeductAmount] = useState("");
 
   // Subject Form
-    // Edit Subject Modal State
+  // Edit Subject Modal State
   const [isEditSubjectModalOpen, setIsEditSubjectModalOpen] = useState(false);
   const [editSubjectId, setEditSubjectId] = useState("");
   const [editSubjectName, setEditSubjectName] = useState("");
@@ -1494,8 +1494,8 @@ export default function AdminDashboard() {
               setIsSidebarOpen(false);
             }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeSection === "overview"
-                ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
+              ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
               }`}
           >
             <LayoutDashboard className="w-4 h-4" />
@@ -1509,8 +1509,8 @@ export default function AdminDashboard() {
               setIsSidebarOpen(false);
             }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeSection === "students"
-                ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
+              ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
               }`}
           >
             <Users className="w-4 h-4" />
@@ -1524,8 +1524,8 @@ export default function AdminDashboard() {
               setIsSidebarOpen(false);
             }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeSection === "classes"
-                ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
+              ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
               }`}
           >
             <BookOpen className="w-4 h-4" />
@@ -1539,8 +1539,8 @@ export default function AdminDashboard() {
               setIsSidebarOpen(false);
             }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeSection === "fees"
-                ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
+              ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
               }`}
           >
             <DollarSign className="w-4 h-4" />
@@ -1554,8 +1554,8 @@ export default function AdminDashboard() {
               setIsSidebarOpen(false);
             }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeSection === "exams"
-                ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
+              ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
               }`}
           >
             <Award className="w-4 h-4" />
@@ -1569,8 +1569,8 @@ export default function AdminDashboard() {
               setIsSidebarOpen(false);
             }}
             className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeSection === "subjects"
-                ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
-                : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
+              ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
               }`}
           >
             <GraduationCap className="w-4 h-4" />
@@ -1586,8 +1586,8 @@ export default function AdminDashboard() {
                 setIsSidebarOpen(false);
               }}
               className={`w-full flex items-center justify-between px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeSection === "users"
-                  ? "bg-slate-950 border border-purple-500/30 text-purple-400 shadow-md"
-                  : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
+                ? "bg-slate-950 border border-purple-500/30 text-purple-400 shadow-md"
+                : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
                 }`}
             >
               <div className="flex items-center gap-3">
@@ -1643,7 +1643,7 @@ export default function AdminDashboard() {
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-rose-400 bg-rose-500/10 border border-rose-500/20 hover:bg-rose-500/20 hover:text-rose-300 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-sm"
           >
             <LogOut className="w-4 h-4 text-rose-400" />
-            <span>{isLoggingOut ? t("signing_in") : t("logout")}</span>
+            <span>{isLoggingOut ? "Logging out..." : t("logout")}</span>
           </button>
         </div>
       </aside>
@@ -1759,13 +1759,13 @@ export default function AdminDashboard() {
                 {/* Form column */}
                 <div className="lg:col-span-4 bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col gap-5">
                   <div>
-                    <h3 className="font-bold text-base text-slate-200">{t("add_student")}</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">{t("guideline_student")}</p>
+                    <h3 className="font-bold text-base text-slate-200">Register New Student</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">Fills basic record and auto-allocates system ID.</p>
                   </div>
 
                   <form onSubmit={handleAddStudent} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("full_name")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Full Name</label>
                       <input
                         type="text"
                         placeholder="e.g. David Miller"
@@ -1776,7 +1776,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("email")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Email Address</label>
                       <input
                         type="email"
                         placeholder="e.g. david@school.edu"
@@ -1787,7 +1787,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("phone_number")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Phone Number</label>
                       <input
                         type="tel"
                         placeholder="e.g. +252 61 500 0000"
@@ -1799,10 +1799,10 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("grade")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Class</label>
                       {classes.length === 0 ? (
                         <div className="text-xs text-amber-400 font-semibold bg-amber-950/20 border border-amber-900/30 p-3.5 rounded-xl">
-                          {t("no_classes_found")}
+                          No classes registered yet. Please create a class first.
                         </div>
                       ) : (
                         <select
@@ -1820,7 +1820,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("academic_year")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Academic Year</label>
                       <select
                         value={studentAcademicYear}
                         onChange={(e) => setStudentAcademicYear(e.target.value)}
@@ -1834,7 +1834,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("login_password")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Login Password</label>
                       <div className="relative flex items-center">
                         <input
                           type={showStudentPasswordInput ? "text" : "password"}
@@ -1847,7 +1847,7 @@ export default function AdminDashboard() {
                         <button
                           type="button"
                           onClick={() => setShowStudentPasswordInput(!showStudentPasswordInput)}
-                          className="absolute ltr:right-3 rtl:left-3 text-slate-500 hover:text-slate-300"
+                          className="absolute right-3 text-slate-500 hover:text-slate-300"
                         >
                           {showStudentPasswordInput ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                         </button>
@@ -1855,7 +1855,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("confirm_password")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Confirm Password</label>
                       <input
                         type="password"
                         placeholder="••••••••"
@@ -1872,7 +1872,7 @@ export default function AdminDashboard() {
                       className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-slate-950 font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-2"
                     >
                       <Plus className="w-4 h-4" />
-                      {t("add_student")}
+                      Add Student
                     </button>
                   </form>
                 </div>
@@ -1881,24 +1881,24 @@ export default function AdminDashboard() {
                 <div className="lg:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
                   <div className="p-6 border-b border-slate-800/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
-                      <h3 className="font-bold text-base text-slate-200">{t("enrolled_students")}</h3>
+                      <h3 className="font-bold text-base text-slate-200">Enrolled Student Registry</h3>
                       <p className="text-xs text-slate-500 mt-0.5">
                         {selectedClassFilter
-                          ? `${t("grade")}: ${selectedClassFilter} (${formatDisplayNumber(sortedStudents.length)})`
-                          : t("select_class")}
+                          ? `Class: ${selectedClassFilter} (${formatDisplayNumber(sortedStudents.length)} student${sortedStudents.length === 1 ? "" : "s"})`
+                          : "Select a class to view enrolled students"}
                       </p>
                     </div>
 
                     {/* Class Filter & Search Inputs */}
                     <div className="flex flex-wrap items-center gap-3">
                       <div className="flex items-center gap-2">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">{t("grade")}:</label>
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Class:</label>
                         <select
                           value={selectedClassFilter}
                           onChange={(e) => setSelectedClassFilter(e.target.value)}
                           className="bg-slate-950 border border-emerald-500/40 focus:border-emerald-500 rounded-xl py-2 px-3 text-xs font-bold text-emerald-400 focus:outline-none cursor-pointer transition-all shadow-sm"
                         >
-                          <option value="">{t("select_class")}</option>
+                          <option value="">Select a Class</option>
                           {classes.map((cls) => (
                             <option key={cls.id} value={cls.className}>
                               {cls.className} ({cls.room})
@@ -1909,19 +1909,19 @@ export default function AdminDashboard() {
 
                       {/* Search Input */}
                       <div className="relative max-w-xs w-full">
-                        <span className="absolute inset-y-0 ltr:left-0 rtl:right-0 ltr:pl-3 rtl:pr-3 flex items-center pointer-events-none text-slate-550">
+                        <span className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-550">
                           <Users className="w-4 h-4 text-slate-500" />
                         </span>
                         <input
                           type="text"
-                          placeholder={t("search_student")}
+                          placeholder={selectedClassFilter ? `Search in ${selectedClassFilter}...` : "Select a class first..."}
                           value={studentSearch}
                           disabled={!selectedClassFilter}
                           onChange={(e) => {
                             setStudentSearch(e.target.value);
                             setStudentCurrentPage(1);
                           }}
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 ltr:pl-9 ltr:pr-4 rtl:pr-9 rtl:pl-4 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition-colors disabled:opacity-40"
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 pl-9 pr-4 text-xs text-slate-100 placeholder-slate-500 focus:outline-none transition-colors disabled:opacity-40"
                         />
                       </div>
                     </div>
@@ -1929,12 +1929,12 @@ export default function AdminDashboard() {
 
                   {/* Desktop Table View */}
                   <div className="hidden md:block overflow-x-auto">
-                    <table className="w-full ltr:text-left rtl:text-right text-sm">
+                    <table className="w-full text-left text-sm">
                       <thead className="bg-slate-950 text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800">
                         <tr>
                           <th className="py-4 px-6 cursor-pointer hover:text-emerald-400 select-none transition-colors" onClick={() => handleSort("id")}>
                             <div className="flex items-center gap-1.5">
-                              {t("student_id")}
+                              Student ID
                               <span className="text-[10px] text-slate-600">
                                 {studentSortField === "id" ? (studentSortDirection === "asc" ? "▲" : "▼") : "↕"}
                               </span>
@@ -1942,17 +1942,17 @@ export default function AdminDashboard() {
                           </th>
                           <th className="py-4 px-6 cursor-pointer hover:text-emerald-400 select-none transition-colors" onClick={() => handleSort("name")}>
                             <div className="flex items-center gap-1.5">
-                              {t("full_name")}
+                              Full Name
                               <span className="text-[10px] text-slate-600">
                                 {studentSortField === "name" ? (studentSortDirection === "asc" ? "▲" : "▼") : "↕"}
                               </span>
                             </div>
                           </th>
-                          <th className="py-4 px-6">{t("email")}</th>
-                          <th className="py-4 px-6">{t("phone_number")}</th>
+                          <th className="py-4 px-6">Email</th>
+                          <th className="py-4 px-6">Phone Number</th>
                           <th className="py-4 px-6 cursor-pointer hover:text-emerald-400 select-none transition-colors" onClick={() => handleSort("gradeGroup")}>
                             <div className="flex items-center gap-1.5">
-                              {t("grade")}
+                              Class
                               <span className="text-[10px] text-slate-600">
                                 {studentSortField === "gradeGroup" ? (studentSortDirection === "asc" ? "▲" : "▼") : "↕"}
                               </span>
@@ -1960,13 +1960,13 @@ export default function AdminDashboard() {
                           </th>
                           <th className="py-4 px-6 cursor-pointer hover:text-emerald-400 select-none transition-colors" onClick={() => handleSort("academicYear")}>
                             <div className="flex items-center gap-1.5">
-                              {t("academic_year")}
+                              Academic Year
                               <span className="text-[10px] text-slate-600">
                                 {studentSortField === "academicYear" ? (studentSortDirection === "asc" ? "▲" : "▼") : "↕"}
                               </span>
                             </div>
                           </th>
-                          <th className="py-4 px-6 ltr:text-right rtl:text-left">{t("actions")}</th>
+                          <th className="py-4 px-6 text-right">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/50 font-medium">
@@ -2302,8 +2302,8 @@ export default function AdminDashboard() {
                           type="button"
                           onClick={() => setStudentCurrentPage(pageNum)}
                           className={`px-3 py-1.5 text-xs font-bold rounded-lg transition-all ${studentCurrentPage === pageNum
-                              ? "bg-emerald-500 text-slate-950"
-                              : "bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-355 hover:text-slate-100"
+                            ? "bg-emerald-500 text-slate-950"
+                            : "bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-355 hover:text-slate-100"
                             }`}
                         >
                           {pageNum}
@@ -2336,13 +2336,13 @@ export default function AdminDashboard() {
                 {/* Form column */}
                 <div className="lg:col-span-4 bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col gap-5">
                   <div>
-                    <h3 className="font-bold text-base text-slate-200">{t("add_class")}</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">{t("curriculum_classes")}</p>
+                    <h3 className="font-bold text-base text-slate-200">Register Class Room</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">Add new academic courses to the curriculum.</p>
                   </div>
 
                   <form onSubmit={handleCreateClass} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("class_name")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Class Name</label>
                       <input
                         type="text"
                         placeholder="e.g. Biology AP"
@@ -2353,7 +2353,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("room")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Room Location</label>
                       <input
                         type="text"
                         placeholder="e.g. Lab 204 or Room 102"
@@ -2364,7 +2364,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("instructor")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Instructor Name</label>
                       <input
                         type="text"
                         placeholder="e.g. Prof. Alan Turing"
@@ -2379,7 +2379,7 @@ export default function AdminDashboard() {
                       className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-2"
                     >
                       <Plus className="w-4 h-4" />
-                      {t("add_class")}
+                      Create Class
                     </button>
                   </form>
                 </div>
@@ -2387,19 +2387,19 @@ export default function AdminDashboard() {
                 {/* Table column */}
                 <div className="lg:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
                   <div className="p-6 border-b border-slate-800/80">
-                    <h3 className="font-bold text-base text-slate-200">{t("curriculum_classes")}</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">{t("classes_mgmt")}: {classes.length}</p>
+                    <h3 className="font-bold text-base text-slate-200">Registered Classes Registry</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">Curriculum list: {classes.length} classes</p>
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full ltr:text-left rtl:text-right text-sm">
+                    <table className="w-full text-left text-sm">
                       <thead className="bg-slate-950 text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800">
                         <tr>
-                          <th className="py-4 px-6">ID</th>
-                          <th className="py-4 px-6">{t("class_name")}</th>
-                          <th className="py-4 px-6">{t("room")}</th>
-                          <th className="py-4 px-6">{t("instructor")}</th>
-                          <th className="py-4 px-6 ltr:text-right rtl:text-left">{t("actions")}</th>
+                          <th className="py-4 px-6">Class ID</th>
+                          <th className="py-4 px-6">Class Name</th>
+                          <th className="py-4 px-6">Room</th>
+                          <th className="py-4 px-6">Instructor</th>
+                          <th className="py-4 px-6 text-right">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/50 font-medium">
@@ -2441,14 +2441,14 @@ export default function AdminDashboard() {
                                     onClick={() => handleSaveClassEdit(cls.id)}
                                     className="px-2.5 py-1 bg-emerald-500 hover:bg-emerald-400 text-slate-950 text-xs font-bold rounded"
                                   >
-                                    {t("save")}
+                                    Save
                                   </button>
                                   <button
                                     type="button"
                                     onClick={() => setEditingClassId(null)}
                                     className="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded"
                                   >
-                                    {t("cancel")}
+                                    Cancel
                                   </button>
                                 </div>
                               </td>
@@ -2474,7 +2474,7 @@ export default function AdminDashboard() {
                                     type="button"
                                     onClick={() => handleDeleteClass(cls.id, cls.className)}
                                     className="p-1.5 hover:bg-rose-950/30 text-slate-500 hover:text-rose-400 rounded-lg transition-colors border border-transparent hover:border-rose-500/20"
-                                    title={t("delete")}
+                                    title="Delete class"
                                   >
                                     <Trash2 className="w-4 h-4" />
                                   </button>
@@ -2516,7 +2516,7 @@ export default function AdminDashboard() {
                       <div>
                         <h4 className="font-bold text-sm text-slate-200 flex items-center gap-2">
                           <Coins className="w-4 h-4 text-amber-500" />
-                          {t("add_charge")}
+                          Add Fee Charge
                         </h4>
                         <p className="text-[11px] text-slate-500 mt-0.5">Create a charge transaction for students (increases balance owed).</p>
                       </div>
@@ -2573,7 +2573,7 @@ export default function AdminDashboard() {
                                     }}
                                     className="rounded border-slate-800 text-emerald-500 focus:ring-emerald-500 w-3.5 h-3.5 cursor-pointer"
                                   />
-                                  <span className="font-bold text-slate-200">{t("all")}</span>
+                                  <span className="font-bold text-slate-200">Select All Students</span>
                                 </label>
                                 <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-900/30">
                                   {selectedFeeStudents.length} students selected
@@ -2635,7 +2635,7 @@ export default function AdminDashboard() {
 
                         <form onSubmit={handleAssignFeeWorkflow} className="flex flex-col gap-3 mt-2">
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-bold">{t("charge_description")}</label>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-bold">Charge Description</label>
                             <input
                               type="text"
                               placeholder="e.g. Monthly Tuition Fee"
@@ -2648,7 +2648,7 @@ export default function AdminDashboard() {
 
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex flex-col gap-1.5">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{t("amount")}</label>
+                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Amount ($)</label>
                               <input
                                 type="number"
                                 placeholder="e.g. 50"
@@ -2659,7 +2659,7 @@ export default function AdminDashboard() {
                               />
                             </div>
                             <div className="flex flex-col gap-1.5">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{t("date")}</label>
+                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Charge Date</label>
                               <input
                                 type="date"
                                 value={chargeDate}
@@ -2672,7 +2672,7 @@ export default function AdminDashboard() {
 
                           <div className="grid grid-cols-2 gap-3">
                             <div className="flex flex-col gap-1.5">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-mono">{t("reference_number")}</label>
+                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-mono">Ref Number (Optional)</label>
                               <input
                                 type="text"
                                 placeholder="e.g. CHG-12345"
@@ -2710,7 +2710,7 @@ export default function AdminDashboard() {
                       <div>
                         <h4 className="font-bold text-sm text-slate-200 flex items-center gap-2">
                           <CreditCard className="w-4 h-4 text-emerald-400" />
-                          {t("record_payment")}
+                          Record Payment
                         </h4>
                         <p className="text-[11px] text-slate-500 mt-0.5">Enter a payment transaction (reduces student balance owed).</p>
                       </div>
@@ -2718,7 +2718,7 @@ export default function AdminDashboard() {
                       <form onSubmit={handleRecordPayment} className="flex flex-col gap-3">
                         {/* Search Student Input */}
                         <div className="flex flex-col gap-1.5 relative">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{t("search_student")}</label>
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Search Student</label>
                           <div className="relative">
                             <input
                               type="text"
@@ -2793,7 +2793,7 @@ export default function AdminDashboard() {
 
                         <div className="grid grid-cols-2 gap-3">
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-mono">{t("payment_method")}</label>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-mono">Payment Method</label>
                             <select
                               value={paymentMethod}
                               onChange={(e) => setPaymentMethod(e.target.value)}
@@ -2808,7 +2808,7 @@ export default function AdminDashboard() {
                             </select>
                           </div>
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-bold font-mono">{t("paid")}</label>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-bold font-mono">Amount Paid ($)</label>
                             <input
                               type="number"
                               placeholder="e.g. 40"
@@ -2822,7 +2822,7 @@ export default function AdminDashboard() {
 
                         <div className="grid grid-cols-2 gap-3">
                           <div className="flex flex-col gap-1.5">
-                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-bold">{t("date")}</label>
+                            <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide font-bold">Payment Date</label>
                             <input
                               type="date"
                               value={paymentDate}
@@ -2843,7 +2843,7 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{t("notes")}</label>
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Notes / Reference (Optional)</label>
                           <input
                             type="text"
                             placeholder="e.g. Reference No / Check No"
@@ -2869,7 +2869,7 @@ export default function AdminDashboard() {
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-6">
                   <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-lg hover:border-slate-700 transition-all duration-300">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("total_amount")}</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Charges</p>
                       <h3 className="text-2xl font-bold text-slate-100 font-mono mt-1">{formatCurrency(feeSummaryTotal)}</h3>
                     </div>
                     <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
@@ -2879,7 +2879,7 @@ export default function AdminDashboard() {
 
                   <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-lg hover:border-slate-700 transition-all duration-300">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("paid")}</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Total Payments</p>
                       <h3 className="text-2xl font-bold text-emerald-400 font-mono mt-1">{formatCurrency(feeSummaryCollected)}</h3>
                     </div>
                     <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
@@ -2889,7 +2889,7 @@ export default function AdminDashboard() {
 
                   <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex items-center justify-between shadow-lg hover:border-slate-700 transition-all duration-300">
                     <div>
-                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{t("outstanding_balance")}</p>
+                      <p className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Outstanding Balance</p>
                       <h3 className="text-2xl font-bold text-rose-400 font-mono mt-1">{formatCurrency(feeSummaryOutstanding)}</h3>
                     </div>
                     <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl">
@@ -2905,7 +2905,7 @@ export default function AdminDashboard() {
                   <div className="p-6 border-b border-slate-800/80 flex flex-col gap-6">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                       <div>
-                        <h3 className="font-bold text-base text-slate-200">{t("financial_ledger")}</h3>
+                        <h3 className="font-bold text-base text-slate-200">Finance Transactions Register</h3>
                         <p className="text-xs text-slate-500 mt-0.5">Audit history of all student charges and payments</p>
                       </div>
 
@@ -3063,22 +3063,22 @@ export default function AdminDashboard() {
 
                   {/* Data Table */}
                   <div className="overflow-x-auto">
-                    <table className="w-full ltr:text-left rtl:text-right text-sm">
+                    <table className="w-full text-left text-sm">
                       <thead className="bg-slate-950 text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-850">
                         <tr>
-                          <th className="py-4 px-5">{t("date")}</th>
-                          <th className="py-4 px-5">{t("reference_number")}</th>
-                          <th className="py-4 px-5">{t("student_id")}</th>
-                          <th className="py-4 px-5">{t("name")}</th>
-                          <th className="py-4 px-5">{t("class_name")}</th>
-                          <th className="py-4 px-5">{t("fee_item")}</th>
-                          <th className="py-4 px-5">{t("description")}</th>
-                          <th className="py-4 px-5">{t("total_amount")}</th>
-                          <th className="py-4 px-5">{t("paid")}</th>
-                          <th className="py-4 px-5">{t("status")}</th>
-                          <th className="py-4 px-5">{t("payment_method")}</th>
-                          <th className="py-4 px-5">{t("instructor")}</th>
-                          <th className="py-4 px-5 ltr:text-right rtl:text-left">{t("actions")}</th>
+                          <th className="py-4 px-5">Date</th>
+                          <th className="py-4 px-5">Ref Number</th>
+                          <th className="py-4 px-5">Student ID</th>
+                          <th className="py-4 px-5">Student Name</th>
+                          <th className="py-4 px-5">Class</th>
+                          <th className="py-4 px-5">Type</th>
+                          <th className="py-4 px-5">Description</th>
+                          <th className="py-4 px-5">Charge Amount</th>
+                          <th className="py-4 px-5">Payment Amount</th>
+                          <th className="py-4 px-5">Status</th>
+                          <th className="py-4 px-5">Method</th>
+                          <th className="py-4 px-5">Staff</th>
+                          <th className="py-4 px-5 text-right">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/40 font-medium">
@@ -3184,8 +3184,8 @@ export default function AdminDashboard() {
                               </td>
                               <td className="py-3.5 px-5">
                                 <span className={`inline-flex px-2.5 py-0.5 text-[9px] font-extrabold uppercase rounded border ${tx.status === "Paid"
-                                    ? "bg-emerald-950/40 border-emerald-500/20 text-emerald-400"
-                                    : "bg-amber-950/40 border-amber-500/20 text-amber-500"
+                                  ? "bg-emerald-950/40 border-emerald-500/20 text-emerald-400"
+                                  : "bg-amber-950/40 border-amber-500/20 text-amber-500"
                                   }`}>
                                   {tx.status}
                                 </span>
@@ -3293,7 +3293,7 @@ export default function AdminDashboard() {
                       <div>
                         <h3 className="font-bold text-lg text-slate-100 flex items-center gap-2">
                           <FileCheck className="w-5.5 h-5.5 text-emerald-400" />
-                          {t("grading_terminal")}
+                          Enter Examination Marks
                         </h3>
                         <p className="text-xs text-slate-400 mt-1">
                           Select a class, academic year, and term — then enter marks for each student and click Save.
@@ -3332,7 +3332,7 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{t("term")}</label>
+                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Assessment Term</label>
                           <select
                             value={examTerm}
                             onChange={(e) => setExamTerm(e.target.value)}
@@ -3406,17 +3406,17 @@ export default function AdminDashboard() {
                                   <table className="w-full text-left text-xs min-w-max">
                                     <thead className="bg-slate-900 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
                                       <tr>
-                                        <th className="py-3.5 px-4 whitespace-nowrap">{t("student_id")}</th>
-                                        <th className="py-3.5 px-4 whitespace-nowrap">{t("name")}</th>
+                                        <th className="py-3.5 px-4 whitespace-nowrap">Student ID</th>
+                                        <th className="py-3.5 px-4 whitespace-nowrap">Name</th>
                                         {subjects.map((sub) => (
                                           <th key={sub.id} className="py-3.5 px-3 text-center whitespace-nowrap font-mono min-w-[80px]">{sub.subjectName}</th>
                                         ))}
-                                        <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("total_amount")}</th>
-                                        <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("grade_score")}</th>
-                                        <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("grade")}</th>
-                                        <th className="py-3.5 px-4 whitespace-nowrap min-w-[180px]">{t("feedback")}</th>
-                                        <th className="py-3.5 px-3 text-center whitespace-nowrap">{t("status")}</th>
-                                        <th className="py-3.5 px-4 ltr:text-right rtl:text-left whitespace-nowrap">{t("save")}</th>
+                                        <th className="py-3.5 px-3 text-center whitespace-nowrap">Total</th>
+                                        <th className="py-3.5 px-3 text-center whitespace-nowrap">Avg</th>
+                                        <th className="py-3.5 px-3 text-center whitespace-nowrap">Grade</th>
+                                        <th className="py-3.5 px-4 whitespace-nowrap min-w-[180px]">Feedback</th>
+                                        <th className="py-3.5 px-3 text-center whitespace-nowrap">Status</th>
+                                        <th className="py-3.5 px-4 text-right whitespace-nowrap">Save</th>
                                       </tr>
                                     </thead>
                                     <tbody className="divide-y divide-slate-800/50">
@@ -3579,7 +3579,7 @@ export default function AdminDashboard() {
                       <div>
                         <h3 className="font-bold text-base text-slate-200 flex items-center gap-2">
                           <Award className="w-5 h-5 text-emerald-400" />
-                          {t("registered_grades")}
+                          Recorded Exam Students
                         </h3>
                         <p className="text-xs text-slate-500 mt-0.5">
                           Select a class to view students who have saved examination results. Expand any row to see the full marksheet.
@@ -3698,7 +3698,7 @@ export default function AdminDashboard() {
                                   </select>
                                 </div>
                                 <div className="flex flex-col gap-1.5">
-                                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">{t("search_student")}</label>
+                                  <label className="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Search Student</label>
                                   <div className="relative">
                                     <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-slate-500 pointer-events-none" />
                                     <input type="text" placeholder="Name or Student ID..."
@@ -3717,7 +3717,7 @@ export default function AdminDashboard() {
                                   ) : (
                                     <>
                                       <p className="text-slate-400 text-sm font-semibold">No recorded examination results found for this class.</p>
-                                      <p className="text-slate-600 text-xs">Use &ldquo;{t("grading_terminal")}&rdquo; above to record marks first.</p>
+                                      <p className="text-slate-600 text-xs">Use &ldquo;Enter Examination Marks&rdquo; above to record marks first.</p>
                                     </>
                                   )}
                                 </div>
@@ -3965,13 +3965,13 @@ export default function AdminDashboard() {
                 {/* Form column */}
                 <div className="lg:col-span-4 bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col gap-5">
                   <div>
-                    <h3 className="font-bold text-base text-slate-200">{t("add_subject")}</h3>
+                    <h3 className="font-bold text-base text-slate-200">Register New Subject</h3>
                     <p className="text-xs text-slate-500 mt-0.5">Add core classes and course subjects to registry.</p>
                   </div>
 
                   <form onSubmit={handleRegisterSubject} className="flex flex-col gap-4">
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("subject")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject Name</label>
                       <input
                         type="text"
                         placeholder="e.g. Mathematics"
@@ -3983,7 +3983,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("subject_code")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject Code <span className="text-slate-600 font-normal">(Optional)</span></label>
                       <input
                         type="text"
                         placeholder="e.g. MTH-101"
@@ -3994,7 +3994,7 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("description")}</label>
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Description <span className="text-slate-600 font-normal">(Optional)</span></label>
                       <textarea
                         placeholder="Subject course summary..."
                         value={newSubjectDescription}
@@ -4017,19 +4017,19 @@ export default function AdminDashboard() {
                 {/* Table column */}
                 <div className="lg:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
                   <div className="p-6 border-b border-slate-800/80">
-                    <h3 className="font-bold text-base text-slate-200">{t("subjects_mgmt")}</h3>
+                    <h3 className="font-bold text-base text-slate-200">Registered Subjects</h3>
                     <p className="text-xs text-slate-500 mt-0.5">Total count: {subjects.length} subjects registered</p>
                   </div>
 
                   <div className="overflow-x-auto">
-                    <table className="w-full ltr:text-left rtl:text-right text-sm">
+                    <table className="w-full text-left text-sm">
                       <thead className="bg-slate-950 text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800">
                         <tr>
-                          <th className="py-4 px-6">{t("subject_code")}</th>
-                          <th className="py-4 px-6">{t("subject")}</th>
-                          <th className="py-4 px-6">{t("subject_code")}</th>
-                          <th className="py-4 px-6">{t("description")}</th>
-                          <th className="py-4 px-6 ltr:text-right rtl:text-left">{t("actions")}</th>
+                          <th className="py-4 px-6">Subject ID</th>
+                          <th className="py-4 px-6">Subject Name</th>
+                          <th className="py-4 px-6">Subject Code</th>
+                          <th className="py-4 px-6">Description</th>
+                          <th className="py-4 px-6 text-right">Actions</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/50 font-medium">
@@ -4158,7 +4158,7 @@ export default function AdminDashboard() {
                     <div>
                       <h3 className="font-bold text-base text-slate-200 flex items-center gap-2">
                         <UserPlus className="w-4 h-4 text-emerald-400" />
-                        {t("add_user")}
+                        Create New Login Account
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
                         Add a new administrative user with login credentials.
@@ -4167,7 +4167,7 @@ export default function AdminDashboard() {
 
                     <form onSubmit={handleAddUserAccountSubmit} className="flex flex-col gap-4">
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("full_name")}</label>
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Full Name</label>
                         <input
                           type="text"
                           placeholder="e.g. Sarah Connor"
@@ -4179,7 +4179,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("email")}</label>
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Email Address (Unique)</label>
                         <input
                           type="email"
                           placeholder="e.g. sarah@madrasa.com"
@@ -4191,7 +4191,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("password")}</label>
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Password</label>
                         <div className="relative flex items-center">
                           <input
                             type={showNewUserPassword ? "text" : "password"}
@@ -4212,7 +4212,7 @@ export default function AdminDashboard() {
                       </div>
 
                       <div className="flex flex-col gap-1.5">
-                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("confirm_password")}</label>
+                        <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Confirm Password</label>
                         <input
                           type="password"
                           placeholder="••••••••"
@@ -4225,7 +4225,7 @@ export default function AdminDashboard() {
 
                       <div className="grid grid-cols-2 gap-3">
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("role")}</label>
+                          <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">User Role</label>
                           <select
                             value={newUserRole}
                             onChange={(e) => setNewUserRole(e.target.value as UserRole)}
@@ -4237,7 +4237,7 @@ export default function AdminDashboard() {
                         </div>
 
                         <div className="flex flex-col gap-1.5">
-                          <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("status")}</label>
+                          <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Initial Status</label>
                           <select
                             value={newUserStatus}
                             onChange={(e) => setNewUserStatus(e.target.value as AccountStatus)}
@@ -4263,7 +4263,7 @@ export default function AdminDashboard() {
                   <div className="lg:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
                     <div className="p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                       <div>
-                        <h3 className="font-bold text-base text-slate-200">{t("user_accounts_registry")}</h3>
+                        <h3 className="font-bold text-base text-slate-200">System User Accounts</h3>
                         <p className="text-xs text-slate-500 mt-0.5">
                           Showing {userAccounts.length} user account records
                         </p>
@@ -4300,14 +4300,14 @@ export default function AdminDashboard() {
                     </div>
 
                     <div className="overflow-x-auto">
-                      <table className="w-full ltr:text-left rtl:text-right text-sm">
+                      <table className="w-full text-left text-sm">
                         <thead className="bg-slate-950 text-slate-400 text-xs font-bold uppercase tracking-wider border-b border-slate-800">
                           <tr>
-                            <th className="py-4 px-6">{t("name")}</th>
-                            <th className="py-4 px-6">{t("email")}</th>
-                            <th className="py-4 px-6">{t("role")}</th>
-                            <th className="py-4 px-6">{t("status")}</th>
-                            <th className="py-4 px-6 ltr:text-right rtl:text-left">{t("actions")}</th>
+                            <th className="py-4 px-6">User Name</th>
+                            <th className="py-4 px-6">Email Address</th>
+                            <th className="py-4 px-6">Role</th>
+                            <th className="py-4 px-6">Status</th>
+                            <th className="py-4 px-6 text-right">Actions</th>
                           </tr>
                         </thead>
                         <tbody className="divide-y divide-slate-800/50 font-medium">
@@ -4399,8 +4399,8 @@ export default function AdminDashboard() {
                                   <td className="py-4 px-6">
                                     <span
                                       className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase border ${user.role === "super_admin"
-                                          ? "bg-purple-950/50 text-purple-300 border-purple-500/30"
-                                          : "bg-blue-950/50 text-blue-300 border-blue-500/30"
+                                        ? "bg-purple-950/50 text-purple-300 border-purple-500/30"
+                                        : "bg-blue-950/50 text-blue-300 border-blue-500/30"
                                         }`}
                                     >
                                       {user.role === "super_admin" ? "Super Admin" : "Admin"}
@@ -4411,8 +4411,8 @@ export default function AdminDashboard() {
                                       type="button"
                                       onClick={() => toggleUserAccountStatus(user.id)}
                                       className={`px-2.5 py-1 rounded-md text-[10px] font-extrabold uppercase border transition-all flex items-center gap-1 ${user.status === "active"
-                                          ? "bg-emerald-950/50 text-emerald-400 border-emerald-500/30 hover:bg-emerald-900/60"
-                                          : "bg-rose-950/50 text-rose-400 border-rose-500/30 hover:bg-rose-900/60"
+                                        ? "bg-emerald-950/50 text-emerald-400 border-emerald-500/30 hover:bg-emerald-900/60"
+                                        : "bg-rose-950/50 text-rose-400 border-rose-500/30 hover:bg-rose-900/60"
                                         }`}
                                       title="Click to toggle account status"
                                     >
@@ -4475,7 +4475,7 @@ export default function AdminDashboard() {
                 {/* Top border accent line */}
                 <div className="absolute top-0 left-0 right-0 h-1 bg-rose-500 rounded-t-2xl" />
 
-                <h3 className="text-base font-bold text-slate-100 mb-2">{t("confirm_delete")}</h3>
+                <h3 className="text-base font-bold text-slate-100 mb-2">Confirm Deletion</h3>
                 <p className="text-xs text-slate-400 mb-4">
                   Confirm if you wish to proceed with this deletion:
                 </p>
@@ -4531,7 +4531,7 @@ export default function AdminDashboard() {
                 <div className="flex justify-between items-start gap-4 mb-6">
                   <div>
                     <span className="text-[10px] text-emerald-400 font-bold uppercase tracking-wider font-mono bg-emerald-950/40 px-2 py-0.5 rounded border border-cyan-850">
-                      {t("student_audit_profile")}
+                      Student Audit Profile
                     </span>
                     <h3 className="text-xl font-bold text-slate-100 mt-1">{selectedStudentDetail.name}</h3>
                     <p className="text-xs text-slate-500 mt-0.5">ID: {selectedStudentDetail.id} | {selectedStudentDetail.email}{selectedStudentDetail.phoneNumber ? ` | ${selectedStudentDetail.phoneNumber}` : ""}</p>
@@ -4896,111 +4896,111 @@ export default function AdminDashboard() {
                     onClick={() => setSelectedStudentDetail(null)}
                     className="px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors"
                   >
-                    {t("close_profile")}
+                    Close Profile Audit
                   </button>
                 </div>
               </motion.div>
             </div>
           )}
-        
-        {/* EDIT SUBJECT MODAL */}
-        <AnimatePresence>
-          {isEditSubjectModalOpen && (
-            <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-              <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0, scale: 0.95 }}
-                transition={{ duration: 0.2 }}
-                className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-5"
-              >
-                <div className="flex items-center justify-between border-b border-slate-800 pb-4">
-                  <div>
-                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                      <Pencil className="w-5 h-5 text-emerald-400" />
-                      {t("edit_subject")}
-                    </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
-                      Update curriculum subject properties
-                    </p>
-                  </div>
-                  <button
-                    type="button"
-                    onClick={() => setIsEditSubjectModalOpen(false)}
-                    className="p-1 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition-colors"
-                  >
-                    <X className="w-5 h-5" />
-                  </button>
-                </div>
 
-                <form onSubmit={handleSaveSubjectSubmit} className="flex flex-col gap-4">
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject ID (Read-only)</label>
-                    <input
-                      type="text"
-                      value={editSubjectId}
-                      readOnly
-                      disabled
-                      className="w-full bg-slate-950/50 border border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-400 font-mono cursor-not-allowed select-none opacity-80"
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">{t("subject")}</label>
-                    <input
-                      type="text"
-                      value={editSubjectName}
-                      onChange={(e) => setEditSubjectName(e.target.value)}
-                      placeholder="e.g. Mathematics"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-100 focus:outline-none transition-colors"
-                      required
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject Code</label>
-                    <input
-                      type="text"
-                      value={editSubjectCode}
-                      onChange={(e) => setEditSubjectCode(e.target.value)}
-                      placeholder="e.g. MTH-101"
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-100 focus:outline-none transition-colors"
-                      required
-                    />
-                  </div>
-
-                  <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Description <span className="text-slate-500 font-normal">(Optional)</span></label>
-                    <textarea
-                      value={editSubjectDescription}
-                      onChange={(e) => setEditSubjectDescription(e.target.value)}
-                      rows={3}
-                      placeholder="Course summary..."
-                      className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-200 focus:outline-none resize-none leading-relaxed"
-                    />
-                  </div>
-
-                  <div className="flex justify-end gap-3 pt-3 border-t border-slate-800 mt-2">
+          {/* EDIT SUBJECT MODAL */}
+          <AnimatePresence>
+            {isEditSubjectModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  transition={{ duration: 0.2 }}
+                  className="bg-slate-900 border border-slate-800 rounded-2xl max-w-md w-full p-6 shadow-2xl flex flex-col gap-5"
+                >
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-4">
+                    <div>
+                      <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                        <Pencil className="w-5 h-5 text-emerald-400" />
+                        Edit Subject Details
+                      </h3>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Update curriculum subject properties
+                      </p>
+                    </div>
                     <button
                       type="button"
                       onClick={() => setIsEditSubjectModalOpen(false)}
-                      className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors"
+                      className="p-1 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition-colors"
                     >
-                      Cancel
-                    </button>
-                    <button
-                      type="submit"
-                      disabled={isSavingSubject}
-                      className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
-                    >
-                      {isSavingSubject ? "Saving..." : "Save Changes"}
+                      <X className="w-5 h-5" />
                     </button>
                   </div>
-                </form>
-              </motion.div>
-            </div>
-          )}
-        </AnimatePresence>
+
+                  <form onSubmit={handleSaveSubjectSubmit} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject ID (Read-only)</label>
+                      <input
+                        type="text"
+                        value={editSubjectId}
+                        readOnly
+                        disabled
+                        className="w-full bg-slate-950/50 border border-slate-800 rounded-xl py-2 px-3 text-xs text-slate-400 font-mono cursor-not-allowed select-none opacity-80"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject Name</label>
+                      <input
+                        type="text"
+                        value={editSubjectName}
+                        onChange={(e) => setEditSubjectName(e.target.value)}
+                        placeholder="e.g. Mathematics"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-100 focus:outline-none transition-colors"
+                        required
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Subject Code</label>
+                      <input
+                        type="text"
+                        value={editSubjectCode}
+                        onChange={(e) => setEditSubjectCode(e.target.value)}
+                        placeholder="e.g. MTH-101"
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-100 focus:outline-none transition-colors"
+                        required
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-1.5">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Description <span className="text-slate-500 font-normal">(Optional)</span></label>
+                      <textarea
+                        value={editSubjectDescription}
+                        onChange={(e) => setEditSubjectDescription(e.target.value)}
+                        rows={3}
+                        placeholder="Course summary..."
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2 px-3 text-xs text-slate-200 focus:outline-none resize-none leading-relaxed"
+                      />
+                    </div>
+
+                    <div className="flex justify-end gap-3 pt-3 border-t border-slate-800 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsEditSubjectModalOpen(false)}
+                        className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors"
+                      >
+                        Cancel
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={isSavingSubject}
+                        className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
+                      >
+                        {isSavingSubject ? "Saving..." : "Save Changes"}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
 
         </AnimatePresence>
       </div>
