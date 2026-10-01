@@ -139,6 +139,13 @@ export default function AdminDashboard() {
   const [selectedReturnStudentIds, setSelectedReturnStudentIds] = useState<string[]>([]);
   const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
 
+  // Promotion History Filter States
+  const [promoHistorySearch, setPromoHistorySearch] = useState("");
+  const [promoHistoryClassFilter, setPromoHistoryClassFilter] = useState("");
+  const [promoHistoryStatusFilter, setPromoHistoryStatusFilter] = useState("");
+  const [promoHistoryFromDate, setPromoHistoryFromDate] = useState("");
+  const [promoHistoryToDate, setPromoHistoryToDate] = useState("");
+
   // Mobile sidebar menu toggle
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
@@ -4867,100 +4874,231 @@ export default function AdminDashboard() {
                   );
                 })()}
 
-                {/* PROMOTION HISTORY LOG TABLE */}
-                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
-                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                    <div className="flex items-center gap-2">
-                      <Clock className="w-5 h-5 text-emerald-500" />
-                      <h3 className="font-black text-base uppercase tracking-wider text-slate-100">
-                        {t("promotion_history")}
-                      </h3>
+                {/* PROMOTION HISTORY LOG TABLE WITH SEARCH AND CLASS FILTERS */}
+                {(() => {
+                  const filteredPromotions = promotions.filter((p) => {
+                    if (promoHistorySearch.trim()) {
+                      const q = promoHistorySearch.trim().toLowerCase();
+                      const st = students.find((s) => s.id === p.studentId);
+                      const phone = (st?.phoneNumber || "").toLowerCase();
+                      const sId = (p.studentId || "").toLowerCase();
+                      const sIdStripped = stripLeadingZeros(p.studentId || "").toLowerCase();
+                      const name = (p.studentName || "").toLowerCase();
+
+                      const matchesSearch =
+                        name.includes(q) || sId.includes(q) || sIdStripped.includes(q) || phone.includes(q);
+                      if (!matchesSearch) return false;
+                    }
+
+                    if (promoHistoryClassFilter) {
+                      const matchesClass =
+                        p.fromClass === promoHistoryClassFilter || p.toClass === promoHistoryClassFilter;
+                      if (!matchesClass) return false;
+                    }
+
+                    if (promoHistoryStatusFilter) {
+                      if (p.status.toLowerCase() !== promoHistoryStatusFilter.toLowerCase()) return false;
+                    }
+
+                    const promoDateStr = p.promotedAt ? p.promotedAt.substring(0, 10) : "";
+                    if (promoHistoryFromDate && promoDateStr && promoDateStr < promoHistoryFromDate) {
+                      return false;
+                    }
+                    if (promoHistoryToDate && promoDateStr && promoDateStr > promoHistoryToDate) {
+                      return false;
+                    }
+
+                    return true;
+                  });
+
+                  const isFiltered =
+                    Boolean(promoHistorySearch.trim()) ||
+                    Boolean(promoHistoryClassFilter) ||
+                    Boolean(promoHistoryStatusFilter) ||
+                    Boolean(promoHistoryFromDate) ||
+                    Boolean(promoHistoryToDate);
+
+                  return (
+                    <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col gap-5">
+                      {/* Section Header */}
+                      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-800 pb-4">
+                        <div className="flex items-center gap-2">
+                          <Clock className="w-5 h-5 text-emerald-500" />
+                          <h3 className="font-black text-base uppercase tracking-wider text-slate-100">
+                            {t("promotion_history")}
+                          </h3>
+                        </div>
+                        <span className="text-xs font-mono font-bold text-slate-400">
+                          {isFiltered
+                            ? t("showing_x_of_y_events")
+                                .replace("{x}", String(filteredPromotions.length))
+                                .replace("{y}", String(promotions.length))
+                            : `${promotions.length} Events Logged`}
+                        </span>
+                      </div>
+
+                      {/* Filter Bar Controls */}
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3 bg-slate-950/80 p-4 rounded-xl border border-slate-850">
+                        {/* Search Input */}
+                        <div className="relative sm:col-span-2 lg:col-span-2">
+                          <Search className="w-4 h-4 text-slate-500 absolute ltr:left-3 rtl:right-3 top-3" />
+                          <input
+                            type="text"
+                            placeholder={t("search_student")}
+                            value={promoHistorySearch}
+                            onChange={(e) => setPromoHistorySearch(e.target.value)}
+                            className="w-full bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-xl ltr:pl-9 ltr:pr-3 rtl:pr-9 rtl:pl-3 py-2.5 font-semibold focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+
+                        {/* Class Dropdown (Previous Class OR New Class) */}
+                        <select
+                          value={promoHistoryClassFilter}
+                          onChange={(e) => setPromoHistoryClassFilter(e.target.value)}
+                          className="bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-xl p-2.5 font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer"
+                        >
+                          <option value="">-- {t("all_classes")} --</option>
+                          {classes.map((cls) => (
+                            <option key={cls.id} value={cls.className}>
+                              {cls.className}
+                            </option>
+                          ))}
+                        </select>
+
+                        {/* Status Dropdown */}
+                        <select
+                          value={promoHistoryStatusFilter}
+                          onChange={(e) => setPromoHistoryStatusFilter(e.target.value)}
+                          className="bg-slate-900 border border-slate-800 text-slate-100 text-xs rounded-xl p-2.5 font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer font-mono uppercase"
+                        >
+                          <option value="">-- {t("all_statuses")} --</option>
+                          <option value="Promoted">PROMOTED</option>
+                          <option value="Reverted">REVERTED</option>
+                        </select>
+
+                        {/* Date Filters & Clear */}
+                        <div className="flex items-center gap-2 sm:col-span-2 lg:col-span-1">
+                          <input
+                            type="date"
+                            value={promoHistoryFromDate}
+                            onChange={(e) => setPromoHistoryFromDate(e.target.value)}
+                            title={t("from_date")}
+                            className="w-full bg-slate-900 border border-slate-800 text-slate-200 text-[11px] font-mono rounded-xl p-2 focus:outline-none focus:border-emerald-500"
+                          />
+                          <input
+                            type="date"
+                            value={promoHistoryToDate}
+                            onChange={(e) => setPromoHistoryToDate(e.target.value)}
+                            title={t("to_date")}
+                            className="w-full bg-slate-900 border border-slate-800 text-slate-200 text-[11px] font-mono rounded-xl p-2 focus:outline-none focus:border-emerald-500"
+                          />
+                        </div>
+                      </div>
+
+                      {/* Clear Filters Button Row */}
+                      {isFiltered && (
+                        <div className="flex justify-end">
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setPromoHistorySearch("");
+                              setPromoHistoryClassFilter("");
+                              setPromoHistoryStatusFilter("");
+                              setPromoHistoryFromDate("");
+                              setPromoHistoryToDate("");
+                            }}
+                            className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-lg border border-slate-700 transition-all cursor-pointer flex items-center gap-1.5"
+                          >
+                            ✕ {t("clear_filters")}
+                          </button>
+                        </div>
+                      )}
+
+                      {/* Log Table */}
+                      <div className="overflow-x-auto">
+                        <table className="w-full ltr:text-left rtl:text-right text-xs">
+                          <thead className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                            <tr>
+                              <th className="py-3.5 px-4">Date & Time</th>
+                              <th className="py-3.5 px-4 font-mono">Student ID</th>
+                              <th className="py-3.5 px-4">Student Name</th>
+                              <th className="py-3.5 px-4 text-center">Previous Class</th>
+                              <th className="py-3.5 px-4 text-center">New Class</th>
+                              <th className="py-3.5 px-4 text-center font-mono">Target Year</th>
+                              <th className="py-3.5 px-4 text-center">Status</th>
+                              <th className="py-3.5 px-4 text-center">{t("action")}</th>
+                            </tr>
+                          </thead>
+                          <tbody className="divide-y divide-slate-800/40">
+                            {filteredPromotions.map((p) => (
+                              <tr key={p.id} className="hover:bg-slate-900/40 transition-colors">
+                                <td className="py-3.5 px-4 font-mono text-slate-400">{p.promotedAt}</td>
+                                <td className="py-3.5 px-4 font-mono font-bold text-emerald-400">
+                                  {stripLeadingZeros(p.studentId)}
+                                </td>
+                                <td className="py-3.5 px-4 font-bold text-slate-100">{p.studentName}</td>
+                                <td className="py-3.5 px-4 text-center font-semibold text-slate-400">{p.fromClass}</td>
+                                <td className="py-3.5 px-4 text-center font-bold text-emerald-400">{p.toClass}</td>
+                                <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">{p.toAcademicYear}</td>
+                                <td className="py-3.5 px-4 text-center">
+                                  <span className={`px-2.5 py-0.5 text-[10px] font-extrabold uppercase rounded border ${
+                                    p.status === "Reverted"
+                                      ? "bg-amber-950/50 border-amber-500/30 text-amber-400"
+                                      : "bg-emerald-950/50 border-emerald-500/20 text-emerald-400"
+                                  }`}>
+                                    {p.status === "Reverted" ? t("reverted") : p.status}
+                                  </span>
+                                </td>
+                                <td className="py-3.5 px-4 text-center">
+                                  {p.status === "Promoted" ? (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        const studentObj = students.find(s => s.id === p.studentId) || {
+                                          id: p.studentId,
+                                          name: p.studentName,
+                                          email: "",
+                                          gradeGroup: p.toClass,
+                                          academicYear: p.toAcademicYear || "2025–2026",
+                                          status: "active"
+                                        };
+                                        setIndividualReturnStudent(studentObj);
+                                        setIndividualReturnPreviousClass(p.fromClass);
+                                        setSelectedReturnPromoId(p.id);
+                                        setSelectedReturnAcademicYear(p.toAcademicYear || "2026–2027");
+                                        setReturnModalMode("single");
+                                        setShowReturnModal(true);
+                                      }}
+                                      className="px-3 py-1 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 text-amber-400 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 mx-auto cursor-pointer shadow-sm"
+                                      title={`Return ${p.studentName} to ${p.fromClass}`}
+                                    >
+                                      <Undo2 className="w-3.5 h-3.5" />
+                                      {t("return")}
+                                    </button>
+                                  ) : (
+                                    <span className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-slate-400 text-[10px] font-bold uppercase rounded flex items-center justify-center gap-1 w-fit mx-auto opacity-70">
+                                      {t("returned")}
+                                    </span>
+                                  )}
+                                </td>
+                              </tr>
+                            ))}
+
+                            {filteredPromotions.length === 0 && (
+                              <tr>
+                                <td colSpan={8} className="py-8 text-center text-slate-500 italic">
+                                  {isFiltered
+                                    ? "No promotion records matched the selected search & filter criteria."
+                                    : "No promotion records logged yet."}
+                                </td>
+                              </tr>
+                            )}
+                          </tbody>
+                        </table>
+                      </div>
                     </div>
-                    <span className="text-xs font-mono font-bold text-slate-400">
-                      {promotions.length} Events Logged
-                    </span>
-                  </div>
-
-                  <div className="overflow-x-auto">
-                    <table className="w-full ltr:text-left rtl:text-right text-xs">
-                      <thead className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
-                        <tr>
-                          <th className="py-3.5 px-4">Date & Time</th>
-                          <th className="py-3.5 px-4 font-mono">Student ID</th>
-                          <th className="py-3.5 px-4">Student Name</th>
-                          <th className="py-3.5 px-4 text-center">Previous Class</th>
-                          <th className="py-3.5 px-4 text-center">New Class</th>
-                          <th className="py-3.5 px-4 text-center font-mono">Target Year</th>
-                          <th className="py-3.5 px-4 text-center">Status</th>
-                          <th className="py-3.5 px-4 text-center">{t("action")}</th>
-                        </tr>
-                      </thead>
-                      <tbody className="divide-y divide-slate-800/40">
-                        {promotions.map((p) => (
-                          <tr key={p.id} className="hover:bg-slate-900/40 transition-colors">
-                            <td className="py-3.5 px-4 font-mono text-slate-400">{p.promotedAt}</td>
-                            <td className="py-3.5 px-4 font-mono font-bold text-emerald-400">
-                              {stripLeadingZeros(p.studentId)}
-                            </td>
-                            <td className="py-3.5 px-4 font-bold text-slate-100">{p.studentName}</td>
-                            <td className="py-3.5 px-4 text-center font-semibold text-slate-400">{p.fromClass}</td>
-                            <td className="py-3.5 px-4 text-center font-bold text-emerald-400">{p.toClass}</td>
-                            <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">{p.toAcademicYear}</td>
-                            <td className="py-3.5 px-4 text-center">
-                              <span className={`px-2.5 py-0.5 text-[10px] font-extrabold uppercase rounded border ${
-                                p.status === "Reverted"
-                                  ? "bg-amber-950/50 border-amber-500/30 text-amber-400"
-                                  : "bg-emerald-950/50 border-emerald-500/20 text-emerald-400"
-                              }`}>
-                                {p.status === "Reverted" ? t("reverted") : p.status}
-                              </span>
-                            </td>
-                            <td className="py-3.5 px-4 text-center">
-                              {p.status === "Promoted" ? (
-                                <button
-                                  type="button"
-                                  onClick={() => {
-                                    const studentObj = students.find(s => s.id === p.studentId) || {
-                                      id: p.studentId,
-                                      name: p.studentName,
-                                      email: "",
-                                      gradeGroup: p.toClass,
-                                      academicYear: p.toAcademicYear || "2025–2026",
-                                      status: "active"
-                                    };
-                                    setIndividualReturnStudent(studentObj);
-                                    setIndividualReturnPreviousClass(p.fromClass);
-                                    setSelectedReturnPromoId(p.id);
-                                    setSelectedReturnAcademicYear(p.toAcademicYear || "2026–2027");
-                                    setReturnModalMode("single");
-                                    setShowReturnModal(true);
-                                  }}
-                                  className="px-3 py-1 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 text-amber-400 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 mx-auto cursor-pointer shadow-sm"
-                                  title={`Return ${p.studentName} to ${p.fromClass}`}
-                                >
-                                  <Undo2 className="w-3.5 h-3.5" />
-                                  {t("return")}
-                                </button>
-                              ) : (
-                                <span className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-slate-400 text-[10px] font-bold uppercase rounded flex items-center justify-center gap-1 w-fit mx-auto opacity-70">
-                                  {t("returned")}
-                                </span>
-                              )}
-                            </td>
-                          </tr>
-                        ))}
-
-                        {promotions.length === 0 && (
-                          <tr>
-                            <td colSpan={8} className="py-8 text-center text-slate-500 italic">
-                              No promotion records logged yet.
-                            </td>
-                          </tr>
-                        )}
-                      </tbody>
-                    </table>
-                  </div>
-                </div>
+                  );
+                })()}
               </motion.div>
             )}
 

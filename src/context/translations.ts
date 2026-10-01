@@ -216,6 +216,13 @@ export const translations = {
     return: "Return",
     returned: "Returned",
     confirm_return_question: "Are you sure you want to return this student to the previous class? The promotion history and all historical records will be preserved.",
+    search_student: "Search student...",
+    all_classes: "All Classes",
+    all_statuses: "All Statuses",
+    clear_filters: "Clear Filters",
+    showing_x_of_y_events: "Showing {x} of {y} events",
+    from_date: "From Date",
+    to_date: "To Date",
   },
   ar: {
     // Branding
@@ -432,6 +439,13 @@ export const translations = {
     return: "إرجاع",
     returned: "تم الإرجاع",
     confirm_return_question: "هل أنت تأكد من أنك تريد إرجاع هذا الطالب إلى الصف السابق؟ سيتم الحفاظ على سجل الترقية وجميع السجلات التاريخية.",
+    search_student: "البحث عن الطالب...",
+    all_classes: "جميع الصفوف",
+    all_statuses: "جميع الحالات",
+    clear_filters: "مسح الفلاتر",
+    showing_x_of_y_events: "عرض {x} من أصل {y} من الأحداث",
+    from_date: "من تاريخ",
+    to_date: "إلى تاريخ",
   },
   so: {
     // Branding
@@ -648,6 +662,13 @@ export const translations = {
     return: "Soo celi",
     returned: "La soo celiyey",
     confirm_return_question: "Ma ziirtaa inaad ardaygan ku celiso fasalkii hore? Taariikhda gudbinta iyo dhammaan diiwaanada hore waa la dhawri doonaa.",
+    search_student: "Raadi arday...",
+    all_classes: "Dhammaan Fasalada",
+    all_statuses: "Dhammaan Xaaladaha",
+    clear_filters: "Nadiifi Shaandhaynta",
+    showing_x_of_y_events: "Waxaa la muujinayaa {x} oo ka mid ah {y} dhacdo",
+    from_date: "Laga bilaabo Taariikhda",
+    to_date: "Ilaa Taariikhda",
   },
 };
 
