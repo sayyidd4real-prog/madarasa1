@@ -153,21 +153,57 @@ export async function initMysqlDb() {
       );
     `);
 
-    // 7. Ensure promotions table exists
-    await p.query(`
-      CREATE TABLE IF NOT EXISTS promotions (
-        id VARCHAR(50) PRIMARY KEY,
-        student_id VARCHAR(50) NOT NULL,
-        student_name VARCHAR(255) NOT NULL,
-        from_class VARCHAR(100) NOT NULL,
-        to_class VARCHAR(100) NOT NULL,
-        from_academic_year VARCHAR(50) NOT NULL DEFAULT '2025–2026',
-        to_academic_year VARCHAR(50) NOT NULL DEFAULT '2026–2027',
-        promoted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-        status VARCHAR(50) NOT NULL DEFAULT 'Promoted',
-        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+    // 7. Ensure promotions table exists with matching charset/collation/length to students.id
+    try {
+      const dbName = process.env.DB_NAME || "madarasa_db";
+      const [stuCols] = await p.query(
+        `SELECT CHARACTER_MAXIMUM_LENGTH, CHARACTER_SET_NAME, COLLATION_NAME 
+         FROM INFORMATION_SCHEMA.COLUMNS 
+         WHERE TABLE_SCHEMA = ? AND TABLE_NAME = 'students' AND COLUMN_NAME = 'id'`,
+        [dbName]
       );
-    `);
+
+      const stuCol = (stuCols as any[])[0] || {};
+      const colLen = stuCol.CHARACTER_MAXIMUM_LENGTH || 50;
+      const colCharset = stuCol.CHARACTER_SET_NAME || "utf8mb4";
+      const colCollation = stuCol.COLLATION_NAME || "utf8mb4_general_ci";
+
+      const studentIdSpec = `VARCHAR(${colLen}) CHARACTER SET ${colCharset} COLLATE ${colCollation}`;
+
+      await p.query(`
+        CREATE TABLE IF NOT EXISTS promotions (
+          id VARCHAR(50) PRIMARY KEY,
+          student_id ${studentIdSpec} NOT NULL,
+          student_name VARCHAR(255) NOT NULL,
+          from_class VARCHAR(100) NOT NULL,
+          to_class VARCHAR(100) NOT NULL,
+          from_academic_year VARCHAR(50) NOT NULL DEFAULT '2025–2026',
+          to_academic_year VARCHAR(50) NOT NULL DEFAULT '2026–2027',
+          promoted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          status VARCHAR(50) NOT NULL DEFAULT 'Promoted'
+        );
+      `);
+
+      // Ensure student_id column definition matches if table pre-existed
+      try {
+        await p.query(`ALTER TABLE promotions MODIFY COLUMN student_id ${studentIdSpec} NOT NULL;`);
+      } catch {
+        // Ignore if column modification is not needed or supported
+      }
+
+      // Add Foreign Key constraint if missing
+      try {
+        await p.query(`
+          ALTER TABLE promotions 
+          ADD CONSTRAINT fk_promotions_student 
+          FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE;
+        `);
+      } catch {
+        // Constraint may already exist or be named differently
+      }
+    } catch (promoErr) {
+      console.error("Promotions table init warning:", promoErr);
+    }
 
     // Seed default admin user if empty
     const [uRows] = await p.query("SELECT COUNT(*) AS count FROM users WHERE role IN ('admin', 'super_admin');");
