@@ -31,7 +31,9 @@ import {
   UserPlus,
   CheckCircle2,
   XCircle,
-  Ban
+  Ban,
+  TrendingUp,
+  Clock
 } from "lucide-react";
 import { usePortal, Student, Exam, ClassItem, Fee, UserAccount, UserRole, AccountStatus } from "@/context/PortalContext";
 import { useToast } from "@/context/ToastContext";
@@ -39,7 +41,7 @@ import { translations } from "@/context/translations";
 import { MadrasaLogoIcon, MadrasaLoader } from "@/components/MadrasaLogo";
 import { formatCurrency, formatDisplayNumber, formatCount, stripLeadingZeros } from "@/lib/formatters";
 
-type AdminSection = "overview" | "students" | "classes" | "fees" | "exams" | "subjects" | "users";
+type AdminSection = "overview" | "students" | "classes" | "fees" | "exams" | "subjects" | "users" | "promotions";
 
 const calculateGrade = (average: number) => {
   if (average >= 90) return "A+ (Excellent)";
@@ -76,6 +78,7 @@ export default function AdminDashboard() {
     exams,
     subjects,
     userAccounts,
+    promotions,
     currentUser,
     isInitialized,
     logout,
@@ -98,6 +101,7 @@ export default function AdminDashboard() {
     addSubject,
     editSubject,
     deleteSubject,
+    promoteStudents,
     language,
     setLanguage,
     theme,
@@ -111,6 +115,16 @@ export default function AdminDashboard() {
 
   // Active section state
   const [activeSection, setActiveSection] = useState<AdminSection>("overview");
+
+  // Student Promotion States
+  const [promoSourceClass, setPromoSourceClass] = useState("");
+  const [promoTargetClass, setPromoTargetClass] = useState("");
+  const [promoAcademicYear, setPromoAcademicYear] = useState("2026–2027");
+  const [selectedPromoStudentIds, setSelectedPromoStudentIds] = useState<string[]>([]);
+  const [individualPromoStudent, setIndividualPromoStudent] = useState<Student | null>(null);
+  const [showPromoModal, setShowPromoModal] = useState(false);
+  const [promoModalMode, setPromoModalMode] = useState<"single" | "bulk">("bulk");
+  const [isSubmittingPromo, setIsSubmittingPromo] = useState(false);
 
   // Mobile sidebar menu toggle
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -1577,6 +1591,21 @@ export default function AdminDashboard() {
           >
             <GraduationCap className="w-4 h-4" />
             {t("subjects_mgmt")}
+          </button>
+
+          <button
+            type="button"
+            onClick={() => {
+              setActiveSection("promotions");
+              setIsSidebarOpen(false);
+            }}
+            className={`w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-semibold transition-all ${activeSection === "promotions"
+              ? "bg-slate-950 border border-emerald-500/20 text-emerald-400 shadow-md"
+              : "text-slate-400 hover:text-slate-200 hover:bg-slate-950/40"
+              }`}
+          >
+            <TrendingUp className="w-4 h-4 text-emerald-400" />
+            {t("student_promotion")}
           </button>
 
           {/* User Accounts Section (Super Admin Only) */}
@@ -4461,6 +4490,371 @@ export default function AdminDashboard() {
               </motion.div>
             )}
 
+            {/* PROMOTIONS SECTION */}
+            {activeSection === "promotions" && (
+              <motion.div
+                key="promotions-panel"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -10 }}
+                transition={{ duration: 0.2 }}
+                className="flex flex-col gap-8"
+              >
+                {/* Page Header */}
+                <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 bg-slate-900/60 border border-slate-800 p-6 rounded-2xl shadow-sm">
+                  <div className="flex items-center gap-4">
+                    <div className="p-3 bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 rounded-xl">
+                      <TrendingUp className="w-6 h-6" />
+                    </div>
+                    <div>
+                      <h2 className="text-xl font-black text-slate-100 uppercase tracking-wider">
+                        {t("student_promotion")}
+                      </h2>
+                      <p className="text-xs text-slate-400 mt-0.5">
+                        Promote eligible students to the next class based on Final Exam results while preserving 100% of historical records.
+                      </p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Promotion Controls */}
+                <div className="bg-slate-900/60 border border-slate-800 p-6 rounded-2xl shadow-sm flex flex-col gap-6">
+                  <h3 className="font-extrabold text-sm uppercase tracking-wider text-slate-200 border-b border-slate-800 pb-3">
+                    1. {t("select_class")} & Target Enrollment
+                  </h3>
+
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+                    {/* Source Class Dropdown (ONE source class strictly) */}
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wide">
+                        {t("current_class")} (Source Class)
+                      </label>
+                      <select
+                        value={promoSourceClass}
+                        onChange={(e) => {
+                          const srcClass = e.target.value;
+                          setPromoSourceClass(srcClass);
+                          const currentIdx = classes.findIndex(c => c.className === srcClass);
+                          if (currentIdx !== -1 && currentIdx + 1 < classes.length) {
+                            setPromoTargetClass(classes[currentIdx + 1].className);
+                          }
+                          setSelectedPromoStudentIds([]);
+                        }}
+                        className="w-full bg-slate-950 border border-slate-800 text-slate-100 text-xs rounded-xl p-3 font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer"
+                      >
+                        <option value="">-- {t("select_class")} --</option>
+                        {classes.map((cls) => (
+                          <option key={cls.id} value={cls.className}>
+                            {cls.className} ({students.filter(s => s.gradeGroup === cls.className).length} Students)
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+
+                    {/* Target Class Dropdown */}
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wide">
+                        {t("new_class")} (Target Class)
+                      </label>
+                      <select
+                        value={promoTargetClass}
+                        onChange={(e) => setPromoTargetClass(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 text-slate-100 text-xs rounded-xl p-3 font-semibold focus:outline-none focus:border-emerald-500 cursor-pointer"
+                      >
+                        <option value="">-- {t("promote_to_class")} --</option>
+                        {classes
+                          .filter((cls) => cls.className !== promoSourceClass)
+                          .map((cls) => (
+                            <option key={cls.id} value={cls.className}>
+                              {cls.className} (Currently {students.filter(s => s.gradeGroup === cls.className).length} Students)
+                            </option>
+                          ))}
+                      </select>
+                    </div>
+
+                    {/* Academic Year Dropdown */}
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-300 uppercase tracking-wide">
+                        Target {t("academic_year")}
+                      </label>
+                      <select
+                        value={promoAcademicYear}
+                        onChange={(e) => setPromoAcademicYear(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 text-slate-100 text-xs rounded-xl p-3 font-semibold focus:outline-none focus:border-emerald-500 font-mono cursor-pointer"
+                      >
+                        <option value="2026–2027">2026–2027 (Next Academic Year)</option>
+                        <option value="2025–2026">2025–2026 (Current Academic Year)</option>
+                      </select>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Eligible & Ineligible Student Evaluation Lists */}
+                {promoSourceClass && promoTargetClass && (() => {
+                  const sourceStudents = students.filter(s => s.gradeGroup === promoSourceClass);
+
+                  const evaluatedList = sourceStudents.map((st) => {
+                    const alreadyPromoted = promotions.some(
+                      (p) => p.studentId === st.id && p.toClass === promoTargetClass && p.toAcademicYear === promoAcademicYear
+                    );
+                    if (alreadyPromoted) {
+                      return { student: st, isEligible: false, reason: t("already_promoted"), finalScore: null };
+                    }
+                    const finalExams = exams.filter(
+                      (e) => e.studentId === st.id && e.term === "Final Exam" && (e.className === promoSourceClass || !e.className)
+                    );
+                    if (finalExams.length === 0) {
+                      return { student: st, isEligible: false, reason: t("no_final_exam_record"), finalScore: null };
+                    }
+                    const scores = finalExams.map((e) => e.score || 0);
+                    const avgScore = Math.round(scores.reduce((a, b) => a + b, 0) / scores.length);
+                    if (avgScore < 60) {
+                      return { student: st, isEligible: false, reason: t("failed_final_exam"), finalScore: avgScore };
+                    }
+                    return { student: st, isEligible: true, reason: t("eligible_for_promotion"), finalScore: avgScore };
+                  });
+
+                  const eligibleList = evaluatedList.filter(item => item.isEligible);
+                  const ineligibleList = evaluatedList.filter(item => !item.isEligible);
+
+                  return (
+                    <div className="flex flex-col gap-6">
+                      
+                      {/* Action Bar */}
+                      <div className="bg-slate-900/60 border border-slate-800 p-5 rounded-2xl shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div className="flex items-center gap-3">
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPromoStudentIds(eligibleList.map(item => item.student.id))}
+                            className="px-3.5 py-2 bg-emerald-950/60 hover:bg-emerald-900/80 text-emerald-400 border border-emerald-500/20 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                          >
+                            ✓ {t("select_all_eligible")}
+                          </button>
+                          <button
+                            type="button"
+                            onClick={() => setSelectedPromoStudentIds([])}
+                            className="px-3.5 py-2 bg-slate-950 hover:bg-slate-800 text-slate-300 border border-slate-800 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                          >
+                            ✕ {t("deselect_all")}
+                          </button>
+                        </div>
+
+                        <div className="flex items-center gap-4">
+                          <span className="text-xs font-bold font-mono text-slate-300">
+                            {selectedPromoStudentIds.length} Selected
+                          </span>
+                          <button
+                            type="button"
+                            disabled={selectedPromoStudentIds.length === 0}
+                            onClick={() => {
+                              setPromoModalMode("bulk");
+                              setShowPromoModal(true);
+                            }}
+                            className="px-5 py-2.5 bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white font-extrabold text-xs rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                          >
+                            <TrendingUp className="w-4 h-4" />
+                            {t("promote_selected")} ({selectedPromoStudentIds.length}) → {promoTargetClass}
+                          </button>
+                        </div>
+                      </div>
+
+                      {/* Lists Grid */}
+                      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                        
+                        {/* ELIGIBLE LIST */}
+                        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4 shadow-sm">
+                          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div className="flex items-center gap-2">
+                              <CheckCircle2 className="w-5 h-5 text-emerald-500" />
+                              <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-100">
+                                {t("eligible_for_promotion")}
+                              </h4>
+                            </div>
+                            <span className="px-2.5 py-1 bg-emerald-950 text-emerald-400 font-mono text-xs font-bold rounded-lg border border-emerald-500/20">
+                              {eligibleList.length} Students
+                            </span>
+                          </div>
+
+                          <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1">
+                            {eligibleList.map((item) => {
+                              const isChecked = selectedPromoStudentIds.includes(item.student.id);
+                              return (
+                                <div
+                                  key={item.student.id}
+                                  onClick={() => {
+                                    if (isChecked) {
+                                      setSelectedPromoStudentIds(selectedPromoStudentIds.filter(id => id !== item.student.id));
+                                    } else {
+                                      setSelectedPromoStudentIds([...selectedPromoStudentIds, item.student.id]);
+                                    }
+                                  }}
+                                  className={`p-4 rounded-xl border transition-all cursor-pointer flex items-center justify-between ${
+                                    isChecked
+                                      ? "bg-emerald-950/40 border-emerald-500/40 shadow-sm"
+                                      : "bg-slate-950/40 border-slate-800 hover:border-emerald-500/30"
+                                  }`}
+                                >
+                                  <div className="flex items-center gap-3">
+                                    <input
+                                      type="checkbox"
+                                      checked={isChecked}
+                                      onChange={() => {}}
+                                      className="w-4 h-4 text-emerald-600 rounded border-slate-700 focus:ring-emerald-500 cursor-pointer"
+                                    />
+                                    <div>
+                                      <h5 className="font-bold text-sm text-slate-100">
+                                        {item.student.name}
+                                      </h5>
+                                      <span className="text-xs font-mono text-emerald-400 font-semibold">
+                                        ID: {stripLeadingZeros(item.student.id)}
+                                      </span>
+                                    </div>
+                                  </div>
+
+                                  <div className="flex items-center gap-3">
+                                    <span className="text-xs font-mono font-bold text-slate-300">
+                                      Final: {item.finalScore} / 100
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        setIndividualPromoStudent(item.student);
+                                        setPromoModalMode("single");
+                                        setShowPromoModal(true);
+                                      }}
+                                      className="px-3 py-1 bg-slate-900 border border-slate-700 hover:border-emerald-500 text-emerald-400 text-xs font-bold rounded-lg transition-all"
+                                    >
+                                      Promote
+                                    </button>
+                                  </div>
+                                </div>
+                              );
+                            })}
+
+                            {eligibleList.length === 0 && (
+                              <div className="py-8 text-center text-xs text-slate-500 italic">
+                                No eligible students found in {promoSourceClass} for promotion.
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* INELIGIBLE LIST */}
+                        <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-5 flex flex-col gap-4 shadow-sm">
+                          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                            <div className="flex items-center gap-2">
+                              <XCircle className="w-5 h-5 text-rose-500" />
+                              <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-100">
+                                {t("not_eligible")}
+                              </h4>
+                            </div>
+                            <span className="px-2.5 py-1 bg-rose-950 text-rose-400 font-mono text-xs font-bold rounded-lg border border-rose-500/20">
+                              {ineligibleList.length} Students
+                            </span>
+                          </div>
+
+                          <div className="flex flex-col gap-3 max-h-[400px] overflow-y-auto pr-1">
+                            {ineligibleList.map((item) => (
+                              <div
+                                key={item.student.id}
+                                className="p-4 bg-slate-950/20 border border-slate-850 rounded-xl flex items-center justify-between text-xs opacity-80"
+                              >
+                                <div className="flex flex-col gap-1">
+                                  <h5 className="font-bold text-slate-200">
+                                    {item.student.name}
+                                  </h5>
+                                  <span className="font-mono text-slate-500">
+                                    ID: {stripLeadingZeros(item.student.id)}
+                                  </span>
+                                </div>
+
+                                <div className="flex flex-col items-end gap-1">
+                                  <span className="px-2 py-0.5 bg-rose-950/50 border border-rose-500/20 text-rose-400 rounded text-[10px] font-extrabold uppercase">
+                                    {item.reason}
+                                  </span>
+                                  {item.finalScore !== null && (
+                                    <span className="font-mono text-[10px] text-slate-500">
+                                      Score: {item.finalScore} / 100
+                                    </span>
+                                  )}
+                                </div>
+                              </div>
+                            ))}
+
+                            {ineligibleList.length === 0 && (
+                              <div className="py-8 text-center text-xs text-slate-500 italic">
+                                All students in {promoSourceClass} are currently eligible!
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* PROMOTION HISTORY LOG TABLE */}
+                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-6 shadow-sm flex flex-col gap-4">
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                    <div className="flex items-center gap-2">
+                      <Clock className="w-5 h-5 text-emerald-500" />
+                      <h3 className="font-black text-base uppercase tracking-wider text-slate-100">
+                        {t("promotion_history")}
+                      </h3>
+                    </div>
+                    <span className="text-xs font-mono font-bold text-slate-400">
+                      {promotions.length} Events Logged
+                    </span>
+                  </div>
+
+                  <div className="overflow-x-auto">
+                    <table className="w-full ltr:text-left rtl:text-right text-xs">
+                      <thead className="bg-slate-950 border-b border-slate-800 text-slate-400 font-bold uppercase tracking-wider">
+                        <tr>
+                          <th className="py-3.5 px-4">Date & Time</th>
+                          <th className="py-3.5 px-4 font-mono">Student ID</th>
+                          <th className="py-3.5 px-4">Student Name</th>
+                          <th className="py-3.5 px-4 text-center">Previous Class</th>
+                          <th className="py-3.5 px-4 text-center">New Class</th>
+                          <th className="py-3.5 px-4 text-center font-mono">Target Year</th>
+                          <th className="py-3.5 px-4 text-center">Status</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-slate-800/40">
+                        {promotions.map((p) => (
+                          <tr key={p.id} className="hover:bg-slate-900/40 transition-colors">
+                            <td className="py-3.5 px-4 font-mono text-slate-400">{p.promotedAt}</td>
+                            <td className="py-3.5 px-4 font-mono font-bold text-emerald-400">
+                              {stripLeadingZeros(p.studentId)}
+                            </td>
+                            <td className="py-3.5 px-4 font-bold text-slate-100">{p.studentName}</td>
+                            <td className="py-3.5 px-4 text-center font-semibold text-slate-400">{p.fromClass}</td>
+                            <td className="py-3.5 px-4 text-center font-bold text-emerald-400">{p.toClass}</td>
+                            <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">{p.toAcademicYear}</td>
+                            <td className="py-3.5 px-4 text-center">
+                              <span className="px-2.5 py-0.5 bg-emerald-950/50 border border-emerald-500/20 text-emerald-400 text-[10px] font-extrabold uppercase rounded">
+                                {p.status}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+
+                        {promotions.length === 0 && (
+                          <tr>
+                            <td colSpan={7} className="py-8 text-center text-slate-500 italic">
+                              No promotion records logged yet.
+                            </td>
+                          </tr>
+                        )}
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
           </AnimatePresence>
         </main>
         {/* Custom Deletion Confirmation Modal */}
@@ -4508,6 +4902,121 @@ export default function AdminDashboard() {
                     className="px-4 py-2 bg-rose-600 hover:bg-rose-500 text-slate-100 font-bold rounded-xl text-xs shadow-md shadow-rose-500/10 hover:shadow-rose-500/20 transition-all"
                   >
                     Confirm Delete
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Student Promotion Confirmation Modal */}
+        <AnimatePresence>
+          {showPromoModal && (
+            <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative flex flex-col gap-5"
+              >
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-emerald-500/10 text-emerald-400 rounded-xl">
+                      <TrendingUp className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-100">
+                        {t("promote_student")}?
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        Confirm student enrollment promotion
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPromoModal(false);
+                      setIndividualPromoStudent(null);
+                    }}
+                    className="p-1 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-3 bg-slate-950 p-4 rounded-xl border border-slate-850 text-xs">
+                  {promoModalMode === "single" && individualPromoStudent && (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Student Name:</span>
+                        <span className="font-bold text-slate-100">{individualPromoStudent.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Student ID:</span>
+                        <span className="font-mono font-bold text-emerald-400">{stripLeadingZeros(individualPromoStudent.id)}</span>
+                      </div>
+                    </>
+                  )}
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">{t("current_class")}:</span>
+                    <span className="font-bold text-slate-200">{promoSourceClass}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">{t("new_class")}:</span>
+                    <span className="font-extrabold text-emerald-400">{promoTargetClass}</span>
+                  </div>
+                  <div className="flex justify-between">
+                    <span className="text-slate-400">Target Academic Year:</span>
+                    <span className="font-mono font-bold text-slate-300">{promoAcademicYear}</span>
+                  </div>
+                  {promoModalMode === "bulk" && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Total Selected Students:</span>
+                      <span className="font-bold font-mono text-emerald-400">{selectedPromoStudentIds.length} Students</span>
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-slate-400 leading-relaxed italic">
+                  "This student will be promoted to the new class. Previous exams, payments, attendance and student information will be preserved."
+                </p>
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowPromoModal(false);
+                      setIndividualPromoStudent(null);
+                    }}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  >
+                    {t("cancel")}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSubmittingPromo}
+                    onClick={async () => {
+                      setIsSubmittingPromo(true);
+                      const idsToPromote = promoModalMode === "single" && individualPromoStudent
+                        ? [individualPromoStudent.id]
+                        : selectedPromoStudentIds;
+
+                      const res = await promoteStudents(idsToPromote, promoSourceClass, promoTargetClass, promoAcademicYear);
+                      setIsSubmittingPromo(false);
+                      setShowPromoModal(false);
+                      setIndividualPromoStudent(null);
+
+                      if (res.success) {
+                        showToast(res.message || "Student(s) promoted successfully!", "success");
+                        setSelectedPromoStudentIds([]);
+                      } else {
+                        showToast(res.error || "Promotion failed.", "error");
+                      }
+                    }}
+                    className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    {isSubmittingPromo ? "Promoting..." : t("promote_student")}
                   </button>
                 </div>
               </motion.div>

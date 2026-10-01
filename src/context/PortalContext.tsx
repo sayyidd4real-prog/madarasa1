@@ -73,6 +73,18 @@ export interface Subject {
   description: string;
 }
 
+export interface Promotion {
+  id: string;
+  studentId: string;
+  studentName: string;
+  fromClass: string;
+  toClass: string;
+  fromAcademicYear: string;
+  toAcademicYear: string;
+  promotedAt: string;
+  status: string;
+}
+
 export type CurrentUser = {
   id?: string;
   email?: string;
@@ -88,6 +100,7 @@ interface PortalContextType {
   exams: Exam[];
   subjects: Subject[];
   userAccounts: UserAccount[];
+  promotions: Promotion[];
   currentUser: CurrentUser;
   isInitialized: boolean;
   login: (role: "admin" | "student", identifier: string, password?: string) => Promise<{ success: boolean; error?: string }>;
@@ -154,6 +167,12 @@ interface PortalContextType {
   addSubject: (subjectName: string, subjectCode: string, description: string) => Promise<{ success: boolean; error?: string }>;
   editSubject: (id: string, subjectName: string, subjectCode: string, description: string) => Promise<{ success: boolean; error?: string }>;
   deleteSubject: (id: string) => Promise<{ success: boolean; error?: string }>;
+  promoteStudents: (
+    studentIds: string[],
+    fromClass: string,
+    toClass: string,
+    academicYear?: string
+  ) => Promise<{ success: boolean; message?: string; error?: string }>;
   language: Language;
   setLanguage: (lang: Language) => void;
   theme: "light" | "dark";
@@ -171,6 +190,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   const [exams, setExams] = useState<Exam[]>([]);
   const [subjects, setSubjects] = useState<Subject[]>([]);
   const [userAccounts, setUserAccounts] = useState<UserAccount[]>([]);
+  const [promotions, setPromotions] = useState<Promotion[]>([]);
   const [currentUser, setCurrentUser] = useState<CurrentUser>(null);
   const [isInitialized, setIsInitialized] = useState(false);
   const [language, setLanguageState] = useState<Language>("en");
@@ -210,6 +230,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
           setExams(json.data.exams || []);
           setSubjects(json.data.subjects || []);
           setUserAccounts(json.data.userAccounts || []);
+          setPromotions(json.data.promotions || []);
         }
       }
     } catch (err) {
@@ -859,6 +880,29 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const promoteStudents = async (
+    studentIds: string[],
+    fromClass: string,
+    toClass: string,
+    academicYear?: string
+  ): Promise<{ success: boolean; message?: string; error?: string }> => {
+    try {
+      const response = await fetch("/api/students/promote", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ studentIds, fromClass, toClass, academicYear })
+      });
+      const data = await response.json();
+      if (data.success) {
+        await refreshData("admin");
+        return { success: true, message: data.message };
+      }
+      return { success: false, error: data.error || "Failed to promote students." };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error." };
+    }
+  };
+
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     saveState("portal_lang", lang);
@@ -895,6 +939,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         exams,
         subjects,
         userAccounts,
+        promotions,
         currentUser,
         isInitialized,
         language,
@@ -927,6 +972,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         addSubject,
         editSubject,
         deleteSubject,
+        promoteStudents,
         refreshData,
       }}
     >

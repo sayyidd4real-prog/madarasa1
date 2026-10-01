@@ -153,6 +153,22 @@ export async function initMysqlDb() {
       );
     `);
 
+    // 7. Ensure promotions table exists
+    await p.query(`
+      CREATE TABLE IF NOT EXISTS promotions (
+        id VARCHAR(50) PRIMARY KEY,
+        student_id VARCHAR(50) NOT NULL,
+        student_name VARCHAR(255) NOT NULL,
+        from_class VARCHAR(100) NOT NULL,
+        to_class VARCHAR(100) NOT NULL,
+        from_academic_year VARCHAR(50) NOT NULL DEFAULT '2025–2026',
+        to_academic_year VARCHAR(50) NOT NULL DEFAULT '2026–2027',
+        promoted_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        status VARCHAR(50) NOT NULL DEFAULT 'Promoted',
+        FOREIGN KEY (student_id) REFERENCES students(id) ON DELETE CASCADE
+      );
+    `);
+
     // Seed default admin user if empty
     const [uRows] = await p.query("SELECT COUNT(*) AS count FROM users WHERE role IN ('admin', 'super_admin');");
     if ((uRows as any[])[0].count === 0) {

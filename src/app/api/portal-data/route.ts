@@ -67,19 +67,22 @@ export async function GET(request: Request) {
     }
 
     // 5. Fetch exams (admins get all, student gets only their exams)
+    // 5. Fetch exams (admins get all, student gets only their exams)
     let exams: any[] = [];
     if (session.role === "super_admin" || session.role === "admin") {
       const [eRows] = await queryDb(`
-        SELECT e.id, e.student_id AS studentId, s.name AS studentName, s.grade AS className, '2025–2026' AS academicYear, e.subject, e.term, e.score, 100 AS maxPoints, COALESCE(e.feedback, '') AS feedback
+        SELECT e.id, e.student_id AS studentId, s.name AS studentName, COALESCE(c.name, s.grade) AS className, COALESCE(e.academic_year, '2025–2026') AS academicYear, e.subject, e.term, e.score, 100 AS maxPoints, COALESCE(e.feedback, '') AS feedback
         FROM exams e
         JOIN students s ON e.student_id = s.id
+        LEFT JOIN classes c ON e.class_id = c.id
       `);
       exams = eRows as any[];
     } else if (session.role === "student" && session.studentId) {
       const [eRows] = await queryDb(`
-        SELECT e.id, e.student_id AS studentId, s.name AS studentName, s.grade AS className, '2025–2026' AS academicYear, e.subject, e.term, e.score, 100 AS maxPoints, COALESCE(e.feedback, '') AS feedback
+        SELECT e.id, e.student_id AS studentId, s.name AS studentName, COALESCE(c.name, s.grade) AS className, COALESCE(e.academic_year, '2025–2026') AS academicYear, e.subject, e.term, e.score, 100 AS maxPoints, COALESCE(e.feedback, '') AS feedback
         FROM exams e
         JOIN students s ON e.student_id = s.id
+        LEFT JOIN classes c ON e.class_id = c.id
         WHERE e.student_id = ?
       `, [session.studentId]);
       exams = eRows as any[];
@@ -111,6 +114,17 @@ export async function GET(request: Request) {
       deductions: parseFloat(f.deductions) || 0,
     }));
 
+    // 7. Fetch promotions history log
+    let promotions: any[] = [];
+    if (session.role === "super_admin" || session.role === "admin") {
+      const [pRows] = await queryDb(`
+        SELECT id, student_id AS studentId, student_name AS studentName, from_class AS fromClass, to_class AS toClass, from_academic_year AS fromAcademicYear, to_academic_year AS toAcademicYear, DATE_FORMAT(promoted_at, '%Y-%m-%d %H:%i') AS promotedAt, status
+        FROM promotions
+        ORDER BY promoted_at DESC
+      `);
+      promotions = pRows as any[];
+    }
+
     return NextResponse.json({
       success: true,
       data: {
@@ -119,7 +133,8 @@ export async function GET(request: Request) {
         fees,
         exams,
         subjects,
-        userAccounts
+        userAccounts,
+        promotions
       }
     });
   } catch (error: any) {

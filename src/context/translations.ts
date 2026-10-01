@@ -185,6 +185,24 @@ export const translations = {
     view_exam_results: "View Exam Results",
     exams_available: "Exams Available",
     select_exam_card: "Select a class card below to view detailed exam transcripts.",
+
+    // Student Promotion System
+    promote_student: "Promote Student",
+    promote_to_class: "Promote to Class",
+    current_class: "Current Class",
+    new_class: "New Class",
+    promotion_history: "Promotion History",
+    eligible_for_promotion: "Eligible for Promotion",
+    promoted: "Promoted",
+    not_eligible: "Not Eligible",
+    failed_final_exam: "Failed Final Exam",
+    already_promoted: "Already Promoted",
+    select_class: "Select Class",
+    select_all_eligible: "Select All Eligible Students",
+    deselect_all: "Deselect All",
+    promote_selected: "Promote Selected Students",
+    student_promotion: "Student Promotion System",
+    no_final_exam_record: "No Final Exam Record",
   },
   ar: {
     // Branding
@@ -370,6 +388,24 @@ export const translations = {
     view_exam_results: "عرض نتائج الامتحانات",
     exams_available: "امتحانات متاحة",
     select_exam_card: "اختر بطاقة الصف أدناه لعرض تفاصيل نتائج امتحاناتك.",
+
+    // Student Promotion System
+    promote_student: "ترقية الطالب",
+    promote_to_class: "الترقية إلى الصف",
+    current_class: "الصف الحالي",
+    new_class: "الصف الجديد",
+    promotion_history: "سجل الترقية",
+    eligible_for_promotion: "مؤهل للترقية",
+    promoted: "تمت الترقية",
+    not_eligible: "غير مؤهل",
+    failed_final_exam: "لم ينجح في الاختبار النهائي",
+    already_promoted: "تمت ترقيته بالفعل",
+    select_class: "اختر الصف",
+    select_all_eligible: "تحديد جميع الطلاب المؤهلين",
+    deselect_all: "إلغاء تحديد الكل",
+    promote_selected: "ترقية الطلاب المحددين",
+    student_promotion: "نظام ترقية الطلاب",
+    no_final_exam_record: "لا يوجد سجل اختبار نهائي",
   },
   so: {
     // Branding
@@ -555,6 +591,24 @@ export const translations = {
     view_exam_results: "Eeg Natiijooyinka Imtixaanka",
     exams_available: "Imtixaanaad Hada Laga Helayo",
     select_exam_card: "Dooro fasalka hoose si aad u eegto natiijooyinka imtixaankaaga.",
+
+    // Student Promotion System
+    promote_student: "Kor u qaad Ardayga",
+    promote_to_class: "U gudbi Fasalka",
+    current_class: "Fasalka Hadda",
+    new_class: "Fasalka Cusub",
+    promotion_history: "Taariikhda Gudbinta",
+    eligible_for_promotion: "U Qalma Gudbinta",
+    promoted: "La Gudbiyey",
+    not_eligible: "Uma Qalmo",
+    failed_final_exam: "Wuu ku dhacay Imtixaanka Final-ka",
+    already_promoted: "Hore ayaa loo gudbiyey",
+    select_class: "Dooro Fasalka",
+    select_all_eligible: "Dooro Dhammaan Ardayda U Qalma",
+    deselect_all: "Kala noqo Dhammaan",
+    promote_selected: "Gudbi Ardayda La Doortay",
+    student_promotion: "Nidaamka Gudbinta Ardayda",
+    no_final_exam_record: "Lama helin Imtixaanka Final-ka",
   },
 };
 
