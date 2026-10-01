@@ -185,7 +185,6 @@ export const translations = {
     view_exam_results: "View Exam Results",
     exams_available: "Exams Available",
     select_exam_card: "Select a class card below to view detailed exam transcripts.",
-    teacher_feedback: "Teacher Feedback / Comments",
   },
   ar: {
     // Branding
@@ -371,7 +370,6 @@ export const translations = {
     view_exam_results: "عرض نتائج الامتحانات",
     exams_available: "امتحانات متاحة",
     select_exam_card: "اختر بطاقة الصف أدناه لعرض تفاصيل نتائج امتحاناتك.",
-    teacher_feedback: "ملاحظات المعلم",
   },
   so: {
     // Branding
@@ -557,7 +555,6 @@ export const translations = {
     view_exam_results: "Eeg Natiijooyinka Imtixaanka",
     exams_available: "Imtixaanaad Hada Laga Helayo",
     select_exam_card: "Dooro fasalka hoose si aad u eegto natiijooyinka imtixaankaaga.",
-    teacher_feedback: "Faallada Macallinka",
   },
 };
 

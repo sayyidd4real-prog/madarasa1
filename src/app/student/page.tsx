@@ -546,37 +546,6 @@ export default function StudentDashboard() {
                         </div>
                       </div>
 
-                      {/* 3. TEACHER FEEDBACK IF AVAILABLE */}
-                      {activeClassGroup.exams.some((e) => e.feedback && e.feedback.trim() !== "") && (
-                        <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 shadow-sm">
-                          <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
-                            <FileText className="w-4.5 h-4.5 text-amber-500" />
-                            <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                              {t("teacher_feedback")}
-                            </h4>
-                          </div>
-                          <div className="flex flex-col gap-2">
-                            {activeClassGroup.exams
-                              .filter((e) => e.feedback && e.feedback.trim() !== "")
-                              .map((e) => (
-                                <div
-                                  key={e.id}
-                                  className="p-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800 rounded-xl text-xs flex flex-col gap-1.5"
-                                >
-                                  <div className="flex items-center justify-between font-bold text-slate-700 dark:text-slate-300">
-                                    <span className="flex items-center gap-2">
-                                      <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{e.subject}</span>
-                                      <span className="text-slate-400 dark:text-slate-600">({e.term})</span>
-                                    </span>
-                                    <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{e.score} / 100</span>
-                                  </div>
-                                  <p className="text-slate-600 dark:text-slate-300 italic">"{e.feedback}"</p>
-                                </div>
-                              ))}
-                          </div>
-                        </div>
-                      )}
-
                     </div>
                   </div>
                 )}
