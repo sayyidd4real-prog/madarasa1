@@ -203,6 +203,15 @@ export const translations = {
     promote_selected: "Promote Selected Students",
     student_promotion: "Student Promotion System",
     no_final_exam_record: "No Final Exam Record",
+    return_student: "Return Student",
+    return_to_previous_class: "Return to Previous Class",
+    return_to_class: "Return to {class}",
+    promotion_reverted: "Promotion Reverted",
+    already_returned: "Student has already been returned to the previous class.",
+    no_previous_class: "No previous class available",
+    return_selected_students: "Return Selected Students",
+    confirm_return_message: "This will return the student to the previous class. Historical exams, finance records, attendance and student information will be preserved.",
+    reverted: "Reverted",
   },
   ar: {
     // Branding
@@ -406,6 +415,15 @@ export const translations = {
     promote_selected: "ترقية الطلاب المحددين",
     student_promotion: "نظام ترقية الطلاب",
     no_final_exam_record: "لا يوجد سجل اختبار نهائي",
+    return_student: "إرجاع الطالب",
+    return_to_previous_class: "العودة إلى الصف السابق",
+    return_to_class: "العودة إلى {class}",
+    promotion_reverted: "تم التراجع عن الترقية",
+    already_returned: "تم إرجاع الطالب بالفعل إلى الصف السابق.",
+    no_previous_class: "لا يوجد صف سابق متاح",
+    return_selected_students: "إرجاع الطلاب المحددين",
+    confirm_return_message: "سيؤدي هذا إلى إرجاع الطالب إلى الصف السابق. سيتم الحفاظ على الامتحانات السابقة، السجلات المالية، الحضور، ومعلومات الطالب.",
+    reverted: "تم التراجع",
   },
   so: {
     // Branding
@@ -609,6 +627,15 @@ export const translations = {
     promote_selected: "Gudbi Ardayda La Doortay",
     student_promotion: "Nidaamka Gudbinta Ardayda",
     no_final_exam_record: "Lama helin Imtixaanka Final-ka",
+    return_student: "Soo celi Ardayga",
+    return_to_previous_class: "Ku celi Fasalkii Hore",
+    return_to_class: "Ku celi {class}",
+    promotion_reverted: "Gudbintii waa laga noqday",
+    already_returned: "Ardayga hore ayaa loo celiyey fasalkii hore.",
+    no_previous_class: "Fasal hore oo lagu celin karo ma jiro",
+    return_selected_students: "Soo celi Ardayda la doortay",
+    confirm_return_message: "Tani waxay ardayga ku celin doontaa fasalkii hore. Imtixaannadii hore, dhaqaalaha, xaadirinta iyo macluumaadka ardayga waa la dhawri doonaa.",
+    reverted: "Laga noqday",
   },
 };
 

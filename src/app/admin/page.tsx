@@ -33,7 +33,9 @@ import {
   XCircle,
   Ban,
   TrendingUp,
-  Clock
+  Clock,
+  Undo2,
+  RotateCcw
 } from "lucide-react";
 import { usePortal, Student, Exam, ClassItem, Fee, UserAccount, UserRole, AccountStatus } from "@/context/PortalContext";
 import { useToast } from "@/context/ToastContext";
@@ -102,6 +104,7 @@ export default function AdminDashboard() {
     editSubject,
     deleteSubject,
     promoteStudents,
+    revertPromotion,
     language,
     setLanguage,
     theme,
@@ -125,6 +128,14 @@ export default function AdminDashboard() {
   const [showPromoModal, setShowPromoModal] = useState(false);
   const [promoModalMode, setPromoModalMode] = useState<"single" | "bulk">("bulk");
   const [isSubmittingPromo, setIsSubmittingPromo] = useState(false);
+
+  // Student Return / Revert Promotion States
+  const [showReturnModal, setShowReturnModal] = useState(false);
+  const [returnModalMode, setReturnModalMode] = useState<"single" | "bulk">("single");
+  const [individualReturnStudent, setIndividualReturnStudent] = useState<Student | null>(null);
+  const [individualReturnPreviousClass, setIndividualReturnPreviousClass] = useState("");
+  const [selectedReturnStudentIds, setSelectedReturnStudentIds] = useState<string[]>([]);
+  const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
 
   // Mobile sidebar menu toggle
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
@@ -2125,6 +2136,26 @@ export default function AdminDashboard() {
                               </td>
                               <td className="py-4 px-6 text-right whitespace-nowrap">
                                 <div className="flex justify-end items-center gap-1.5">
+                                  {(() => {
+                                    const activePromo = promotions.find(p => p.studentId === student.id && p.status === "Promoted");
+                                    if (!activePromo) return null;
+                                    return (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setIndividualReturnStudent(student);
+                                          setIndividualReturnPreviousClass(activePromo.fromClass);
+                                          setReturnModalMode("single");
+                                          setShowReturnModal(true);
+                                        }}
+                                        className="px-2.5 py-1 bg-amber-950/40 border border-amber-800/40 hover:border-amber-500/40 text-amber-400 text-xs font-bold rounded transition-colors flex items-center gap-1.5 cursor-pointer"
+                                        title={t("return_to_previous_class")}
+                                      >
+                                        <Undo2 className="w-3.5 h-3.5" />
+                                        {t("return_to_class").replace("{class}", activePromo.fromClass)}
+                                      </button>
+                                    );
+                                  })()}
                                   <button
                                     type="button"
                                     onClick={() => setSelectedStudentDetail(student)}
@@ -2274,6 +2305,26 @@ export default function AdminDashboard() {
                                 </div>
                               </div>
                               <div className="flex items-center gap-1.5 border-t border-slate-900 pt-3 mt-1 justify-end">
+                                {(() => {
+                                  const activePromo = promotions.find(p => p.studentId === student.id && p.status === "Promoted");
+                                  if (!activePromo) return null;
+                                  return (
+                                    <button
+                                      type="button"
+                                      onClick={() => {
+                                        setIndividualReturnStudent(student);
+                                        setIndividualReturnPreviousClass(activePromo.fromClass);
+                                        setReturnModalMode("single");
+                                        setShowReturnModal(true);
+                                      }}
+                                      className="px-2.5 py-1 bg-amber-950/40 border border-amber-800/40 hover:border-amber-500/40 text-amber-400 text-xs font-bold rounded transition-colors flex items-center gap-1.5 cursor-pointer"
+                                      title={t("return_to_previous_class")}
+                                    >
+                                      <Undo2 className="w-3.5 h-3.5" />
+                                      {t("return_to_class").replace("{class}", activePromo.fromClass)}
+                                    </button>
+                                  );
+                                })()}
                                 <button
                                   type="button"
                                   onClick={() => setSelectedStudentDetail(student)}
@@ -4778,6 +4829,25 @@ export default function AdminDashboard() {
                                       Score: {item.finalScore} / 100
                                     </span>
                                   )}
+                                  {(() => {
+                                    const activePromo = promotions.find(p => p.studentId === item.student.id && p.status === "Promoted");
+                                    if (!activePromo) return null;
+                                    return (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          setIndividualReturnStudent(item.student);
+                                          setIndividualReturnPreviousClass(activePromo.fromClass);
+                                          setReturnModalMode("single");
+                                          setShowReturnModal(true);
+                                        }}
+                                        className="mt-1 px-2.5 py-1 bg-amber-950/60 border border-amber-500/30 hover:bg-amber-900/80 text-amber-400 text-[11px] font-bold rounded-lg transition-all flex items-center gap-1 cursor-pointer"
+                                      >
+                                        <Undo2 className="w-3.5 h-3.5" />
+                                        {t("return_to_class").replace("{class}", activePromo.fromClass)}
+                                      </button>
+                                    );
+                                  })()}
                                 </div>
                               </div>
                             ))}
@@ -4834,8 +4904,12 @@ export default function AdminDashboard() {
                             <td className="py-3.5 px-4 text-center font-bold text-emerald-400">{p.toClass}</td>
                             <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-400">{p.toAcademicYear}</td>
                             <td className="py-3.5 px-4 text-center">
-                              <span className="px-2.5 py-0.5 bg-emerald-950/50 border border-emerald-500/20 text-emerald-400 text-[10px] font-extrabold uppercase rounded">
-                                {p.status}
+                              <span className={`px-2.5 py-0.5 text-[10px] font-extrabold uppercase rounded border ${
+                                p.status === "Reverted"
+                                  ? "bg-amber-950/50 border-amber-500/30 text-amber-400"
+                                  : "bg-emerald-950/50 border-emerald-500/20 text-emerald-400"
+                              }`}>
+                                {p.status === "Reverted" ? t("reverted") : p.status}
                               </span>
                             </td>
                           </tr>
@@ -5017,6 +5091,117 @@ export default function AdminDashboard() {
                     className="px-5 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-extrabold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
                   >
                     {isSubmittingPromo ? "Promoting..." : t("promote_student")}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Student Return Confirmation Modal */}
+        <AnimatePresence>
+          {showReturnModal && (
+            <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full max-w-lg bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-2xl relative flex flex-col gap-5"
+              >
+                <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+                  <div className="flex items-center gap-3">
+                    <div className="p-2.5 bg-amber-500/10 text-amber-400 rounded-xl">
+                      <Undo2 className="w-5 h-5" />
+                    </div>
+                    <div>
+                      <h3 className="text-base font-extrabold text-slate-100">
+                        {t("return_student")}?
+                      </h3>
+                      <p className="text-xs text-slate-400">
+                        {t("return_to_previous_class")}
+                      </p>
+                    </div>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowReturnModal(false);
+                      setIndividualReturnStudent(null);
+                    }}
+                    className="p-1 hover:bg-slate-800 text-slate-400 hover:text-slate-200 rounded-lg transition-colors"
+                  >
+                    <X className="w-5 h-5" />
+                  </button>
+                </div>
+
+                <div className="flex flex-col gap-3 bg-slate-950 p-4 rounded-xl border border-slate-850 text-xs">
+                  {returnModalMode === "single" && individualReturnStudent && (
+                    <>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Student Name:</span>
+                        <span className="font-bold text-slate-100">{individualReturnStudent.name}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Student ID:</span>
+                        <span className="font-mono font-bold text-amber-400">{stripLeadingZeros(individualReturnStudent.id)}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">{t("current_class")}:</span>
+                        <span className="font-bold text-slate-200">{individualReturnStudent.gradeGroup}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">{t("return_to_previous_class")}:</span>
+                        <span className="font-extrabold text-amber-400">{individualReturnPreviousClass}</span>
+                      </div>
+                    </>
+                  )}
+                  {returnModalMode === "bulk" && (
+                    <div className="flex justify-between">
+                      <span className="text-slate-400">Total Selected Students to Return:</span>
+                      <span className="font-bold font-mono text-amber-400">{selectedReturnStudentIds.length} Students</span>
+                    </div>
+                  )}
+                </div>
+
+                <p className="text-xs text-slate-400 leading-relaxed italic">
+                  "{t("confirm_return_message")}"
+                </p>
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setShowReturnModal(false);
+                      setIndividualReturnStudent(null);
+                    }}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  >
+                    {t("cancel")}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSubmittingReturn}
+                    onClick={async () => {
+                      setIsSubmittingReturn(true);
+                      const idsToReturn = returnModalMode === "single" && individualReturnStudent
+                        ? [individualReturnStudent.id]
+                        : selectedReturnStudentIds;
+
+                      const res = await revertPromotion(idsToReturn);
+                      setIsSubmittingReturn(false);
+                      setShowReturnModal(false);
+                      setIndividualReturnStudent(null);
+
+                      if (res.success) {
+                        showToast(res.message || "Student returned successfully!", "success");
+                        setSelectedReturnStudentIds([]);
+                      } else {
+                        showToast(res.error || "Return operation failed.", "error");
+                      }
+                    }}
+                    className="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-extrabold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    {isSubmittingReturn ? "Returning..." : t("return_student")}
                   </button>
                 </div>
               </motion.div>
