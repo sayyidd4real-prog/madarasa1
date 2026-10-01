@@ -5,32 +5,85 @@ export async function POST(request: Request) {
   try {
     await initMysqlDb();
     const body = await request.json();
-    const { studentIds } = body;
+    const { promotionId, studentIds } = body;
 
-    if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
-      return NextResponse.json({ success: false, error: "No students selected for return." }, { status: 400 });
+    // Handle single promotion reversal by promotionId
+    if (promotionId) {
+      const [pRows] = await queryDb("SELECT * FROM promotions WHERE id = ?", [promotionId]);
+      if ((pRows as any[]).length === 0) {
+        return NextResponse.json({ success: false, error: "Promotion record was not found." }, { status: 400 });
+      }
+
+      const promo = (pRows as any[])[0];
+      if (promo.status === "Reverted") {
+        return NextResponse.json(
+          { success: false, error: `Student ${promo.student_name} has already been returned to ${promo.from_class}.` },
+          { status: 400 }
+        );
+      }
+
+      // Verify student exists
+      const [sRows] = await queryDb("SELECT id, name, grade FROM students WHERE id = ?", [promo.student_id]);
+      if ((sRows as any[]).length === 0) {
+        return NextResponse.json(
+          { success: false, error: `Student with ID ${promo.student_id} was not found.` },
+          { status: 400 }
+        );
+      }
+      const studentObj = (sRows as any[])[0];
+
+      // Restore student's grade to the previous class recorded in this promotion
+      await queryDb("UPDATE students SET grade = ? WHERE id = ?", [promo.from_class, promo.student_id]);
+
+      // Mark the promotion record status as 'Reverted'
+      await queryDb("UPDATE promotions SET status = 'Reverted' WHERE id = ?", [promotionId]);
+
+      // Insert an audit log record for reversal event
+      const revertLogId = `prm-rev-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
+      await queryDb(
+        `INSERT INTO promotions (id, student_id, student_name, from_class, to_class, from_academic_year, to_academic_year, promoted_at, status)
+         VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'Reverted')`,
+        [
+          revertLogId,
+          promo.student_id,
+          studentObj.name,
+          studentObj.grade,
+          promo.from_class,
+          promo.to_academic_year || "2026–2027",
+          promo.from_academic_year || "2025–2026",
+        ]
+      );
+
+      return NextResponse.json({
+        success: true,
+        message: `Successfully returned ${studentObj.name} to ${promo.from_class}.`,
+      });
     }
 
-    // Phase 1: Validate all requested students first
+    // Handle array of studentIds (bulk return)
+    if (!studentIds || !Array.isArray(studentIds) || studentIds.length === 0) {
+      return NextResponse.json({ success: false, error: "No promotion record or students selected for return." }, { status: 400 });
+    }
+
     const revertTargets: Array<{
       studentId: string;
       studentName: string;
       currentClass: string;
       previousClass: string;
       originalPromoId: string;
+      fromYear: string;
+      toYear: string;
     }> = [];
 
     for (const sId of studentIds) {
-      // 1. Verify student exists
       const [sRows] = await queryDb("SELECT id, name, grade FROM students WHERE id = ?", [sId]);
       if ((sRows as any[]).length === 0) {
         return NextResponse.json({ success: false, error: `Student with ID ${sId} was not found.` }, { status: 400 });
       }
       const studentObj = (sRows as any[])[0];
 
-      // 2. Find the latest active promotion (status = 'Promoted')
       const [pRows] = await queryDb(
-        `SELECT id, from_class, to_class, status 
+        `SELECT id, from_class, to_class, from_academic_year, to_academic_year, status 
          FROM promotions 
          WHERE student_id = ? AND status = 'Promoted' 
          ORDER BY promoted_at DESC 
@@ -39,19 +92,8 @@ export async function POST(request: Request) {
       );
 
       if ((pRows as any[]).length === 0) {
-        // Check if student was already returned
-        const [revRows] = await queryDb(
-          `SELECT id FROM promotions WHERE student_id = ? AND status = 'Reverted' ORDER BY promoted_at DESC LIMIT 1`,
-          [sId]
-        );
-        if ((revRows as any[]).length > 0) {
-          return NextResponse.json(
-            { success: false, error: `Student ${studentObj.name} (${sId}) has already been returned to the previous class.` },
-            { status: 400 }
-          );
-        }
         return NextResponse.json(
-          { success: false, error: `No previous promotion record found for student ${studentObj.name} (${sId}).` },
+          { success: false, error: `Student ${studentObj.name} (${sId}) has already been returned or has no active promotion.` },
           { status: 400 }
         );
       }
@@ -64,25 +106,30 @@ export async function POST(request: Request) {
         currentClass: studentObj.grade,
         previousClass: activePromo.from_class,
         originalPromoId: activePromo.id,
+        fromYear: activePromo.from_academic_year || "2025–2026",
+        toYear: activePromo.to_academic_year || "2026–2027",
       });
     }
 
-    // Phase 2: Execute Reversal for all validated students
     const revertedNames: string[] = [];
 
     for (const target of revertTargets) {
-      // 1. Restore student's grade in students table to previous class
       await queryDb("UPDATE students SET grade = ? WHERE id = ?", [target.previousClass, target.studentId]);
-
-      // 2. Update status of original promotion record to 'Reverted'
       await queryDb("UPDATE promotions SET status = 'Reverted' WHERE id = ?", [target.originalPromoId]);
 
-      // 3. Create a new audit log record for the return action
       const revertLogId = `prm-rev-${Date.now()}-${Math.random().toString(36).substring(2, 7)}`;
       await queryDb(
         `INSERT INTO promotions (id, student_id, student_name, from_class, to_class, from_academic_year, to_academic_year, promoted_at, status)
-         VALUES (?, ?, ?, ?, ?, '2026–2027', '2025–2026', NOW(), 'Reverted')`,
-        [revertLogId, target.studentId, target.studentName, target.currentClass, target.previousClass]
+         VALUES (?, ?, ?, ?, ?, ?, ?, NOW(), 'Reverted')`,
+        [
+          revertLogId,
+          target.studentId,
+          target.studentName,
+          target.currentClass,
+          target.previousClass,
+          target.toYear,
+          target.fromYear,
+        ]
       );
 
       revertedNames.push(target.studentName);

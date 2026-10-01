@@ -212,6 +212,10 @@ export const translations = {
     return_selected_students: "Return Selected Students",
     confirm_return_message: "This will return the student to the previous class. Historical exams, finance records, attendance and student information will be preserved.",
     reverted: "Reverted",
+    action: "Action",
+    return: "Return",
+    returned: "Returned",
+    confirm_return_question: "Are you sure you want to return this student to the previous class? The promotion history and all historical records will be preserved.",
   },
   ar: {
     // Branding
@@ -424,6 +428,10 @@ export const translations = {
     return_selected_students: "إرجاع الطلاب المحددين",
     confirm_return_message: "سيؤدي هذا إلى إرجاع الطالب إلى الصف السابق. سيتم الحفاظ على الامتحانات السابقة، السجلات المالية، الحضور، ومعلومات الطالب.",
     reverted: "تم التراجع",
+    action: "الإجراء",
+    return: "إرجاع",
+    returned: "تم الإرجاع",
+    confirm_return_question: "هل أنت تأكد من أنك تريد إرجاع هذا الطالب إلى الصف السابق؟ سيتم الحفاظ على سجل الترقية وجميع السجلات التاريخية.",
   },
   so: {
     // Branding
@@ -636,6 +644,10 @@ export const translations = {
     return_selected_students: "Soo celi Ardayda la doortay",
     confirm_return_message: "Tani waxay ardayga ku celin doontaa fasalkii hore. Imtixaannadii hore, dhaqaalaha, xaadirinta iyo macluumaadka ardayga waa la dhawri doonaa.",
     reverted: "Laga noqday",
+    action: "Tallaabada",
+    return: "Soo celi",
+    returned: "La soo celiyey",
+    confirm_return_question: "Ma ziirtaa inaad ardaygan ku celiso fasalkii hore? Taariikhda gudbinta iyo dhammaan diiwaanada hore waa la dhawri doonaa.",
   },
 };
 

@@ -174,7 +174,7 @@ interface PortalContextType {
     academicYear?: string
   ) => Promise<{ success: boolean; message?: string; error?: string }>;
   revertPromotion: (
-    studentIds: string[]
+    opts: { promotionId?: string; studentIds?: string[] } | string[]
   ) => Promise<{ success: boolean; message?: string; error?: string }>;
   language: Language;
   setLanguage: (lang: Language) => void;
@@ -915,13 +915,14 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   const revertPromotion = async (
-    studentIds: string[]
+    opts: { promotionId?: string; studentIds?: string[] } | string[]
   ): Promise<{ success: boolean; message?: string; error?: string }> => {
     try {
+      const payload = Array.isArray(opts) ? { studentIds: opts } : opts;
       const response = await fetch("/api/students/revert-promotion", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ studentIds })
+        body: JSON.stringify(payload)
       });
       
       let data: any = {};

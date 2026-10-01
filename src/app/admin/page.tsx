@@ -134,6 +134,8 @@ export default function AdminDashboard() {
   const [returnModalMode, setReturnModalMode] = useState<"single" | "bulk">("single");
   const [individualReturnStudent, setIndividualReturnStudent] = useState<Student | null>(null);
   const [individualReturnPreviousClass, setIndividualReturnPreviousClass] = useState("");
+  const [selectedReturnPromoId, setSelectedReturnPromoId] = useState<string | null>(null);
+  const [selectedReturnAcademicYear, setSelectedReturnAcademicYear] = useState<string>("2026–2027");
   const [selectedReturnStudentIds, setSelectedReturnStudentIds] = useState<string[]>([]);
   const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
 
@@ -4890,6 +4892,7 @@ export default function AdminDashboard() {
                           <th className="py-3.5 px-4 text-center">New Class</th>
                           <th className="py-3.5 px-4 text-center font-mono">Target Year</th>
                           <th className="py-3.5 px-4 text-center">Status</th>
+                          <th className="py-3.5 px-4 text-center">{t("action")}</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-slate-800/40">
@@ -4912,12 +4915,44 @@ export default function AdminDashboard() {
                                 {p.status === "Reverted" ? t("reverted") : p.status}
                               </span>
                             </td>
+                            <td className="py-3.5 px-4 text-center">
+                              {p.status === "Promoted" ? (
+                                <button
+                                  type="button"
+                                  onClick={() => {
+                                    const studentObj = students.find(s => s.id === p.studentId) || {
+                                      id: p.studentId,
+                                      name: p.studentName,
+                                      email: "",
+                                      gradeGroup: p.toClass,
+                                      academicYear: p.toAcademicYear || "2025–2026",
+                                      status: "active"
+                                    };
+                                    setIndividualReturnStudent(studentObj);
+                                    setIndividualReturnPreviousClass(p.fromClass);
+                                    setSelectedReturnPromoId(p.id);
+                                    setSelectedReturnAcademicYear(p.toAcademicYear || "2026–2027");
+                                    setReturnModalMode("single");
+                                    setShowReturnModal(true);
+                                  }}
+                                  className="px-3 py-1 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 text-amber-400 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 mx-auto cursor-pointer shadow-sm"
+                                  title={`Return ${p.studentName} to ${p.fromClass}`}
+                                >
+                                  <Undo2 className="w-3.5 h-3.5" />
+                                  {t("return")}
+                                </button>
+                              ) : (
+                                <span className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-slate-400 text-[10px] font-bold uppercase rounded flex items-center justify-center gap-1 w-fit mx-auto opacity-70">
+                                  {t("returned")}
+                                </span>
+                              )}
+                            </td>
                           </tr>
                         ))}
 
                         {promotions.length === 0 && (
                           <tr>
-                            <td colSpan={7} className="py-8 text-center text-slate-500 italic">
+                            <td colSpan={8} className="py-8 text-center text-slate-500 italic">
                               No promotion records logged yet.
                             </td>
                           </tr>
@@ -5153,6 +5188,10 @@ export default function AdminDashboard() {
                         <span className="text-slate-400">{t("return_to_previous_class")}:</span>
                         <span className="font-extrabold text-amber-400">{individualReturnPreviousClass}</span>
                       </div>
+                      <div className="flex justify-between">
+                        <span className="text-slate-400">Target Academic Year:</span>
+                        <span className="font-mono font-bold text-slate-300">{selectedReturnAcademicYear}</span>
+                      </div>
                     </>
                   )}
                   {returnModalMode === "bulk" && (
@@ -5164,7 +5203,7 @@ export default function AdminDashboard() {
                 </div>
 
                 <p className="text-xs text-slate-400 leading-relaxed italic">
-                  "{t("confirm_return_message")}"
+                  "{t("confirm_return_question")}"
                 </p>
 
                 <div className="flex items-center justify-end gap-3 pt-2">
@@ -5173,6 +5212,7 @@ export default function AdminDashboard() {
                     onClick={() => {
                       setShowReturnModal(false);
                       setIndividualReturnStudent(null);
+                      setSelectedReturnPromoId(null);
                     }}
                     className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all cursor-pointer"
                   >
@@ -5183,14 +5223,17 @@ export default function AdminDashboard() {
                     disabled={isSubmittingReturn}
                     onClick={async () => {
                       setIsSubmittingReturn(true);
-                      const idsToReturn = returnModalMode === "single" && individualReturnStudent
-                        ? [individualReturnStudent.id]
-                        : selectedReturnStudentIds;
+                      const payload = selectedReturnPromoId
+                        ? { promotionId: selectedReturnPromoId }
+                        : (returnModalMode === "single" && individualReturnStudent
+                            ? [individualReturnStudent.id]
+                            : selectedReturnStudentIds);
 
-                      const res = await revertPromotion(idsToReturn);
+                      const res = await revertPromotion(payload);
                       setIsSubmittingReturn(false);
                       setShowReturnModal(false);
                       setIndividualReturnStudent(null);
+                      setSelectedReturnPromoId(null);
 
                       if (res.success) {
                         showToast(res.message || "Student returned successfully!", "success");
