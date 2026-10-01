@@ -328,23 +328,11 @@ export default function AdminDashboard() {
 
       const scores: { [subj: string]: string } = {};
 
-      // Initialize all subjects with saved term score or prefilled sum for Final Exam
+      // Initialize all subjects with saved term score
       subjects.forEach((sub) => {
         const found = studentTermExams.find((e) => e.subject === sub.subjectName);
         if (found) {
           scores[sub.subjectName] = found.score.toString();
-        } else if (examTerm === "Final Exam") {
-          const priorExams = allStudentClassExams.filter(
-            (e) => e.subject === sub.subjectName &&
-              (e.term === "Term 1" || e.term === "Mid-term" || e.term === "Term 2")
-          );
-          if (priorExams.length > 0) {
-            const rawSum = priorExams.reduce((sum, e) => sum + (e.score || 0), 0);
-            const cappedSum = Math.min(100, Math.max(0, rawSum));
-            scores[sub.subjectName] = cappedSum.toString();
-          } else {
-            scores[sub.subjectName] = "";
-          }
         } else {
           scores[sub.subjectName] = "";
         }
@@ -1077,10 +1065,24 @@ export default function AdminDashboard() {
     for (const [subject, scoreStr] of Object.entries(studentInput.scores)) {
       if (!scoreStr || scoreStr.trim() === "") continue;
       const scoreVal = parseInt(scoreStr, 10);
-      if (isNaN(scoreVal) || scoreVal < 0 || scoreVal > examMaxPoints) {
-        showToast(`Invalid score for "${subject}". Must be between 0 and ${examMaxPoints}.`, "error");
+      if (isNaN(scoreVal) || scoreVal < 0 || scoreVal > 100) {
+        showToast(t("score_range_error"), "error");
         return;
       }
+
+      // Continuous Assessment validation: Term 1 + Mid-term <= 100
+      if (examTerm === "Term 1" || examTerm === "Mid-term") {
+        const otherTerm = examTerm === "Term 1" ? "Mid-term" : "Term 1";
+        const otherExam = exams.find(
+          (e) => e.studentId === studentId && e.subject === subject && e.term === otherTerm
+        );
+        const otherScore = otherExam ? (otherExam.score || 0) : 0;
+        if (otherScore + scoreVal > 100) {
+          showToast(t("term_combined_error"), "error");
+          return;
+        }
+      }
+
       gradesToSave.push({ subject, score: scoreVal, feedback: studentInput.feedback.trim() });
     }
 
@@ -3338,10 +3340,9 @@ export default function AdminDashboard() {
                             onChange={(e) => setExamTerm(e.target.value)}
                             className="w-full bg-slate-900 border border-slate-800 focus:border-emerald-500/50 rounded-lg py-2 px-3 text-xs text-slate-100 focus:outline-none cursor-pointer"
                           >
-                            <option value="Term 1">Term 1</option>
-                            <option value="Mid-term">Mid-term</option>
-                            <option value="Term 2">Term 2</option>
-                            <option value="Final Exam">Final Exam</option>
+                            <option value="Term 1">{t("term_1")}</option>
+                            <option value="Mid-term">{t("mid_term")}</option>
+                            <option value="Final Exam">{t("final_exam")}</option>
                           </select>
                         </div>
 

@@ -357,165 +357,123 @@ export default function StudentDashboard() {
                           <div className="h-px bg-slate-200 dark:bg-slate-900/60 flex-1" />
                         </div>
 
-                        {/* Terms List - Display only latest uploaded term */}
-                        <div className="flex flex-col gap-8 pl-1 md:pl-3">
-                          {(() => {
-                            const termSequence = ["Term 1", "Mid-term", "Term 2", "Term 3", "Term 4", "Final Exam"];
-                            const sortedTerms = Object.keys(terms).sort((a, b) => {
-                              const rankA = termSequence.indexOf(a) !== -1 ? termSequence.indexOf(a) : 99;
-                              const rankB = termSequence.indexOf(b) !== -1 ? termSequence.indexOf(b) : 99;
-                              if (rankA !== rankB) return rankA - rankB;
+                        {/* Separated Evaluation Systems */}
+                        <div className="flex flex-col gap-6">
+                          
+                          {/* 1. CONTINUOUS ASSESSMENT SYSTEM */}
+                          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-4 shadow-sm backdrop-blur-md">
+                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/70 pb-3">
+                              <div className="flex items-center gap-2">
+                                <Award className="w-4.5 h-4.5 text-emerald-500" />
+                                <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                                  {t("continuous_assessment")}
+                                </h4>
+                              </div>
+                              <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                                {t("max_points")}: 100
+                              </span>
+                            </div>
 
-                              const getMaxTs = (t: string) => {
-                                let max = 0;
-                                Object.values(terms[t]).forEach((examList) => {
-                                  examList.forEach((e) => {
-                                    const match = e.id?.match(/EXM-(\d+)/);
-                                    if (match) {
-                                      const ts = parseInt(match[1], 10);
-                                      if (ts > max) max = ts;
-                                    }
-                                  });
-                                });
-                                return max;
-                              };
-                              return getMaxTs(a) - getMaxTs(b);
-                            });
-
-                            const latestTermList = sortedTerms.length > 0 ? [sortedTerms[sortedTerms.length - 1]] : [];
-                            return latestTermList.map((term) => {
-                              const classesInTerm = terms[term];
-                              return (
-                              <div key={term} className="flex flex-col gap-4">
-                                {/* Term title */}
-                                <div className="flex items-center gap-2 text-slate-600 dark:text-slate-400">
-                                  <Clock className="w-4 h-4 text-emerald-500" />
-                                  <span className="text-xs font-black uppercase tracking-wider">
-                                    {term} Examination Reports
-                                  </span>
-                                </div>
-
-                                {/* Classes list in this term */}
-                                <div className="flex flex-col gap-6 pl-4 border-l border-slate-200 dark:border-slate-850">
-                                  {Object.keys(classesInTerm).sort().map((className) => {
-                                    const classExams = classesInTerm[className];
-
-                                    // Build map of subject -> score from classExams
-                                    const examMap: { [subj: string]: number } = {};
-                                     subjects.forEach((sub) => {
-                                       const subjectExams = studentExams.filter(
-                                         (e) => (e.academicYear || "2025–2026") === year && e.subject === sub.subjectName
-                                       );
-                                       if (subjectExams.length > 0) {
-                                         const rawSum = subjectExams.reduce((sum, e) => sum + (e.score || 0), 0);
-                                         examMap[sub.subjectName] = Math.min(100, Math.max(0, rawSum));
-                                       }
-                                     });
-
-                                    // Calculate total and grade
-                                    let total = 0;
-                                    let count = 0;
-                                    subjects.forEach((sub) => {
-                                      const score = examMap[sub.subjectName];
-                                      if (score !== undefined) {
-                                        total += score;
-                                        count++;
-                                      }
-                                    });
-
-                                    const average = count > 0 ? (total / count) : 0;
-                                    const grade = count > 0 ? calculateGrade(average) : "—";
-
-                                    // Gather feedback
-                                    const feedbacks = classExams
-                                      .map((e) => e.feedback)
-                                      .filter((fb) => fb && fb.trim() !== "");
+                            <div className="overflow-x-auto">
+                              <table className="w-full ltr:text-left rtl:text-right text-xs min-w-max">
+                                <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                                  <tr>
+                                    <th className="py-3 px-4">{t("subject")}</th>
+                                    <th className="py-3 px-4 text-center">{t("term_1")}</th>
+                                    <th className="py-3 px-4 text-center">{t("mid_term")}</th>
+                                    <th className="py-3 px-4 text-center text-emerald-600 dark:text-emerald-400">
+                                      {t("continuous_assessment")} Total (/100)
+                                    </th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
+                                  {subjects.map((sub) => {
+                                    const term1Exam = studentExams.find(
+                                      (e) => (e.academicYear || "2025–2026") === year && e.subject === sub.subjectName && e.term === "Term 1"
+                                    );
+                                    const midTermExam = studentExams.find(
+                                      (e) => (e.academicYear || "2025–2026") === year && e.subject === sub.subjectName && e.term === "Mid-term"
+                                    );
+                                    const term1Score = term1Exam ? term1Exam.score : null;
+                                    const midTermScore = midTermExam ? midTermExam.score : null;
+                                    const caTotal = (term1Score !== null || midTermScore !== null)
+                                      ? ((term1Score || 0) + (midTermScore || 0))
+                                      : null;
 
                                     return (
-                                      <div
-                                        key={className}
-                                        className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl overflow-hidden shadow-sm backdrop-blur-md"
-                                      >
-                                        {/* Card Header — Class + Term + Academic Year banner */}
-                                        <div className="bg-gradient-to-r from-emerald-50 dark:from-emerald-950/50 to-transparent border-b border-slate-100 dark:border-slate-800/70 px-5 py-4">
-                                          <h4 className="font-extrabold text-base text-slate-800 dark:text-slate-100 uppercase tracking-wider leading-tight">
-                                            {className}
-                                          </h4>
-                                          <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-[10px] font-bold text-slate-500 dark:text-slate-500 font-mono">
-                                            <span>Academic Year: {year}</span>
-                                            <span className="text-slate-300 dark:text-slate-700">·</span>
-                                            <span className="text-emerald-600 dark:text-emerald-400">{term} Examination Reports</span>
-                                          </div>
-                                        </div>
-
-                                        {/* Professional Marksheet Table */}
-                                        <div className="overflow-x-auto">
-                                          <table className="w-full ltr:text-left rtl:text-right text-xs min-w-max">
-                                            <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-                                              <tr>
-                                                {subjects.map((sub) => (
-                                                  <th key={sub.id} className="py-3 px-4 text-center whitespace-nowrap font-mono text-[10px]">
-                                                    {sub.subjectName}
-                                                  </th>
-                                                ))}
-                                                <th className="py-3 px-4 text-center whitespace-nowrap text-emerald-600 dark:text-emerald-400 text-[10px]">{t("total_amount")}</th>
-                                                <th className="py-3 px-4 text-center whitespace-nowrap text-emerald-600 dark:text-emerald-300 text-[10px]">{t("avg_score")}</th>
-                                                <th className="py-3 px-4 text-center whitespace-nowrap text-[10px]">{t("grade")}</th>
-                                              </tr>
-                                            </thead>
-                                            <tbody>
-                                              <tr className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
-                                                {subjects.map((sub) => {
-                                                  const s = examMap[sub.subjectName];
-                                                  return (
-                                                    <td key={sub.id} className="py-4 px-4 text-center border-b border-slate-100 dark:border-slate-800/40">
-                                                      {s !== undefined
-                                                        ? <span className="font-bold text-slate-800 dark:text-slate-100 font-mono text-sm">{s}</span>
-                                                        : <span className="text-slate-400 dark:text-slate-700">—</span>}
-                                                    </td>
-                                                  );
-                                                })}
-                                                <td className="py-4 px-4 text-center border-b border-slate-100 dark:border-slate-800/40">
-                                                  <span className="font-bold text-emerald-600 dark:text-emerald-400 font-mono text-sm">
-                                                    {count > 0 ? total : <span className="text-slate-400 dark:text-slate-700">—</span>}
-                                                  </span>
-                                                </td>
-                                                <td className="py-4 px-4 text-center border-b border-slate-100 dark:border-slate-800/40">
-                                                  <span className="font-bold text-emerald-600 dark:text-emerald-300 font-mono text-sm">
-                                                    {count > 0 ? `${average.toFixed(1)}%` : <span className="text-slate-400 dark:text-slate-700">—</span>}
-                                                  </span>
-                                                </td>
-                                                <td className="py-4 px-4 text-center border-b border-slate-100 dark:border-slate-800/40">
-                                                  {count > 0
-                                                    ? <span className={`inline-flex px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide rounded border ${getGradeBadge(grade)}`}>{grade}</span>
-                                                    : <span className="text-slate-400 dark:text-slate-700">—</span>}
-                                                </td>
-                                              </tr>
-                                            </tbody>
-                                          </table>
-                                        </div>
-
-                                        {/* Instructor Feedback */}
-                                        {feedbacks.length > 0 && (
-                                          <div className="mx-5 mb-4 mt-3 text-xs text-slate-600 dark:text-slate-400 bg-slate-50 dark:bg-slate-950/30 px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-800/60 border-dashed">
-                                            <span className="text-[10px] font-bold text-slate-400 dark:text-slate-500 block uppercase tracking-wide mb-1">
-                                              Instructor Feedback
-                                            </span>
-                                            <ul className="list-disc pl-4 space-y-1">
-                                              {feedbacks.map((fb, idx) => (
-                                                <li key={idx} className="italic">"{fb}"</li>
-                                              ))}
-                                            </ul>
-                                          </div>
-                                        )}
-                                      </div>
+                                      <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
+                                        <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">{sub.subjectName}</td>
+                                        <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                                          {term1Score !== null ? term1Score : "—"}
+                                        </td>
+                                        <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                                          {midTermScore !== null ? midTermScore : "—"}
+                                        </td>
+                                        <td className="py-3.5 px-4 text-center font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                                          {caTotal !== null ? `${caTotal} / 100` : "—"}
+                                        </td>
+                                      </tr>
                                     );
                                   })}
-                                </div>
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+
+                          {/* 2. FINAL EXAM SYSTEM */}
+                          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-4 shadow-sm backdrop-blur-md">
+                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/70 pb-3">
+                              <div className="flex items-center gap-2">
+                                <GraduationCap className="w-4.5 h-4.5 text-cyan-500" />
+                                <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                                  {t("final_exam")}
+                                </h4>
                               </div>
-                            );
-                          });
-                        })()}
+                              <span className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 px-2.5 py-1 rounded-lg border border-cyan-500/20">
+                                {t("max_points")}: 100
+                              </span>
+                            </div>
+
+                            <div className="overflow-x-auto">
+                              <table className="w-full ltr:text-left rtl:text-right text-xs min-w-max">
+                                <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                                  <tr>
+                                    <th className="py-3 px-4">{t("subject")}</th>
+                                    <th className="py-3 px-4 text-center text-cyan-600 dark:text-cyan-400">{t("final_exam")} Score (/100)</th>
+                                    <th className="py-3 px-4 text-center">{t("grade")}</th>
+                                  </tr>
+                                </thead>
+                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
+                                  {subjects.map((sub) => {
+                                    const finalExamObj = studentExams.find(
+                                      (e) => (e.academicYear || "2025–2026") === year && e.subject === sub.subjectName && e.term === "Final Exam"
+                                    );
+                                    const finalScore = finalExamObj ? finalExamObj.score : null;
+                                    const grade = finalScore !== null ? calculateGrade(finalScore) : "—";
+
+                                    return (
+                                      <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
+                                        <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">{sub.subjectName}</td>
+                                        <td className="py-3.5 px-4 text-center font-mono font-black text-cyan-600 dark:text-cyan-400 text-sm">
+                                          {finalScore !== null ? `${finalScore} / 100` : "—"}
+                                        </td>
+                                        <td className="py-3.5 px-4 text-center">
+                                          {finalScore !== null ? (
+                                            <span className={`inline-flex px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide rounded border ${getGradeBadge(grade)}`}>
+                                              {grade}
+                                            </span>
+                                          ) : (
+                                            <span className="text-slate-400 dark:text-slate-700">—</span>
+                                          )}
+                                        </td>
+                                      </tr>
+                                    );
+                                  })}
+                                </tbody>
+                              </table>
+                            </div>
+                          </div>
+
                         </div>
                       </div>
                     );

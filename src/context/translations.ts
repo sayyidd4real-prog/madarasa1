@@ -171,6 +171,16 @@ export const translations = {
 
     // Notifications & Deletions
     delete_review: "You can review or edit the deletion statement below before confirming the action:",
+
+    // Exam System Separation
+    final_exam: "Final Exam",
+    term_1: "Term 1",
+    mid_term: "Mid-term",
+    continuous_assessment: "Continuous Assessment",
+    max_points: "Maximum Points",
+    score: "Score",
+    term_combined_error: "Term 1 + Mid-term cannot exceed 100 points.",
+    score_range_error: "Score must be between 0 and 100.",
   },
   ar: {
     // Branding
@@ -342,6 +352,16 @@ export const translations = {
 
     // Notifications & Deletions
     delete_review: "يمكنك مراجعة أو تعديل نص رسالة تأكيد الحذف أدناه قبل التنفيذ:",
+
+    // Exam System Separation
+    final_exam: "الاختبار النهائي",
+    term_1: "الفصل الأول",
+    mid_term: "الاختبار النصفي",
+    continuous_assessment: "التقييم المستمر",
+    max_points: "الدرجة القصوى",
+    score: "الدرجة",
+    term_combined_error: "لا يمكن أن يتجاوز مجموع الفصل الأول والاختبار النصفي 100 درجة.",
+    score_range_error: "يجب أن تكون الدرجة بين 0 و 100.",
   },
   so: {
     // Branding
@@ -513,5 +533,16 @@ export const translations = {
 
     // Notifications & Deletions
     delete_review: "Waad wax ka beddeli kartaa farriinta xaqiijinta tirtirista ee hoose inta aadan fulin:",
+
+    // Exam System Separation
+    final_exam: "Imtixaanka Final-ka",
+    term_1: "Term 1",
+    mid_term: "Mid-term",
+    continuous_assessment: "Qiimeynta Joogtada ah",
+    max_points: "Dhibcaha ugu badan",
+    score: "Dhibcaha",
+    term_combined_error: "Isugeynta Term 1 iyo Mid-term kama badnaan karto 100 dhibcood.",
+    score_range_error: "Buundadu waa inay u dhaxaysaa 0 iyo 100.",
   },
 };
+
