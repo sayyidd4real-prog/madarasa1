@@ -181,6 +181,11 @@ export const translations = {
     score: "Score",
     term_combined_error: "Term 1 + Mid-term cannot exceed 100 points.",
     score_range_error: "Score must be between 0 and 100.",
+    back_to_exams: "← Back to Exams",
+    view_exam_results: "View Exam Results",
+    exams_available: "Exams Available",
+    select_exam_card: "Select a class card below to view detailed exam transcripts.",
+    teacher_feedback: "Teacher Feedback / Comments",
   },
   ar: {
     // Branding
@@ -362,6 +367,11 @@ export const translations = {
     score: "الدرجة",
     term_combined_error: "لا يمكن أن يتجاوز مجموع الفصل الأول والاختبار النصفي 100 درجة.",
     score_range_error: "يجب أن تكون الدرجة بين 0 و 100.",
+    back_to_exams: "← العودة إلى الامتحانات",
+    view_exam_results: "عرض نتائج الامتحانات",
+    exams_available: "امتحانات متاحة",
+    select_exam_card: "اختر بطاقة الصف أدناه لعرض تفاصيل نتائج امتحاناتك.",
+    teacher_feedback: "ملاحظات المعلم",
   },
   so: {
     // Branding
@@ -543,6 +553,11 @@ export const translations = {
     score: "Dhibcaha",
     term_combined_error: "Isugeynta Term 1 iyo Mid-term kama badnaan karto 100 dhibcood.",
     score_range_error: "Buundadu waa inay u dhaxaysaa 0 iyo 100.",
+    back_to_exams: "← Dib u ugu noqo Imtixaanaadka",
+    view_exam_results: "Eeg Natiijooyinka Imtixaanka",
+    exams_available: "Imtixaanaad Hada Laga Helayo",
+    select_exam_card: "Dooro fasalka hoose si aad u eegto natiijooyinka imtixaankaaga.",
+    teacher_feedback: "Faallada Macallinka",
   },
 };
 

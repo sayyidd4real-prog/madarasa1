@@ -13,7 +13,9 @@ import {
   AlertCircle,
   FileText,
   User,
-  TrendingUp
+  TrendingUp,
+  BookOpen,
+  ArrowLeft
 } from "lucide-react";
 import { usePortal, Exam } from "@/context/PortalContext";
 import { useToast } from "@/context/ToastContext";
@@ -72,6 +74,7 @@ export default function StudentDashboard() {
 
   // Selected tab state
   const [activeTab, setActiveTab] = useState<StudentTab>("results");
+  const [selectedClassKey, setSelectedClassKey] = useState<string | null>(null);
 
   // Redirect if unauthorized once state has loaded
   useEffect(() => {
@@ -109,32 +112,27 @@ export default function StudentDashboard() {
     router.push("/login");
   };
 
-  // Group exams by Academic Year, then Term, then Class
-  interface GroupedExams {
-    [year: string]: {
-      [term: string]: {
-        [className: string]: Exam[]
-      }
-    }
+  // Group student exams by Class and Academic Year
+  interface StudentClassGroup {
+    key: string;
+    className: string;
+    academicYear: string;
+    exams: Exam[];
   }
 
-  const groupedExams: GroupedExams = {};
+  const classGroupsMap = new Map<string, StudentClassGroup>();
   studentExams.forEach((exam) => {
-    const year = exam.academicYear || "2025–2026";
-    const term = exam.term || "Term 1";
-    const cls = exam.className || "Class One";
-
-    if (!groupedExams[year]) {
-      groupedExams[year] = {};
+    const cls = exam.className || studentProfile?.gradeGroup || "Class";
+    const yr = exam.academicYear || studentProfile?.academicYear || "2025–2026";
+    const key = `${cls}___${yr}`;
+    if (!classGroupsMap.has(key)) {
+      classGroupsMap.set(key, { key, className: cls, academicYear: yr, exams: [] });
     }
-    if (!groupedExams[year][term]) {
-      groupedExams[year][term] = {};
-    }
-    if (!groupedExams[year][term][cls]) {
-      groupedExams[year][term][cls] = [];
-    }
-    groupedExams[year][term][cls].push(exam);
+    classGroupsMap.get(key)!.exams.push(exam);
   });
+
+  const classGroups = Array.from(classGroupsMap.values());
+  const activeClassGroup = selectedClassKey ? classGroups.find((g) => g.key === selectedClassKey) : null;
 
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 flex flex-col font-sans transition-colors duration-300">
@@ -294,199 +292,294 @@ export default function StudentDashboard() {
                 transition={{ duration: 0.25 }}
                 className="flex flex-col gap-8"
               >
-                {/* Stats row */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  
-                  <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                    <div className="p-3 bg-slate-100 dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 rounded-xl">
-                      <FileText className="w-5 h-5" />
+                {!selectedClassKey || !activeClassGroup ? (
+                  /* --- CARD SELECTION VIEW --- */
+                  <div className="flex flex-col gap-6">
+                    <div className="flex flex-col gap-1 border-b border-slate-200 dark:border-slate-800 pb-3">
+                      <h3 className="text-base md:text-lg font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider flex items-center gap-2">
+                        <Award className="w-5 h-5 text-emerald-500" />
+                        {t("academic_transcript")}
+                      </h3>
+                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                        {t("select_exam_card")}
+                      </p>
                     </div>
-                    <div>
-                      <span className="block text-2xl font-bold font-mono text-slate-800 dark:text-slate-100">{formatDisplayNumber(studentExams.length)}</span>
-                      <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("completed_exams")}</span>
+
+                    {/* Class Cards Grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
+                      {classGroups.map((group) => {
+                        return (
+                          <div
+                            key={group.key}
+                            onClick={() => setSelectedClassKey(group.key)}
+                            className="group relative bg-white dark:bg-slate-900/70 border border-slate-200 dark:border-slate-800 hover:border-emerald-500/50 dark:hover:border-emerald-500/50 rounded-2xl p-6 shadow-sm hover:shadow-md transition-all cursor-pointer flex flex-col justify-between gap-5 overflow-hidden"
+                          >
+                            <div className="absolute top-0 right-0 w-24 h-24 bg-emerald-500/5 rounded-full blur-xl group-hover:bg-emerald-500/10 transition-all pointer-events-none" />
+                            
+                            <div className="flex flex-col gap-3">
+                              <div className="flex items-center justify-between">
+                                <div className="p-2.5 bg-emerald-50 dark:bg-emerald-950/60 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                                  <GraduationCap className="w-5 h-5" />
+                                </div>
+                                <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700">
+                                  {group.academicYear}
+                                </span>
+                              </div>
+
+                              <div>
+                                <h4 className="text-base font-extrabold text-slate-800 dark:text-slate-100 group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors">
+                                  [ {group.className} Exams ]
+                                </h4>
+                                <p className="text-xs text-slate-500 dark:text-slate-400 font-mono font-bold mt-1">
+                                  {formatDisplayNumber(group.exams.length)} {t("exams_available")}
+                                </p>
+                              </div>
+                            </div>
+
+                            <div className="pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs font-bold text-emerald-600 dark:text-emerald-400">
+                              <span>{t("view_exam_results")}</span>
+                              <span className="transform group-hover:translate-x-1 rtl:group-hover:-translate-x-1 transition-transform">→</span>
+                            </div>
+                          </div>
+                        );
+                      })}
                     </div>
+
+                    {classGroups.length === 0 && (
+                      <div className="bg-white dark:bg-slate-900/20 border border-slate-200 dark:border-slate-900 rounded-2xl py-12 text-center text-slate-500 shadow-sm">
+                        <FileText className="w-8 h-8 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
+                        <p className="text-sm">No exam scores or transcripts found for your student profile.</p>
+                      </div>
+                    )}
                   </div>
+                ) : (
+                  /* --- DETAILED EXAM VIEW FOR SELECTED CLASS --- */
+                  <div className="flex flex-col gap-8">
+                    {/* Header & Back Button */}
+                    <div className="flex flex-col gap-4">
+                      <div className="flex items-center justify-between flex-wrap gap-3">
+                        <button
+                          type="button"
+                          onClick={() => setSelectedClassKey(null)}
+                          className="inline-flex items-center gap-2 px-4 py-2 bg-white dark:bg-slate-900 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 rounded-xl text-xs font-bold border border-slate-200 dark:border-slate-800 hover:border-emerald-500/40 transition-all cursor-pointer shadow-sm"
+                        >
+                          <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
+                          <span>{t("back_to_exams")}</span>
+                        </button>
+                        <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-lg font-mono">
+                          {activeClassGroup.academicYear}
+                        </span>
+                      </div>
 
-                  <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                    <div className="p-3 bg-slate-100 dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 rounded-xl">
-                      <TrendingUp className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="block text-2xl font-bold font-mono text-slate-800 dark:text-slate-100">
-                        {studentExams.length > 0
-                          ? Math.round(studentExams.reduce((sum, e) => sum + e.score, 0) / studentExams.length)
-                          : 0}
-                        %
-                      </span>
-                      <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("avg_score")}</span>
-                    </div>
-                  </div>
-
-                  <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
-                    <div className="p-3 bg-slate-100 dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 rounded-xl">
-                      <GraduationCap className="w-5 h-5" />
-                    </div>
-                    <div>
-                      <span className="block text-lg font-bold text-slate-800 dark:text-slate-100">
-                        {studentExams.length > 0
-                          ? Math.round(studentExams.reduce((sum, e) => sum + e.score, 0) / studentExams.length) >= 60
-                            ? "Satisfactory Good"
-                            : "Academic Warning"
-                          : "No records"}
-                      </span>
-                      <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("academic_standing")}</span>
-                    </div>
-                  </div>
-
-                </div>
-
-                {/* Grouped evaluations by Academic Year, Term, Class */}
-                <div className="flex flex-col gap-10">
-                  {Object.keys(groupedExams).sort().reverse().map((year) => {
-                    const terms = groupedExams[year];
-                    return (
-                      <div key={year} className="flex flex-col gap-6 bg-slate-900/10 dark:bg-slate-900/30 border border-slate-200 dark:border-slate-850 p-6 rounded-3xl shadow-sm">
-                        {/* Academic Year Header */}
-                        <div className="flex items-center gap-3">
-                          <span className="px-3.5 py-1 bg-emerald-100 dark:bg-emerald-950 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-lg font-mono">
-                            {year}
-                          </span>
-                          <h3 className="text-xs md:text-sm font-extrabold uppercase text-slate-500 dark:text-slate-450 tracking-wider">
-                            Academic Year evaluations
+                      <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-800 pb-3">
+                        <div>
+                          <h3 className="text-lg md:text-xl font-black text-slate-800 dark:text-slate-100 uppercase tracking-wider">
+                            {activeClassGroup.className.toUpperCase()} EXAMS
                           </h3>
-                          <div className="h-px bg-slate-200 dark:bg-slate-900/60 flex-1" />
-                        </div>
-
-                        {/* Separated Evaluation Systems */}
-                        <div className="flex flex-col gap-6">
-                          
-                          {/* 1. CONTINUOUS ASSESSMENT SYSTEM */}
-                          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-4 shadow-sm backdrop-blur-md">
-                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/70 pb-3">
-                              <div className="flex items-center gap-2">
-                                <Award className="w-4.5 h-4.5 text-emerald-500" />
-                                <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                                  {t("continuous_assessment")}
-                                </h4>
-                              </div>
-                              <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                                {t("max_points")}: 100
-                              </span>
-                            </div>
-
-                            <div className="overflow-x-auto">
-                              <table className="w-full ltr:text-left rtl:text-right text-xs min-w-max">
-                                <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-                                  <tr>
-                                    <th className="py-3 px-4">{t("subject")}</th>
-                                    <th className="py-3 px-4 text-center">{t("term_1")}</th>
-                                    <th className="py-3 px-4 text-center">{t("mid_term")}</th>
-                                    <th className="py-3 px-4 text-center text-emerald-600 dark:text-emerald-400">
-                                      {t("continuous_assessment")} Total (/100)
-                                    </th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
-                                  {subjects.map((sub) => {
-                                    const term1Exam = studentExams.find(
-                                      (e) => (e.academicYear || "2025–2026") === year && e.subject === sub.subjectName && e.term === "Term 1"
-                                    );
-                                    const midTermExam = studentExams.find(
-                                      (e) => (e.academicYear || "2025–2026") === year && e.subject === sub.subjectName && e.term === "Mid-term"
-                                    );
-                                    const term1Score = term1Exam ? term1Exam.score : null;
-                                    const midTermScore = midTermExam ? midTermExam.score : null;
-                                    const caTotal = (term1Score !== null || midTermScore !== null)
-                                      ? ((term1Score || 0) + (midTermScore || 0))
-                                      : null;
-
-                                    return (
-                                      <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
-                                        <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">{sub.subjectName}</td>
-                                        <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
-                                          {term1Score !== null ? term1Score : "—"}
-                                        </td>
-                                        <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
-                                          {midTermScore !== null ? midTermScore : "—"}
-                                        </td>
-                                        <td className="py-3.5 px-4 text-center font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
-                                          {caTotal !== null ? `${caTotal} / 100` : "—"}
-                                        </td>
-                                      </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-
-                          {/* 2. FINAL EXAM SYSTEM */}
-                          <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-4 shadow-sm backdrop-blur-md">
-                            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/70 pb-3">
-                              <div className="flex items-center gap-2">
-                                <GraduationCap className="w-4.5 h-4.5 text-cyan-500" />
-                                <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">
-                                  {t("final_exam")}
-                                </h4>
-                              </div>
-                              <span className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 px-2.5 py-1 rounded-lg border border-cyan-500/20">
-                                {t("max_points")}: 100
-                              </span>
-                            </div>
-
-                            <div className="overflow-x-auto">
-                              <table className="w-full ltr:text-left rtl:text-right text-xs min-w-max">
-                                <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
-                                  <tr>
-                                    <th className="py-3 px-4">{t("subject")}</th>
-                                    <th className="py-3 px-4 text-center text-cyan-600 dark:text-cyan-400">{t("final_exam")} Score (/100)</th>
-                                    <th className="py-3 px-4 text-center">{t("grade")}</th>
-                                  </tr>
-                                </thead>
-                                <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
-                                  {subjects.map((sub) => {
-                                    const finalExamObj = studentExams.find(
-                                      (e) => (e.academicYear || "2025–2026") === year && e.subject === sub.subjectName && e.term === "Final Exam"
-                                    );
-                                    const finalScore = finalExamObj ? finalExamObj.score : null;
-                                    const grade = finalScore !== null ? calculateGrade(finalScore) : "—";
-
-                                    return (
-                                      <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
-                                        <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">{sub.subjectName}</td>
-                                        <td className="py-3.5 px-4 text-center font-mono font-black text-cyan-600 dark:text-cyan-400 text-sm">
-                                          {finalScore !== null ? `${finalScore} / 100` : "—"}
-                                        </td>
-                                        <td className="py-3.5 px-4 text-center">
-                                          {finalScore !== null ? (
-                                            <span className={`inline-flex px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide rounded border ${getGradeBadge(grade)}`}>
-                                              {grade}
-                                            </span>
-                                          ) : (
-                                            <span className="text-slate-400 dark:text-slate-700">—</span>
-                                          )}
-                                        </td>
-                                      </tr>
-                                    );
-                                  })}
-                                </tbody>
-                              </table>
-                            </div>
-                          </div>
-
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
+                            Detailed evaluations for {activeClassGroup.className} ({activeClassGroup.academicYear})
+                          </p>
                         </div>
                       </div>
-                    );
-                  })}
-
-                  {studentExams.length === 0 && (
-                    <div className="bg-white dark:bg-slate-900/20 border border-slate-200 dark:border-slate-900 rounded-2xl py-12 text-center text-slate-500 shadow-sm">
-                      <FileText className="w-8 h-8 text-slate-400 dark:text-slate-600 mx-auto mb-3" />
-                      <p className="text-sm">No exam scores or transcripts found for your student profile.</p>
                     </div>
-                  )}
-                </div>
 
+                    {/* Stats row for selected class */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+                        <div className="p-3 bg-slate-100 dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                          <FileText className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="block text-2xl font-bold font-mono text-slate-800 dark:text-slate-100">
+                            {formatDisplayNumber(activeClassGroup.exams.length)}
+                          </span>
+                          <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("completed_exams")}</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+                        <div className="p-3 bg-slate-100 dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                          <TrendingUp className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="block text-2xl font-bold font-mono text-slate-800 dark:text-slate-100">
+                            {activeClassGroup.exams.length > 0
+                              ? Math.round(activeClassGroup.exams.reduce((sum, e) => sum + e.score, 0) / activeClassGroup.exams.length)
+                              : 0}
+                            %
+                          </span>
+                          <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("avg_score")}</span>
+                        </div>
+                      </div>
+
+                      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 p-5 rounded-2xl flex items-center gap-4 shadow-sm">
+                        <div className="p-3 bg-slate-100 dark:bg-slate-950 text-emerald-600 dark:text-emerald-400 rounded-xl">
+                          <GraduationCap className="w-5 h-5" />
+                        </div>
+                        <div>
+                          <span className="block text-lg font-bold text-slate-800 dark:text-slate-100">
+                            {activeClassGroup.exams.length > 0
+                              ? Math.round(activeClassGroup.exams.reduce((sum, e) => sum + e.score, 0) / activeClassGroup.exams.length) >= 60
+                                ? "Satisfactory Good"
+                                : "Academic Warning"
+                              : "No records"}
+                          </span>
+                          <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("academic_standing")}</span>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Separated Evaluation Systems */}
+                    <div className="flex flex-col gap-6">
+                      
+                      {/* 1. CONTINUOUS ASSESSMENT SYSTEM */}
+                      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-4 shadow-sm backdrop-blur-md">
+                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/70 pb-3">
+                          <div className="flex items-center gap-2">
+                            <Award className="w-4.5 h-4.5 text-emerald-500" />
+                            <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                              {t("continuous_assessment")}
+                            </h4>
+                          </div>
+                          <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-500/20">
+                            {t("max_points")}: 100
+                          </span>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <table className="w-full ltr:text-left rtl:text-right text-xs min-w-max">
+                            <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                              <tr>
+                                <th className="py-3 px-4">{t("subject")}</th>
+                                <th className="py-3 px-4 text-center">{t("term_1")}</th>
+                                <th className="py-3 px-4 text-center">{t("mid_term")}</th>
+                                <th className="py-3 px-4 text-center text-emerald-600 dark:text-emerald-400">
+                                  {t("continuous_assessment")} Total (/100)
+                                </th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
+                              {subjects.map((sub) => {
+                                const term1Exam = activeClassGroup.exams.find(
+                                  (e) => e.subject === sub.subjectName && e.term === "Term 1"
+                                );
+                                const midTermExam = activeClassGroup.exams.find(
+                                  (e) => e.subject === sub.subjectName && e.term === "Mid-term"
+                                );
+                                const term1Score = term1Exam ? term1Exam.score : null;
+                                const midTermScore = midTermExam ? midTermExam.score : null;
+                                const caTotal = (term1Score !== null || midTermScore !== null)
+                                  ? ((term1Score || 0) + (midTermScore || 0))
+                                  : null;
+
+                                return (
+                                  <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
+                                    <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">{sub.subjectName}</td>
+                                    <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                                      {term1Score !== null ? term1Score : "—"}
+                                    </td>
+                                    <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
+                                      {midTermScore !== null ? midTermScore : "—"}
+                                    </td>
+                                    <td className="py-3.5 px-4 text-center font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
+                                      {caTotal !== null ? `${caTotal} / 100` : "—"}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      {/* 2. FINAL EXAM SYSTEM */}
+                      <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800/80 rounded-2xl p-5 flex flex-col gap-4 shadow-sm backdrop-blur-md">
+                        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800/70 pb-3">
+                          <div className="flex items-center gap-2">
+                            <GraduationCap className="w-4.5 h-4.5 text-cyan-500" />
+                            <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                              {t("final_exam")}
+                            </h4>
+                          </div>
+                          <span className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 px-2.5 py-1 rounded-lg border border-cyan-500/20">
+                            {t("max_points")}: 100
+                          </span>
+                        </div>
+
+                        <div className="overflow-x-auto">
+                          <table className="w-full ltr:text-left rtl:text-right text-xs min-w-max">
+                            <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
+                              <tr>
+                                <th className="py-3 px-4">{t("subject")}</th>
+                                <th className="py-3 px-4 text-center text-cyan-600 dark:text-cyan-400">{t("final_exam")} Score (/100)</th>
+                                <th className="py-3 px-4 text-center">{t("grade")}</th>
+                              </tr>
+                            </thead>
+                            <tbody className="divide-y divide-slate-100 dark:divide-slate-800/40">
+                              {subjects.map((sub) => {
+                                const finalExamObj = activeClassGroup.exams.find(
+                                  (e) => e.subject === sub.subjectName && e.term === "Final Exam"
+                                );
+                                const finalScore = finalExamObj ? finalExamObj.score : null;
+                                const grade = finalScore !== null ? calculateGrade(finalScore) : "—";
+
+                                return (
+                                  <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
+                                    <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">{sub.subjectName}</td>
+                                    <td className="py-3.5 px-4 text-center font-mono font-black text-cyan-600 dark:text-cyan-400 text-sm">
+                                      {finalScore !== null ? `${finalScore} / 100` : "—"}
+                                    </td>
+                                    <td className="py-3.5 px-4 text-center">
+                                      {finalScore !== null ? (
+                                        <span className={`inline-flex px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide rounded border ${getGradeBadge(grade)}`}>
+                                          {grade}
+                                        </span>
+                                      ) : (
+                                        <span className="text-slate-400 dark:text-slate-700">—</span>
+                                      )}
+                                    </td>
+                                  </tr>
+                                );
+                              })}
+                            </tbody>
+                          </table>
+                        </div>
+                      </div>
+
+                      {/* 3. TEACHER FEEDBACK IF AVAILABLE */}
+                      {activeClassGroup.exams.some((e) => e.feedback && e.feedback.trim() !== "") && (
+                        <div className="bg-white dark:bg-slate-900/60 border border-slate-200 dark:border-slate-800 rounded-2xl p-5 flex flex-col gap-3 shadow-sm">
+                          <div className="flex items-center gap-2 border-b border-slate-100 dark:border-slate-800 pb-2">
+                            <FileText className="w-4.5 h-4.5 text-amber-500" />
+                            <h4 className="font-extrabold text-sm uppercase tracking-wider text-slate-800 dark:text-slate-100">
+                              {t("teacher_feedback")}
+                            </h4>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            {activeClassGroup.exams
+                              .filter((e) => e.feedback && e.feedback.trim() !== "")
+                              .map((e) => (
+                                <div
+                                  key={e.id}
+                                  className="p-3.5 bg-slate-50 dark:bg-slate-950/60 border border-slate-200/70 dark:border-slate-800 rounded-xl text-xs flex flex-col gap-1.5"
+                                >
+                                  <div className="flex items-center justify-between font-bold text-slate-700 dark:text-slate-300">
+                                    <span className="flex items-center gap-2">
+                                      <span className="text-emerald-600 dark:text-emerald-400 font-extrabold">{e.subject}</span>
+                                      <span className="text-slate-400 dark:text-slate-600">({e.term})</span>
+                                    </span>
+                                    <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{e.score} / 100</span>
+                                  </div>
+                                  <p className="text-slate-600 dark:text-slate-300 italic">"{e.feedback}"</p>
+                                </div>
+                              ))}
+                          </div>
+                        </div>
+                      )}
+
+                    </div>
+                  </div>
+                )}
               </motion.div>
             )}
 
