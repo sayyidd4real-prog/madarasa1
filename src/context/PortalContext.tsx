@@ -892,14 +892,22 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ studentIds, fromClass, toClass, academicYear })
       });
-      const data = await response.json();
-      if (data.success) {
+      
+      let data: any = {};
+      try {
+        data = await response.json();
+      } catch {
+        const text = await response.text().catch(() => "");
+        data = { success: false, error: text || `Server error (HTTP ${response.status})` };
+      }
+
+      if (response.ok && data.success) {
         await refreshData("admin");
         return { success: true, message: data.message };
       }
-      return { success: false, error: data.error || "Failed to promote students." };
+      return { success: false, error: data.error || `Promotion failed (HTTP ${response.status})` };
     } catch (err: any) {
-      return { success: false, error: err.message || "Network error." };
+      return { success: false, error: err.message || "Network request failed." };
     }
   };
 
