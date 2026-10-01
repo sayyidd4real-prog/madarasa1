@@ -151,3 +151,60 @@ body {
 :root:not(.dark) .admin-portal .border-slate-800\/80 {
   border-color: #e2e8f0 !important;
 }
+
+/* ==========================================================================
+   RTL / LTR Sidebar & Main Content Layout Overrides
+   ========================================================================== */
+
+/* Mobile / Base Sidebar Positioning & Offscreen State */
+.admin-sidebar {
+  left: 0;
+  right: auto;
+}
+
+@media (max-width: 1023px) {
+  .admin-sidebar:not(.translate-x-0) {
+    transform: translateX(-100%) !important;
+  }
+}
+
+html[dir="rtl"] .admin-sidebar {
+  left: auto !important;
+  right: 0 !important;
+  border-right-width: 0px !important;
+  border-left-width: 1px !important;
+}
+
+@media (max-width: 1023px) {
+  html[dir="rtl"] .admin-sidebar:not(.translate-x-0) {
+    transform: translateX(100%) !important;
+  }
+}
+
+/* Desktop Sidebar & Main Pane Layout (min-width: 1024px) */
+@media (min-width: 1024px) {
+  /* LTR Desktop (English & Somali) */
+  .admin-sidebar {
+    transform: translateX(0) !important;
+    left: 0 !important;
+    right: auto !important;
+  }
+  
+  .admin-main-pane {
+    margin-left: 16rem !important;
+    margin-right: 0px !important;
+  }
+
+  /* RTL Desktop (Arabic) */
+  html[dir="rtl"] .admin-sidebar {
+    transform: translateX(0) !important;
+    right: 0 !important;
+    left: auto !important;
+  }
+
+  html[dir="rtl"] .admin-main-pane {
+    margin-left: 0px !important;
+    margin-right: 16rem !important;
+  }
+}
+

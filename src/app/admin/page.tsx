@@ -1462,7 +1462,7 @@ export default function AdminDashboard() {
 
       {/* Sidebar navigation */}
       <aside
-        className={`fixed inset-y-0 ltr:left-0 rtl:right-0 z-50 w-64 bg-slate-900 ltr:border-r rtl:border-l border-slate-800 p-5 flex flex-col gap-5 overflow-y-auto max-h-screen transition-transform duration-300 lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "ltr:-translate-x-full rtl:translate-x-full"
+        className={`admin-sidebar fixed inset-y-0 z-50 w-64 bg-slate-900 border-r border-slate-800 p-5 flex flex-col gap-5 overflow-y-auto max-h-screen transition-transform duration-300 lg:translate-x-0 ${isSidebarOpen ? "translate-x-0" : "max-lg:-translate-x-full"
           }`}
       >
         {/* Brand */}
@@ -1649,7 +1649,7 @@ export default function AdminDashboard() {
       </aside>
 
       {/* Main content pane */}
-      <div className="flex-1 flex flex-col min-w-0 bg-slate-950 lg:h-screen lg:overflow-hidden ltr:lg:ml-64 rtl:lg:mr-64">
+      <div className="admin-main-pane flex-1 flex flex-col min-w-0 bg-slate-950 lg:h-screen lg:overflow-hidden lg:ml-64">
 
         {/* Mobile Header Bar */}
         <header className="lg:hidden flex items-center justify-between p-4 bg-slate-900 border-b border-slate-800">
