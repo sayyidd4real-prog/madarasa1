@@ -31,7 +31,7 @@ export interface ClassItem {
   id: string;
   className: string;
   room: string;
-  instructor: string;
+  instructor?: string;
 }
 
 export interface Fee {
@@ -113,8 +113,8 @@ interface PortalContextType {
   addStudent: (name: string, email: string, gradeGroup: string, academicYear: string, password?: string, phoneNumber?: string) => Promise<{ success: boolean; error?: string }>;
   editStudent: (id: string, name: string, email: string, gradeGroup: string, academicYear: string, password?: string, phoneNumber?: string) => Promise<{ success: boolean; error?: string }>;
   deleteStudent: (id: string) => Promise<{ success: boolean; error?: string }>;
-  addClass: (className: string, room: string, instructor: string) => Promise<{ success: boolean; error?: string }>;
-  editClass: (id: string, className: string, room: string, instructor: string) => Promise<{ success: boolean; error?: string }>;
+  addClass: (className: string, room: string) => Promise<{ success: boolean; error?: string }>;
+  editClass: (id: string, className: string, room: string) => Promise<{ success: boolean; error?: string }>;
   deleteClass: (id: string) => Promise<{ success: boolean; error?: string }>;
   addCharge: (
     studentIds: string[],
@@ -494,12 +494,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
   };
 
   // Class CRUD operations
-  const addClass = async (className: string, room: string, instructor: string): Promise<{ success: boolean; error?: string }> => {
+  const addClass = async (className: string, room: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch("/api/classes", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ className, room, instructor }),
+        body: JSON.stringify({ className, room }),
       });
       const data = await response.json();
       if (data.success) {
@@ -512,12 +512,12 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
-  const editClass = async (id: string, className: string, room: string, instructor: string): Promise<{ success: boolean; error?: string }> => {
+  const editClass = async (id: string, className: string, room: string): Promise<{ success: boolean; error?: string }> => {
     try {
       const response = await fetch("/api/classes", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ id, className, room, instructor }),
+        body: JSON.stringify({ id, className, room }),
       });
       const data = await response.json();
       if (data.success) {

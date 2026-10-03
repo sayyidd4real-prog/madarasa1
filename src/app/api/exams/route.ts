@@ -12,7 +12,7 @@ async function resolveClassId(classNameOrId: string): Promise<string> {
     return (allClasses as any[])[0].id;
   }
   const fallbackId = `cls-${Date.now()}`;
-  await queryDb("INSERT INTO classes (id, name, room, instructor) VALUES (?, ?, 'Room 101', 'Staff')", [
+  await queryDb("INSERT INTO classes (id, name, room) VALUES (?, ?, 'Room 101')", [
     fallbackId,
     classNameOrId || "General Class"
   ]);

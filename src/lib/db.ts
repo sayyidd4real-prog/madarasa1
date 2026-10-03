@@ -85,9 +85,15 @@ export async function initMysqlDb() {
         id VARCHAR(50) PRIMARY KEY,
         name VARCHAR(255) NOT NULL,
         room VARCHAR(100) NOT NULL,
-        instructor VARCHAR(255) NOT NULL
+        instructor VARCHAR(255) NULL
       );
     `);
+
+    try {
+      await p.query("ALTER TABLE classes MODIFY COLUMN instructor VARCHAR(255) NULL;");
+    } catch {
+      // Column may already be nullable
+    }
 
     // 3. Ensure students table exists
     await p.query(`

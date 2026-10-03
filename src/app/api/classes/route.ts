@@ -4,7 +4,7 @@ import { queryDb, initMysqlDb } from "@/lib/db";
 export async function GET() {
   try {
     await initMysqlDb();
-    const [rows] = await queryDb("SELECT id, name AS className, room, instructor FROM classes");
+    const [rows] = await queryDb("SELECT id, name AS className, room FROM classes");
     return NextResponse.json({ success: true, classes: rows });
   } catch (error: any) {
     console.error("Classes GET Error:", error);
@@ -16,9 +16,9 @@ export async function POST(request: Request) {
   try {
     await initMysqlDb();
     const body = await request.json();
-    const { className, room, instructor } = body;
+    const { className, room } = body;
 
-    if (!className || !room || !instructor) {
+    if (!className || !room) {
       return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
     }
 
@@ -29,14 +29,13 @@ export async function POST(request: Request) {
       return NextResponse.json({ success: false, error: "A class with this name already exists." }, { status: 400 });
     }
 
-    await queryDb("INSERT INTO classes (id, name, room, instructor) VALUES (?, ?, ?, ?)", [
+    await queryDb("INSERT INTO classes (id, name, room) VALUES (?, ?, ?)", [
       id,
       className.trim(),
-      room.trim(),
-      instructor.trim()
+      room.trim()
     ]);
 
-    return NextResponse.json({ success: true, class: { id, className: className.trim(), room: room.trim(), instructor: instructor.trim() } });
+    return NextResponse.json({ success: true, class: { id, className: className.trim(), room: room.trim() } });
   } catch (error: any) {
     console.error("Classes POST Error:", error);
     return NextResponse.json({ success: false, error: error.message || "Server Error" }, { status: 500 });
@@ -47,9 +46,9 @@ export async function PUT(request: Request) {
   try {
     await initMysqlDb();
     const body = await request.json();
-    const { id, className, room, instructor } = body;
+    const { id, className, room } = body;
 
-    if (!id || !className || !room || !instructor) {
+    if (!id || !className || !room) {
       return NextResponse.json({ success: false, error: "Missing required fields." }, { status: 400 });
     }
 
@@ -63,10 +62,9 @@ export async function PUT(request: Request) {
       return NextResponse.json({ success: false, error: "A class with this name already exists." }, { status: 400 });
     }
 
-    await queryDb("UPDATE classes SET name = ?, room = ?, instructor = ? WHERE id = ?", [
+    await queryDb("UPDATE classes SET name = ?, room = ? WHERE id = ?", [
       className.trim(),
       room.trim(),
-      instructor.trim(),
       id
     ]);
 

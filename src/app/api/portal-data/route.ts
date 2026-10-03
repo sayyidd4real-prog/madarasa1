@@ -41,7 +41,7 @@ export async function GET(request: Request) {
 
     // 2. Fetch classes (everyone can view classes)
     const [cRows] = await queryDb(
-      "SELECT id, name AS className, room, instructor FROM classes"
+      "SELECT id, name AS className, room FROM classes"
     );
     const classes = cRows as any[];
 

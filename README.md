@@ -9,7 +9,7 @@ A modern responsive school/madrasa educational portal built with Next.js, React,
 - **Admin Dashboard**:
   - Student Registration (Registration of name, email, academic year, and grade group).
   - Searchable, sortable, and paginated student directory.
-  - Class Management (Add, edit, or delete classrooms and instructors).
+  - Class Management (Add, edit, or delete classrooms).
   - Subject Registry (Assign name, course code, and description).
   - Fee Management (Assign fees individually or to entire classes, record transactions, apply credit deductions, and export statements to Excel/CSV).
   - Exam Entry System (Bulk exam entries with subject grade inputs, maximum points threshold, term selection, and feedback notes).

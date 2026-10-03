@@ -388,7 +388,6 @@ export default function AdminDashboard() {
   // Class Form
   const [newClassName, setNewClassName] = useState("");
   const [classRoom, setClassRoom] = useState("");
-  const [classInstructor, setClassInstructor] = useState("");
 
   // Fee Form: Assign (Unused variables commented out)
   // const [feeStudentId, setFeeStudentId] = useState("");
@@ -584,21 +583,19 @@ export default function AdminDashboard() {
   const [editingClassId, setEditingClassId] = useState<string | null>(null);
   const [editClassNameVal, setEditClassNameVal] = useState("");
   const [editClassRoomVal, setEditClassRoomVal] = useState("");
-  const [editClassInstructorVal, setEditClassInstructorVal] = useState("");
 
   const startEditClass = (cls: ClassItem) => {
     setEditingClassId(cls.id);
     setEditClassNameVal(cls.className);
     setEditClassRoomVal(cls.room);
-    setEditClassInstructorVal(cls.instructor);
   };
 
   const handleSaveClassEdit = async (id: string) => {
-    if (!editClassNameVal.trim() || !editClassRoomVal.trim() || !editClassInstructorVal.trim()) {
+    if (!editClassNameVal.trim() || !editClassRoomVal.trim()) {
       showToast("Please fill in all class details", "error");
       return;
     }
-    const res = await editClass(id, editClassNameVal.trim(), editClassRoomVal.trim(), editClassInstructorVal.trim());
+    const res = await editClass(id, editClassNameVal.trim(), editClassRoomVal.trim());
     if (res.success) {
       showToast("Class details updated successfully", "success");
       setEditingClassId(null);
@@ -835,16 +832,15 @@ export default function AdminDashboard() {
 
   const handleCreateClass = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newClassName.trim() || !classRoom.trim() || !classInstructor.trim()) {
+    if (!newClassName.trim() || !classRoom.trim()) {
       showToast("Please fill all class fields", "error");
       return;
     }
-    const res = await addClass(newClassName.trim(), classRoom.trim(), classInstructor.trim());
+    const res = await addClass(newClassName.trim(), classRoom.trim());
     if (res.success) {
       showToast(`Class "${newClassName}" registered in ${classRoom}`, "success");
       setNewClassName("");
       setClassRoom("");
-      setClassInstructor("");
     } else {
       showToast(res.error || "Failed to create class", "error");
     }
@@ -2454,17 +2450,6 @@ export default function AdminDashboard() {
                       />
                     </div>
 
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Instructor Name</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Prof. Alan Turing"
-                        value={classInstructor}
-                        onChange={(e) => setClassInstructor(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                      />
-                    </div>
-
                     <button
                       type="submit"
                       className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-2"
@@ -2489,7 +2474,6 @@ export default function AdminDashboard() {
                           <th className="py-4 px-6">Class ID</th>
                           <th className="py-4 px-6">Class Name</th>
                           <th className="py-4 px-6">Room</th>
-                          <th className="py-4 px-6">Instructor</th>
                           <th className="py-4 px-6 text-right">Actions</th>
                         </tr>
                       </thead>
@@ -2514,14 +2498,6 @@ export default function AdminDashboard() {
                                   type="text"
                                   value={editClassRoomVal}
                                   onChange={(e) => setEditClassRoomVal(e.target.value)}
-                                  className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded py-1 px-2 text-xs text-slate-100 focus:outline-none"
-                                />
-                              </td>
-                              <td className="py-4 px-6">
-                                <input
-                                  type="text"
-                                  value={editClassInstructorVal}
-                                  onChange={(e) => setEditClassInstructorVal(e.target.value)}
                                   className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded py-1 px-2 text-xs text-slate-100 focus:outline-none"
                                 />
                               </td>
@@ -2551,7 +2527,6 @@ export default function AdminDashboard() {
                               </td>
                               <td className="py-4 px-6 text-slate-100">{cls.className}</td>
                               <td className="py-4 px-6 text-slate-400">{cls.room}</td>
-                              <td className="py-4 px-6 text-slate-350">{cls.instructor}</td>
                               <td className="py-4 px-6 text-right whitespace-nowrap">
                                 <div className="flex justify-end items-center gap-1.5">
                                   <button
@@ -3751,12 +3726,6 @@ export default function AdminDashboard() {
                                     <h4 className="font-extrabold text-lg text-slate-100 uppercase tracking-wider">{regClassName}</h4>
                                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs text-slate-400 font-mono">
                                       {regClass?.room && <span>Room: {regClass.room}</span>}
-                                      {regClass?.instructor && (
-                                        <>
-                                          <span className="text-slate-700">·</span>
-                                          <span>Instructor: {regClass.instructor}</span>
-                                        </>
-                                      )}
                                       <span className="text-slate-700">·</span>
                                       <span className="text-emerald-400 font-semibold">{entries.length} record(s) found</span>
                                     </div>
