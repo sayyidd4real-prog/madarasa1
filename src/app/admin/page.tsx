@@ -3706,14 +3706,73 @@ export default function AdminDashboard() {
                               entryMap.set(key, { studentId: e.studentId, year: e.academicYear, term: e.term });
                             }
                           });
-                          let entries = Array.from(entryMap.values());
+                          const rawEntries = Array.from(entryMap.values());
 
-                          // Search filter
+                          // Pre-calculate stats for all entries in the selected class
+                          const calculatedEntries = rawEntries.map((entry) => {
+                            const { studentId, year, term } = entry;
+                            const student = students.find((s) => s.id === studentId);
+                            const studentName = student ? student.name : studentId;
+
+                            const rowExams = allClassExams.filter(
+                              (e) => e.studentId === studentId && e.academicYear === year && e.term === term
+                            );
+
+                            const rowScores: { [subj: string]: number } = {};
+                            rowExams.forEach((e) => { rowScores[e.subject] = e.score; });
+
+                            let rTotal = 0, rCount = 0;
+                            subjects.forEach((sub) => {
+                              const s = rowScores[sub.subjectName];
+                              if (s !== undefined) { rTotal += s; rCount++; }
+                            });
+                            const rAvg = rCount > 0 ? rTotal / rCount : 0;
+                            const rGrade = rCount > 0 ? calculateGrade(rAvg) : "—";
+
+                            return {
+                              studentId,
+                              year,
+                              term,
+                              student,
+                              studentName,
+                              rowExams,
+                              rowScores,
+                              rTotal,
+                              rCount,
+                              rAvg,
+                              rGrade,
+                            };
+                          });
+
+                          // Sort entries by Total descending, then Average descending, then Name ascending
+                          calculatedEntries.sort((a, b) => {
+                            if (b.rTotal !== a.rTotal) return b.rTotal - a.rTotal;
+                            if (b.rAvg !== a.rAvg) return b.rAvg - a.rAvg;
+                            return a.studentName.localeCompare(b.studentName);
+                          });
+
+                          // Assign standard competition ranks (1, 2, 2, 4...)
+                          let currentRank = 1;
+                          const rankedEntries = calculatedEntries.map((entry, idx, arr) => {
+                            if (idx === 0) {
+                              currentRank = 1;
+                            } else {
+                              const prev = arr[idx - 1];
+                              if (entry.rTotal === prev.rTotal && entry.rAvg === prev.rAvg) {
+                                // Same total & avg = same rank
+                              } else {
+                                currentRank = idx + 1;
+                              }
+                            }
+                            return { ...entry, rank: currentRank };
+                          });
+
+                          // Apply Search filter AFTER rank calculation so ranks remain relative to the full class
+                          let entries = rankedEntries;
                           if (registryStudentSearch.trim()) {
                             const q = registryStudentSearch.toLowerCase();
-                            entries = entries.filter(({ studentId }) => {
-                              const st = students.find((s) => s.id === studentId);
-                              return st?.name.toLowerCase().includes(q) || studentId.toLowerCase().includes(q);
+                            entries = entries.filter(({ studentId, studentName }) => {
+                              return studentName.toLowerCase().includes(q) || studentId.toLowerCase().includes(q);
                             });
                           }
 
@@ -3782,26 +3841,9 @@ export default function AdminDashboard() {
                                 </div>
                               ) : (
                                 <div className="flex flex-col gap-2">
-                                  {entries.map(({ studentId, year, term }) => {
+                                  {entries.map(({ studentId, year, term, student, studentName, rowExams, rowScores, rTotal, rCount, rAvg, rGrade, rank }) => {
                                     const rowKey = `${studentId}|${year}|${term}`;
-                                    const student = students.find((s) => s.id === studentId);
                                     if (!student) return null;
-
-                                    const rowExams = allClassExams.filter(
-                                      (e) => e.studentId === studentId && e.academicYear === year && e.term === term
-                                    );
-
-                                    // Build score map for this row
-                                    const rowScores: { [subj: string]: number } = {};
-                                    rowExams.forEach((e) => { rowScores[e.subject] = e.score; });
-
-                                    let rTotal = 0, rCount = 0;
-                                    subjects.forEach((sub) => {
-                                      const s = rowScores[sub.subjectName];
-                                      if (s !== undefined) { rTotal += s; rCount++; }
-                                    });
-                                    const rAvg = rCount > 0 ? rTotal / rCount : 0;
-                                    const rGrade = rCount > 0 ? calculateGrade(rAvg) : "—";
 
                                     const isExpanded = expandedRegistryKeys.has(rowKey);
                                     const isEditing = registryEditKey === rowKey;
@@ -3820,13 +3862,42 @@ export default function AdminDashboard() {
                                       <div key={rowKey} className="bg-slate-950 border border-slate-800 rounded-xl overflow-hidden">
                                         {/* Summary Row */}
                                         <div className={`flex items-center gap-3 px-4 py-3 ${isExpanded ? "bg-slate-900/70 border-b border-slate-800" : "hover:bg-slate-900/30"} transition-colors`}>
-                                          {/* Avatar */}
-                                          <div className="w-8 h-8 rounded-full bg-emerald-950/70 border border-emerald-500/20 flex items-center justify-center shrink-0">
-                                            <span className="text-emerald-400 text-xs font-extrabold">{student.name.charAt(0)}</span>
+                                          {/* Avatar / Rank Icon */}
+                                          <div className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 border text-xs font-extrabold ${
+                                            rank === 1
+                                              ? "bg-amber-500/20 border-amber-500/50 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.2)]"
+                                              : rank === 2
+                                              ? "bg-slate-300/20 border-slate-400/50 text-slate-200 shadow-[0_0_10px_rgba(148,163,184,0.2)]"
+                                              : rank === 3
+                                              ? "bg-amber-700/20 border-amber-600/50 text-amber-400 shadow-[0_0_10px_rgba(180,83,9,0.2)]"
+                                              : "bg-emerald-950/70 border-emerald-500/20 text-emerald-400"
+                                          }`}>
+                                            {rank === 1 ? "🥇" : rank === 2 ? "🥈" : rank === 3 ? "🥉" : student.name.charAt(0)}
                                           </div>
-                                          {/* Info */}
+
+                                          {/* Info & Badges */}
                                           <div className="flex-1 min-w-0">
                                             <div className="flex flex-wrap items-center gap-2">
+                                              {/* Top 3 Badges */}
+                                              {rank === 1 && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-500/15 border border-amber-500/40 text-amber-300 shadow-[0_0_10px_rgba(245,158,11,0.15)]">
+                                                  <span>🥇</span>
+                                                  <span>{t("place_1st")}</span>
+                                                </span>
+                                              )}
+                                              {rank === 2 && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-slate-400/15 border border-slate-400/40 text-slate-200 shadow-[0_0_10px_rgba(148,163,184,0.15)]">
+                                                  <span>🥈</span>
+                                                  <span>{t("place_2nd")}</span>
+                                                </span>
+                                              )}
+                                              {rank === 3 && (
+                                                <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-black bg-amber-700/20 border border-amber-600/40 text-amber-400 shadow-[0_0_10px_rgba(180,83,9,0.15)]">
+                                                  <span>🥉</span>
+                                                  <span>{t("place_3rd")}</span>
+                                                </span>
+                                              )}
+
                                               <span className="font-bold text-slate-100 text-sm">{student.name}</span>
                                               <span className="font-mono text-emerald-400 text-[10px] font-bold bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/50">{student.id}</span>
                                             </div>
@@ -3836,8 +3907,18 @@ export default function AdminDashboard() {
                                               <span>{term}</span>
                                             </div>
                                           </div>
-                                          {/* Stats */}
+
+                                          {/* Desktop Stats */}
                                           <div className="hidden sm:flex items-center gap-3 shrink-0">
+                                            <div className="text-right">
+                                              <div className="text-[10px] text-slate-500 uppercase font-bold">{t("rank")}</div>
+                                              <div className={`font-bold font-mono text-sm ${
+                                                rank === 1 ? "text-amber-400" : rank === 2 ? "text-slate-300" : rank === 3 ? "text-amber-500" : "text-slate-400"
+                                              }`}>
+                                                #{rank}
+                                              </div>
+                                            </div>
+
                                             {rCount > 0 && (
                                               <>
                                                 <div className="text-right">
@@ -3852,6 +3933,7 @@ export default function AdminDashboard() {
                                               </>
                                             )}
                                           </div>
+
                                           {/* Actions */}
                                           <div className="flex items-center gap-1.5 shrink-0">
                                             <button type="button" onClick={toggleExpand}
@@ -3884,17 +3966,24 @@ export default function AdminDashboard() {
                                         </div>
 
                                         {/* Mobile stats strip */}
-                                        {rCount > 0 && (
-                                          <div className="sm:hidden flex items-center gap-4 px-4 py-2 bg-slate-900/40 border-b border-slate-800/60">
-                                            <span className="text-[10px] text-slate-500 uppercase font-bold">Total</span>
-                                            <span className="text-emerald-400 font-bold font-mono text-xs">{rTotal}</span>
-                                            <span className="text-slate-700">·</span>
-                                            <span className="text-[10px] text-slate-500 uppercase font-bold">Avg</span>
-                                            <span className="text-emerald-300 font-bold font-mono text-xs">{Math.round(rAvg)}%</span>
-                                            <span className="text-slate-700">·</span>
-                                            <span className={`inline-flex px-1.5 py-0.5 text-[9px] font-extrabold uppercase rounded border ${getGradeBadge(rGrade)}`}>{rGrade}</span>
-                                          </div>
-                                        )}
+                                        <div className="sm:hidden flex flex-wrap items-center gap-2.5 px-4 py-2 bg-slate-900/40 border-b border-slate-800/60 font-mono text-xs">
+                                          <span className="text-[10px] text-slate-500 uppercase font-bold">{t("rank")}</span>
+                                          <span className={`font-bold ${
+                                            rank === 1 ? "text-amber-400" : rank === 2 ? "text-slate-300" : rank === 3 ? "text-amber-500" : "text-slate-400"
+                                          }`}>#{rank}</span>
+                                          {rCount > 0 && (
+                                            <>
+                                              <span className="text-slate-700">·</span>
+                                              <span className="text-[10px] text-slate-500 uppercase font-bold">Total</span>
+                                              <span className="text-emerald-400 font-bold">{rTotal}</span>
+                                              <span className="text-slate-700">·</span>
+                                              <span className="text-[10px] text-slate-500 uppercase font-bold">Avg</span>
+                                              <span className="text-emerald-300 font-bold">{Math.round(rAvg)}%</span>
+                                              <span className="text-slate-700">·</span>
+                                              <span className={`inline-flex px-1.5 py-0.5 text-[9px] font-extrabold uppercase rounded border ${getGradeBadge(rGrade)}`}>{rGrade}</span>
+                                            </>
+                                          )}
+                                        </div>
 
                                         {/* Expandable Details Panel */}
                                         <AnimatePresence>
