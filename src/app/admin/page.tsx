@@ -151,6 +151,8 @@ export default function AdminDashboard() {
 
   // --- Form States ---
   // Student Form
+  const [isAddStudentModalOpen, setIsAddStudentModalOpen] = useState(false);
+  const [isAddClassModalOpen, setIsAddClassModalOpen] = useState(false);
   const [studentName, setStudentName] = useState("");
   const [studentEmail, setStudentEmail] = useState("");
   const [studentPhoneNumber, setStudentPhoneNumber] = useState("");
@@ -719,6 +721,7 @@ export default function AdminDashboard() {
     setStudentPhoneNumber("");
     setStudentPassword("");
     setStudentConfirmPassword("");
+    setIsAddStudentModalOpen(false);
   };
 
   // User Accounts Handlers
@@ -841,6 +844,7 @@ export default function AdminDashboard() {
       showToast(`Class "${newClassName}" registered in ${classRoom}`, "success");
       setNewClassName("");
       setClassRoom("");
+      setIsAddClassModalOpen(false);
     } else {
       showToast(res.error || "Failed to create class", "error");
     }
@@ -1801,131 +1805,10 @@ export default function AdminDashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+                className="flex flex-col gap-6"
               >
-                {/* Form column */}
-                <div className="lg:col-span-4 bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col gap-5">
-                  <div>
-                    <h3 className="font-bold text-base text-slate-200">Register New Student</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">Fills basic record and auto-allocates system ID.</p>
-                  </div>
-
-                  <form onSubmit={handleAddStudent} className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Full Name</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. David Miller"
-                        value={studentName}
-                        onChange={(e) => setStudentName(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Email Address</label>
-                      <input
-                        type="email"
-                        placeholder="e.g. david@school.edu"
-                        value={studentEmail}
-                        onChange={(e) => setStudentEmail(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Phone Number</label>
-                      <input
-                        type="tel"
-                        placeholder="e.g. +252 61 500 0000"
-                        value={studentPhoneNumber}
-                        onChange={(e) => setStudentPhoneNumber(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                        required
-                      />
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Class</label>
-                      {classes.length === 0 ? (
-                        <div className="text-xs text-amber-400 font-semibold bg-amber-950/20 border border-amber-900/30 p-3.5 rounded-xl">
-                          No classes registered yet. Please create a class first.
-                        </div>
-                      ) : (
-                        <select
-                          value={studentGrade}
-                          onChange={(e) => setStudentGrade(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                        >
-                          {classes.map((cls) => (
-                            <option key={cls.id} value={cls.className}>
-                              {cls.className}
-                            </option>
-                          ))}
-                        </select>
-                      )}
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Academic Year</label>
-                      <select
-                        value={studentAcademicYear}
-                        onChange={(e) => setStudentAcademicYear(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                        required
-                      >
-                        <option value="2025–2026">2025–2026</option>
-                        <option value="2026–2027">2026–2027</option>
-                        <option value="2027–2028">2027–2028</option>
-                      </select>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Login Password</label>
-                      <div className="relative flex items-center">
-                        <input
-                          type={showStudentPasswordInput ? "text" : "password"}
-                          placeholder="••••••••"
-                          value={studentPassword}
-                          onChange={(e) => setStudentPassword(e.target.value)}
-                          className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 pl-4 pr-10 text-sm text-slate-100 focus:outline-none transition-colors"
-                          required
-                        />
-                        <button
-                          type="button"
-                          onClick={() => setShowStudentPasswordInput(!showStudentPasswordInput)}
-                          className="absolute right-3 text-slate-500 hover:text-slate-300"
-                        >
-                          {showStudentPasswordInput ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                        </button>
-                      </div>
-                    </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Confirm Password</label>
-                      <input
-                        type="password"
-                        placeholder="••••••••"
-                        value={studentConfirmPassword}
-                        onChange={(e) => setStudentConfirmPassword(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                        required
-                      />
-                    </div>
-
-                    <button
-                      type="submit"
-                      disabled={classes.length === 0}
-                      className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-slate-950 font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-2"
-                    >
-                      <Plus className="w-4 h-4" />
-                      Add Student
-                    </button>
-                  </form>
-                </div>
-
                 {/* Table column */}
-                <div className="lg:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
+                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
                   <div className="p-6 border-b border-slate-800/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
                     <div>
                       <h3 className="font-bold text-base text-slate-200">Enrolled Student Registry</h3>
@@ -1936,8 +1819,16 @@ export default function AdminDashboard() {
                       </p>
                     </div>
 
-                    {/* Class Filter & Search Inputs */}
+                    {/* Class Filter, Search & Add Student Button */}
                     <div className="flex flex-wrap items-center gap-3">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddStudentModalOpen(true)}
+                        className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        {t("add_student_btn")}
+                      </button>
                       <div className="flex items-center gap-2">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Class:</label>
                         <select
@@ -2418,53 +2309,23 @@ export default function AdminDashboard() {
                 animate={{ opacity: 1, y: 0 }}
                 exit={{ opacity: 0, y: -10 }}
                 transition={{ duration: 0.2 }}
-                className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start"
+                className="flex flex-col gap-6"
               >
-                {/* Form column */}
-                <div className="lg:col-span-4 bg-slate-900/60 border border-slate-800 p-6 rounded-2xl flex flex-col gap-5">
-                  <div>
-                    <h3 className="font-bold text-base text-slate-200">Register Class Room</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">Add new academic courses to the curriculum.</p>
-                  </div>
-
-                  <form onSubmit={handleCreateClass} className="flex flex-col gap-4">
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Class Name</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Biology AP"
-                        value={newClassName}
-                        onChange={(e) => setNewClassName(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                      />
+                {/* Table column */}
+                <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
+                  <div className="p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                    <div>
+                      <h3 className="font-bold text-base text-slate-200">Registered Classes Registry</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">Curriculum list: {classes.length} classes</p>
                     </div>
-
-                    <div className="flex flex-col gap-2">
-                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Room Location</label>
-                      <input
-                        type="text"
-                        placeholder="e.g. Lab 204 or Room 102"
-                        value={classRoom}
-                        onChange={(e) => setClassRoom(e.target.value)}
-                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
-                      />
-                    </div>
-
                     <button
-                      type="submit"
-                      className="w-full py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl transition-all flex items-center justify-center gap-2 mt-2"
+                      type="button"
+                      onClick={() => setIsAddClassModalOpen(true)}
+                      className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer"
                     >
                       <Plus className="w-4 h-4" />
-                      Create Class
+                      {t("register_class_btn")}
                     </button>
-                  </form>
-                </div>
-
-                {/* Table column */}
-                <div className="lg:col-span-8 bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden">
-                  <div className="p-6 border-b border-slate-800/80">
-                    <h3 className="font-bold text-base text-slate-200">Registered Classes Registry</h3>
-                    <p className="text-xs text-slate-500 mt-0.5">Curriculum list: {classes.length} classes</p>
                   </div>
 
                   <div className="overflow-x-auto">
@@ -5928,6 +5789,225 @@ export default function AdminDashboard() {
                         className="px-4 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all shadow-md flex items-center gap-1.5 disabled:opacity-50"
                       >
                         {isSavingSubject ? "Saving..." : "Save Changes"}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
+          {/* Add Student Modal */}
+          <AnimatePresence>
+            {isAddStudentModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-lg shadow-2xl relative max-h-[90vh] overflow-y-auto"
+                >
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+                    <h3 className="font-bold text-lg text-slate-100 flex items-center gap-2">
+                      <UserPlus className="w-5 h-5 text-emerald-400" />
+                      {t("register_new_student_modal")}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddStudentModalOpen(false)}
+                      className="p-1 text-slate-400 hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleAddStudent} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Full Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. David Miller"
+                        value={studentName}
+                        onChange={(e) => setStudentName(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Email Address</label>
+                      <input
+                        type="email"
+                        placeholder="e.g. david@school.edu"
+                        value={studentEmail}
+                        onChange={(e) => setStudentEmail(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Phone Number</label>
+                      <input
+                        type="tel"
+                        placeholder="e.g. +252 61 500 0000"
+                        value={studentPhoneNumber}
+                        onChange={(e) => setStudentPhoneNumber(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
+                        required
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Class</label>
+                      {classes.length === 0 ? (
+                        <div className="text-xs text-amber-400 font-semibold bg-amber-950/20 border border-amber-900/30 p-3.5 rounded-xl">
+                          No classes registered yet. Please create a class first.
+                        </div>
+                      ) : (
+                        <select
+                          value={studentGrade}
+                          onChange={(e) => setStudentGrade(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors cursor-pointer"
+                        >
+                          {classes.map((cls) => (
+                            <option key={cls.id} value={cls.className}>
+                              {cls.className}
+                            </option>
+                          ))}
+                        </select>
+                      )}
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Academic Year</label>
+                      <select
+                        value={studentAcademicYear}
+                        onChange={(e) => setStudentAcademicYear(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors cursor-pointer"
+                        required
+                      >
+                        <option value="2025–2026">2025–2026</option>
+                        <option value="2026–2027">2026–2027</option>
+                        <option value="2027–2028">2027–2028</option>
+                      </select>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Login Password</label>
+                      <div className="relative flex items-center">
+                        <input
+                          type={showStudentPasswordInput ? "text" : "password"}
+                          placeholder="••••••••"
+                          value={studentPassword}
+                          onChange={(e) => setStudentPassword(e.target.value)}
+                          className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 pl-4 pr-10 text-sm text-slate-100 focus:outline-none transition-colors"
+                          required
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowStudentPasswordInput(!showStudentPasswordInput)}
+                          className="absolute right-3 text-slate-500 hover:text-slate-300 cursor-pointer"
+                        >
+                          {showStudentPasswordInput ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Confirm Password</label>
+                      <input
+                        type="password"
+                        placeholder="••••••••"
+                        value={studentConfirmPassword}
+                        onChange={(e) => setStudentConfirmPassword(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
+                        required
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddStudentModalOpen(false)}
+                        className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                      >
+                        {t("cancel")}
+                      </button>
+                      <button
+                        type="submit"
+                        disabled={classes.length === 0}
+                        className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 disabled:from-slate-800 disabled:to-slate-800 disabled:text-slate-500 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-2 cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        {t("add_student_btn")}
+                      </button>
+                    </div>
+                  </form>
+                </motion.div>
+              </div>
+            )}
+          </AnimatePresence>
+
+          {/* Register Class Modal */}
+          <AnimatePresence>
+            {isAddClassModalOpen && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.95 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  exit={{ opacity: 0, scale: 0.95 }}
+                  className="bg-slate-900 border border-slate-800 rounded-2xl p-6 w-full max-w-md shadow-2xl relative"
+                >
+                  <div className="flex items-center justify-between border-b border-slate-800 pb-4 mb-5">
+                    <h3 className="font-bold text-lg text-slate-100 flex items-center gap-2">
+                      <BookOpen className="w-5 h-5 text-emerald-400" />
+                      {t("register_new_class_modal")}
+                    </h3>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddClassModalOpen(false)}
+                      className="p-1 text-slate-400 hover:text-slate-200 rounded-lg transition-colors cursor-pointer"
+                    >
+                      <X className="w-5 h-5" />
+                    </button>
+                  </div>
+
+                  <form onSubmit={handleCreateClass} className="flex flex-col gap-4">
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Class Name</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Biology AP"
+                        value={newClassName}
+                        onChange={(e) => setNewClassName(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                      <label className="text-xs font-bold text-slate-400 uppercase tracking-wide">Room Location</label>
+                      <input
+                        type="text"
+                        placeholder="e.g. Lab 204 or Room 102"
+                        value={classRoom}
+                        onChange={(e) => setClassRoom(e.target.value)}
+                        className="w-full bg-slate-950 border border-slate-800 focus:border-emerald-500/50 rounded-xl py-2.5 px-4 text-sm text-slate-100 focus:outline-none transition-colors"
+                      />
+                    </div>
+
+                    <div className="flex items-center justify-end gap-3 pt-4 border-t border-slate-800 mt-2">
+                      <button
+                        type="button"
+                        onClick={() => setIsAddClassModalOpen(false)}
+                        className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                      >
+                        {t("cancel")}
+                      </button>
+                      <button
+                        type="submit"
+                        className="px-5 py-2.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-2 cursor-pointer"
+                      >
+                        <Plus className="w-4 h-4" />
+                        {t("register_class_btn")}
                       </button>
                     </div>
                   </form>
