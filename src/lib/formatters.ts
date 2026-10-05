@@ -1,9 +1,21 @@
-/**
- * Global reusable number formatting utility for Madarasa system.
- * Removes unnecessary leading zeros when displaying numbers, currency, counts, and IDs.
- * Preserves decimal formatting for currency (e.g., 020.00 -> 20.00, 0010.50 -> 10.50)
- * and keeps thousand separators (e.g., 001000 -> 1,000).
- */
+export function toArabicNumerals(value: string | number | null | undefined): string {
+  if (value === null || value === undefined) return "";
+  const str = String(value);
+  const arabicDigits = ["٠", "١", "٢", "٣", "٤", "٥", "٦", "٧", "٨", "٩"];
+  let result = str.replace(/\d/g, (d) => arabicDigits[parseInt(d, 10)]).replace(/%/g, "٪");
+  // Replace decimal point between digits with Arabic decimal separator '٫'
+  result = result.replace(/([\u0660-\u0669])\.([\u0660-\u0669])/g, "$1٫$2");
+  return result;
+}
+
+export function formatLangNumber(value: string | number | null | undefined, language?: string): string {
+  if (value === null || value === undefined) return "";
+  const str = String(value);
+  if (language === "ar") {
+    return toArabicNumerals(str);
+  }
+  return str;
+}
 
 export function stripLeadingZeros(value: string | number | null | undefined): string {
   if (value === null || value === undefined) return "";
@@ -24,16 +36,18 @@ export function formatDisplayNumber(
     useGrouping?: boolean;
     isCurrency?: boolean;
     currencySymbol?: string;
+    language?: string;
   }
 ): string {
-  if (value === null || value === undefined || value === "") return "0";
+  if (value === null || value === undefined || value === "") return options?.language === "ar" ? "٠" : "0";
 
+  let formatted = "";
   if (typeof value === "number") {
     const decimals = options?.decimals !== undefined
       ? options.decimals
       : (options?.isCurrency ? 2 : (Number.isInteger(value) ? 0 : 2));
 
-    const formatted = value.toLocaleString("en-US", {
+    formatted = value.toLocaleString("en-US", {
       minimumFractionDigits: decimals,
       maximumFractionDigits: decimals,
       useGrouping: options?.useGrouping ?? true,
@@ -41,46 +55,53 @@ export function formatDisplayNumber(
 
     if (options?.isCurrency) {
       const symbol = options.currencySymbol ?? "$";
-      return `${symbol}${formatted}`;
+      formatted = `${symbol}${formatted}`;
     }
-    return formatted;
-  }
+  } else {
+    const strVal = String(value).trim();
+    const rawNumStr = strVal.replace(/^\$/, "").trim();
+    const parsed = parseFloat(rawNumStr);
 
-  const strVal = String(value).trim();
-  const rawNumStr = strVal.replace(/^\$/, "").trim();
-  const parsed = parseFloat(rawNumStr);
+    if (!isNaN(parsed) && /^-?\d+(\.\d+)?$/.test(rawNumStr)) {
+      const isInt = Number.isInteger(parsed) && !rawNumStr.includes(".");
+      const decimals = options?.decimals !== undefined
+        ? options.decimals
+        : (options?.isCurrency ? 2 : (isInt ? 0 : 2));
 
-  if (!isNaN(parsed) && /^-?\d+(\.\d+)?$/.test(rawNumStr)) {
-    const isInt = Number.isInteger(parsed) && !rawNumStr.includes(".");
-    const decimals = options?.decimals !== undefined
-      ? options.decimals
-      : (options?.isCurrency ? 2 : (isInt ? 0 : 2));
+      formatted = parsed.toLocaleString("en-US", {
+        minimumFractionDigits: decimals,
+        maximumFractionDigits: decimals,
+        useGrouping: options?.useGrouping ?? true,
+      });
 
-    const formatted = parsed.toLocaleString("en-US", {
-      minimumFractionDigits: decimals,
-      maximumFractionDigits: decimals,
-      useGrouping: options?.useGrouping ?? true,
-    });
-
-    if (options?.isCurrency || strVal.startsWith("$")) {
-      const symbol = options?.currencySymbol ?? "$";
-      return `${symbol}${formatted}`;
+      if (options?.isCurrency || strVal.startsWith("$")) {
+        const symbol = options?.currencySymbol ?? "$";
+        formatted = `${symbol}${formatted}`;
+      }
+    } else {
+      let cleaned = stripLeadingZeros(strVal);
+      if (options?.isCurrency && !cleaned.startsWith("$")) {
+        cleaned = `${options.currencySymbol ?? "$"}${cleaned}`;
+      }
+      formatted = cleaned;
     }
-    return formatted;
   }
 
-  let cleaned = stripLeadingZeros(strVal);
-  if (options?.isCurrency && !cleaned.startsWith("$")) {
-    cleaned = `${options.currencySymbol ?? "$"}${cleaned}`;
+  if (options?.language === "ar") {
+    return toArabicNumerals(formatted);
   }
-  return cleaned;
+  return formatted;
 }
 
 export function formatCurrency(
   value: string | number | null | undefined,
-  symbol: string = "$"
+  symbol: string = "$",
+  language?: string
 ): string {
-  if (value === null || value === undefined || value === "") return `${symbol}0.00`;
+  if (value === null || value === undefined || value === "") {
+    const res = `${symbol}0.00`;
+    return language === "ar" ? toArabicNumerals(res) : res;
+  }
 
   let num: number;
   if (typeof value === "number") {
@@ -94,17 +115,22 @@ export function formatCurrency(
     }
   }
 
-  if (isNaN(num)) return `${symbol}0.00`;
+  if (isNaN(num)) {
+    const res = `${symbol}0.00`;
+    return language === "ar" ? toArabicNumerals(res) : res;
+  }
 
-  return `${symbol}${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  const res = `${symbol}${num.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`;
+  return language === "ar" ? toArabicNumerals(res) : res;
 }
 
 export function formatCount(
   count: number | string | null | undefined,
-  label: string
+  label: string,
+  language?: string
 ): string {
-  if (count === null || count === undefined || count === "") return `0 ${label}s`;
-  const formattedNum = formatDisplayNumber(count, { useGrouping: true });
-  const isOne = formattedNum === "1";
+  if (count === null || count === undefined || count === "") return language === "ar" ? `٠ ${label}` : `0 ${label}s`;
+  const formattedNum = formatDisplayNumber(count, { useGrouping: true, language });
+  const isOne = String(count) === "1";
   return `${formattedNum} ${label}${isOne ? "" : "s"}`;
 }
