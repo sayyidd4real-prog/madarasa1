@@ -176,6 +176,9 @@ interface PortalContextType {
   revertPromotion: (
     opts: { promotionId?: string; studentIds?: string[] } | string[]
   ) => Promise<{ success: boolean; message?: string; error?: string }>;
+  deletePromotionHistory: (
+    promotionId: string
+  ) => Promise<{ success: boolean; message?: string; error?: string }>;
   language: Language;
   setLanguage: (lang: Language) => void;
   theme: "light" | "dark";
@@ -943,6 +946,32 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
     }
   };
 
+  const deletePromotionHistory = async (
+    promotionId: string
+  ): Promise<{ success: boolean; message?: string; error?: string }> => {
+    try {
+      const response = await fetch(`/api/students/delete-promotion?id=${encodeURIComponent(promotionId)}`, {
+        method: "DELETE",
+      });
+
+      let data: any = {};
+      try {
+        data = await response.json();
+      } catch {
+        const text = await response.text().catch(() => "");
+        data = { success: false, error: text || `Server error (HTTP ${response.status})` };
+      }
+
+      if (response.ok && data.success) {
+        setPromotions((prev) => prev.filter((p) => p.id !== promotionId));
+        return { success: true, message: data.message };
+      }
+      return { success: false, error: data.error || `Delete promotion history failed (HTTP ${response.status})` };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network request failed." };
+    }
+  };
+
   const setLanguage = (lang: Language) => {
     setLanguageState(lang);
     saveState("portal_lang", lang);
@@ -1014,6 +1043,7 @@ export const PortalProvider: React.FC<{ children: React.ReactNode }> = ({ childr
         deleteSubject,
         promoteStudents,
         revertPromotion,
+        deletePromotionHistory,
         refreshData,
       }}
     >

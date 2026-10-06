@@ -368,6 +368,7 @@ export default function AdminDashboard() {
     deleteSubject,
     promoteStudents,
     revertPromotion,
+    deletePromotionHistory,
     language,
     setLanguage,
     theme,
@@ -401,6 +402,8 @@ export default function AdminDashboard() {
   const [selectedReturnAcademicYear, setSelectedReturnAcademicYear] = useState<string>("2026–2027");
   const [selectedReturnStudentIds, setSelectedReturnStudentIds] = useState<string[]>([]);
   const [isSubmittingReturn, setIsSubmittingReturn] = useState(false);
+  const [promoToDelete, setPromoToDelete] = useState<any>(null);
+  const [isSubmittingDeletePromo, setIsSubmittingDeletePromo] = useState(false);
 
   // Promotion History Filter States
   const [promoHistorySearch, setPromoHistorySearch] = useState("");
@@ -5207,36 +5210,48 @@ export default function AdminDashboard() {
                                   </span>
                                 </td>
                                 <td className="py-3.5 px-4 text-center">
-                                  {p.status === "Promoted" ? (
+                                  <div className="flex items-center justify-center gap-2">
+                                    {p.status === "Promoted" ? (
+                                      <button
+                                        type="button"
+                                        onClick={() => {
+                                          const studentObj = students.find(s => s.id === p.studentId) || {
+                                            id: p.studentId,
+                                            name: p.studentName,
+                                            email: "",
+                                            gradeGroup: p.toClass,
+                                            academicYear: p.toAcademicYear || "2025–2026",
+                                            status: "active"
+                                          };
+                                          setIndividualReturnStudent(studentObj);
+                                          setIndividualReturnPreviousClass(p.fromClass);
+                                          setSelectedReturnPromoId(p.id);
+                                          setSelectedReturnAcademicYear(p.toAcademicYear || "2026–2027");
+                                          setReturnModalMode("single");
+                                          setShowReturnModal(true);
+                                        }}
+                                        className="px-3 py-1 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 text-amber-400 hover:text-amber-300 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shrink-0"
+                                        title={`Return ${p.studentName} to ${p.fromClass}`}
+                                      >
+                                        <Undo2 className="w-3.5 h-3.5" />
+                                        {t("return")}
+                                      </button>
+                                    ) : (
+                                      <span className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-slate-400 text-[10px] font-bold uppercase rounded flex items-center justify-center gap-1 w-fit opacity-70 shrink-0">
+                                        {t("returned")}
+                                      </span>
+                                    )}
+
                                     <button
                                       type="button"
-                                      onClick={() => {
-                                        const studentObj = students.find(s => s.id === p.studentId) || {
-                                          id: p.studentId,
-                                          name: p.studentName,
-                                          email: "",
-                                          gradeGroup: p.toClass,
-                                          academicYear: p.toAcademicYear || "2025–2026",
-                                          status: "active"
-                                        };
-                                        setIndividualReturnStudent(studentObj);
-                                        setIndividualReturnPreviousClass(p.fromClass);
-                                        setSelectedReturnPromoId(p.id);
-                                        setSelectedReturnAcademicYear(p.toAcademicYear || "2026–2027");
-                                        setReturnModalMode("single");
-                                        setShowReturnModal(true);
-                                      }}
-                                      className="px-3 py-1 bg-amber-950/60 hover:bg-amber-900/80 border border-amber-500/30 text-amber-400 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 mx-auto cursor-pointer shadow-sm"
-                                      title={`Return ${p.studentName} to ${p.fromClass}`}
+                                      onClick={() => setPromoToDelete(p)}
+                                      className="px-3 py-1 bg-rose-950/60 hover:bg-rose-900/80 border border-rose-500/30 text-rose-400 hover:text-rose-300 text-xs font-bold rounded-lg transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-sm shrink-0"
+                                      title="Delete promotion history record"
                                     >
-                                      <Undo2 className="w-3.5 h-3.5" />
-                                      {t("return")}
+                                      <Trash2 className="w-3.5 h-3.5" />
+                                      {t("delete")}
                                     </button>
-                                  ) : (
-                                    <span className="px-2.5 py-1 bg-slate-950 border border-slate-800 text-slate-400 text-[10px] font-bold uppercase rounded flex items-center justify-center gap-1 w-fit mx-auto opacity-70">
-                                      {t("returned")}
-                                    </span>
-                                  )}
+                                  </div>
                                 </td>
                               </tr>
                             ))}
@@ -5540,6 +5555,69 @@ export default function AdminDashboard() {
                     className="px-5 py-2 bg-amber-600 hover:bg-amber-500 text-white text-xs font-extrabold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
                   >
                     {isSubmittingReturn ? "Returning..." : t("return_student")}
+                  </button>
+                </div>
+              </motion.div>
+            </div>
+          )}
+        </AnimatePresence>
+
+        {/* Delete Promotion History Confirmation Modal */}
+        <AnimatePresence>
+          {promoToDelete && (
+            <div className="fixed inset-0 z-[10000] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
+              <motion.div
+                initial={{ opacity: 0, scale: 0.95 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                className="w-full max-w-md bg-slate-900 border border-rose-500/20 rounded-3xl p-6 shadow-2xl flex flex-col gap-5 relative overflow-hidden"
+              >
+                <div className="flex items-center gap-3 border-b border-slate-800 pb-4">
+                  <div className="p-3 bg-rose-500/10 border border-rose-500/20 rounded-2xl text-rose-400 shrink-0">
+                    <Trash2 className="w-6 h-6" />
+                  </div>
+                  <div>
+                    <h3 className="font-bold text-base text-slate-100">
+                      {t("delete_promo_history_title")}
+                    </h3>
+                    <p className="text-xs text-rose-400 font-medium mt-0.5">
+                      {promoToDelete.studentName} ({stripLeadingZeros(promoToDelete.studentId)})
+                    </p>
+                  </div>
+                </div>
+
+                <p className="text-xs text-slate-400 leading-relaxed">
+                  {t("delete_promo_history_msg")}
+                </p>
+
+                <div className="flex items-center justify-end gap-3 pt-2">
+                  <button
+                    type="button"
+                    disabled={isSubmittingDeletePromo}
+                    onClick={() => setPromoToDelete(null)}
+                    className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-bold rounded-xl transition-all cursor-pointer"
+                  >
+                    {t("cancel")}
+                  </button>
+                  <button
+                    type="button"
+                    disabled={isSubmittingDeletePromo}
+                    onClick={async () => {
+                      setIsSubmittingDeletePromo(true);
+                      const res = await deletePromotionHistory(promoToDelete.id);
+                      setIsSubmittingDeletePromo(false);
+                      setPromoToDelete(null);
+
+                      if (res.success) {
+                        showToast(res.message || "Promotion history record deleted successfully!", "success");
+                      } else {
+                        showToast(res.error || "Failed to delete promotion history record.", "error");
+                      }
+                    }}
+                    className="px-5 py-2 bg-rose-600 hover:bg-rose-500 text-white text-xs font-extrabold rounded-xl shadow-md transition-all flex items-center gap-2 cursor-pointer"
+                  >
+                    <Trash2 className="w-3.5 h-3.5" />
+                    {isSubmittingDeletePromo ? "Deleting..." : t("delete")}
                   </button>
                 </div>
               </motion.div>
