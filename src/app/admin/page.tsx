@@ -2085,26 +2085,30 @@ export default function AdminDashboard() {
               >
                 {/* Table column */}
                 <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
-                  <div className="p-6 border-b border-slate-800/80 flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                    <div>
-                      <h3 className="font-bold text-base text-slate-200">Enrolled Student Registry</h3>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        {selectedClassFilter
-                          ? `Class: ${selectedClassFilter} (${formatDisplayNumber(sortedStudents.length)} student${sortedStudents.length === 1 ? "" : "s"})`
-                          : "Select a class to view enrolled students"}
-                      </p>
-                    </div>
+                  <div className="p-6 border-b border-slate-800/80 flex flex-col gap-4">
+                    {/* Header Row: Title on Left, Add Student Button on Far Right */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h3 className="font-bold text-base text-slate-200">Enrolled Student Registry</h3>
+                        <p className="text-xs text-slate-500 mt-0.5">
+                          {selectedClassFilter
+                            ? `Class: ${selectedClassFilter} (${formatDisplayNumber(sortedStudents.length)} student${sortedStudents.length === 1 ? "" : "s"})`
+                            : "Select a class to view enrolled students"}
+                        </p>
+                      </div>
 
-                    {/* Class Filter, Search & Add Student Button */}
-                    <div className="flex flex-wrap items-center gap-3">
                       <button
                         type="button"
                         onClick={() => setIsAddStudentModalOpen(true)}
-                        className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer"
+                        className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer self-start sm:self-auto"
                       >
                         <Plus className="w-4 h-4" />
                         {t("add_student_btn")}
                       </button>
+                    </div>
+
+                    {/* Class Filter & Search Row */}
+                    <div className="flex flex-wrap items-center gap-3 pt-1 border-t border-slate-800/40">
                       <div className="flex items-center gap-2">
                         <label className="text-xs font-bold text-slate-400 uppercase tracking-wide whitespace-nowrap">Class:</label>
                         <select
@@ -2597,7 +2601,7 @@ export default function AdminDashboard() {
                     <button
                       type="button"
                       onClick={() => setIsAddClassModalOpen(true)}
-                      className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer"
+                      className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer self-start sm:self-auto"
                     >
                       <Plus className="w-4 h-4" />
                       {t("register_class_btn")}
@@ -4250,20 +4254,18 @@ export default function AdminDashboard() {
                 {/* Table container */}
                 <div className="bg-slate-900/60 border border-slate-800 rounded-2xl overflow-hidden flex flex-col">
                   <div className="p-6 border-b border-slate-800/80 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                    <div className="flex items-center gap-3">
-                      <button
-                        type="button"
-                        onClick={() => setIsAddSubjectModalOpen(true)}
-                        className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer"
-                      >
-                        <Plus className="w-4 h-4" />
-                        {t("add_new_subject_btn")}
-                      </button>
-                      <div>
-                        <h3 className="font-bold text-base text-slate-200">Registered Subjects</h3>
-                        <p className="text-xs text-slate-500 mt-0.5">Total count: {formatLangNumber(subjects.length, language)} subjects registered</p>
-                      </div>
+                    <div>
+                      <h3 className="font-bold text-base text-slate-200">Registered Subjects</h3>
+                      <p className="text-xs text-slate-500 mt-0.5">Total count: {formatLangNumber(subjects.length, language)} subjects registered</p>
                     </div>
+                    <button
+                      type="button"
+                      onClick={() => setIsAddSubjectModalOpen(true)}
+                      className="px-3.5 py-2 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold rounded-xl text-xs transition-all flex items-center gap-1.5 shadow-sm shrink-0 cursor-pointer self-start sm:self-auto"
+                    >
+                      <Plus className="w-4 h-4" />
+                      {t("add_new_subject_btn")}
+                    </button>
                   </div>
 
                   <div className="overflow-x-auto">
