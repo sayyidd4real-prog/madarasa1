@@ -21,7 +21,7 @@ import { usePortal, Exam } from "@/context/PortalContext";
 import { useToast } from "@/context/ToastContext";
 import { translations } from "@/context/translations";
 import { MadrasaLoader } from "@/components/MadrasaLogo";
-import { formatCurrency, formatDisplayNumber, stripLeadingZeros } from "@/lib/formatters";
+import { formatCurrency, formatDisplayNumber, stripLeadingZeros, formatLangNumber } from "@/lib/formatters";
 
 type StudentTab = "results" | "fees";
 
@@ -154,7 +154,7 @@ export default function StudentDashboard() {
               <h1 className="text-base font-bold text-slate-800 dark:text-slate-100">{studentProfile?.name || currentUser.name}</h1>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                {t("student_id")}: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{stripLeadingZeros(studentId)}</span>
+                {t("student_id")}: <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">{formatLangNumber(stripLeadingZeros(studentId), language)}</span>
               </span>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="text-xs text-slate-500 dark:text-slate-400">
@@ -162,7 +162,7 @@ export default function StudentDashboard() {
               </span>
               <span className="text-slate-300 dark:text-slate-700">|</span>
               <span className="text-xs text-slate-500 dark:text-slate-400">
-                {t("academic_year")}: <span className="text-slate-800 dark:text-slate-200 font-semibold">{studentProfile?.academicYear || "Unassigned"}</span>
+                {t("academic_year")}: <span className="text-slate-800 dark:text-slate-200 font-semibold">{formatLangNumber(studentProfile?.academicYear || "Unassigned", language)}</span>
               </span>
               {studentProfile?.email && (
                 <>
@@ -176,7 +176,7 @@ export default function StudentDashboard() {
                 <>
                   <span className="text-slate-300 dark:text-slate-700">|</span>
                   <span className="text-xs text-slate-500 dark:text-slate-400">
-                    {t("phone_number")}: <span className="text-slate-800 dark:text-slate-200 font-mono">{studentProfile.phoneNumber}</span>
+                    {t("phone_number")}: <span className="text-slate-800 dark:text-slate-200 font-mono">{formatLangNumber(studentProfile.phoneNumber, language)}</span>
                   </span>
                 </>
               )}
@@ -322,7 +322,7 @@ export default function StudentDashboard() {
                                   <GraduationCap className="w-5 h-5" />
                                 </div>
                                 <span className="px-2.5 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 font-mono text-xs font-bold rounded-lg border border-slate-200 dark:border-slate-700">
-                                  {group.academicYear}
+                                  {formatLangNumber(group.academicYear, language)}
                                 </span>
                               </div>
 
@@ -331,7 +331,7 @@ export default function StudentDashboard() {
                                   [ {group.className} Exams ]
                                 </h4>
                                 <p className="text-xs text-slate-500 dark:text-slate-400 font-mono font-bold mt-1">
-                                  {formatDisplayNumber(group.exams.length)} {t("exams_available")}
+                                  {formatDisplayNumber(group.exams.length, { language })} {t("exams_available")}
                                 </p>
                               </div>
                             </div>
@@ -367,7 +367,7 @@ export default function StudentDashboard() {
                           <span>{t("back_to_exams")}</span>
                         </button>
                         <span className="px-3 py-1 bg-emerald-100 dark:bg-emerald-950 border border-emerald-500/20 text-emerald-600 dark:text-emerald-400 text-xs font-bold rounded-lg font-mono">
-                          {activeClassGroup.academicYear}
+                          {formatLangNumber(activeClassGroup.academicYear, language)}
                         </span>
                       </div>
 
@@ -377,7 +377,7 @@ export default function StudentDashboard() {
                             {activeClassGroup.className.toUpperCase()} EXAMS
                           </h3>
                           <p className="text-xs text-slate-500 dark:text-slate-400 font-medium mt-0.5">
-                            Detailed evaluations for {activeClassGroup.className} ({activeClassGroup.academicYear})
+                            Detailed evaluations for {activeClassGroup.className} ({formatLangNumber(activeClassGroup.academicYear, language)})
                           </p>
                         </div>
                       </div>
@@ -391,7 +391,7 @@ export default function StudentDashboard() {
                         </div>
                         <div>
                           <span className="block text-2xl font-bold font-mono text-slate-800 dark:text-slate-100">
-                            {formatDisplayNumber(activeClassGroup.exams.length)}
+                            {formatDisplayNumber(activeClassGroup.exams.length, { language })}
                           </span>
                           <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("completed_exams")}</span>
                         </div>
@@ -404,8 +404,8 @@ export default function StudentDashboard() {
                         <div>
                           <span className="block text-2xl font-bold font-mono text-slate-800 dark:text-slate-100">
                             {activeClassGroup.exams.length > 0
-                              ? Math.round(activeClassGroup.exams.reduce((sum, e) => sum + e.score, 0) / activeClassGroup.exams.length)
-                              : 0}
+                              ? formatLangNumber(Math.round(activeClassGroup.exams.reduce((sum, e) => sum + e.score, 0) / activeClassGroup.exams.length), language)
+                              : formatLangNumber(0, language)}
                             %
                           </span>
                           <span className="block text-[10px] text-slate-500 uppercase font-bold tracking-wider">{t("avg_score")}</span>
@@ -442,7 +442,7 @@ export default function StudentDashboard() {
                             </h4>
                           </div>
                           <span className="text-xs font-mono font-bold text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-                            {t("max_points")}: 100
+                            {t("max_points")}: {formatLangNumber(100, language)}
                           </span>
                         </div>
 
@@ -454,7 +454,7 @@ export default function StudentDashboard() {
                                 <th className="py-3 px-4 text-center">{t("term_1")}</th>
                                 <th className="py-3 px-4 text-center">{t("mid_term")}</th>
                                 <th className="py-3 px-4 text-center text-emerald-600 dark:text-emerald-400">
-                                  {t("continuous_assessment")} Total (/100)
+                                  {t("continuous_assessment")} Total (/{formatLangNumber(100, language)})
                                 </th>
                               </tr>
                             </thead>
@@ -476,13 +476,13 @@ export default function StudentDashboard() {
                                   <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
                                     <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">{sub.subjectName}</td>
                                     <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
-                                      {term1Score !== null ? term1Score : "—"}
+                                      {term1Score !== null ? formatLangNumber(term1Score, language) : "—"}
                                     </td>
                                     <td className="py-3.5 px-4 text-center font-mono font-bold text-slate-700 dark:text-slate-300">
-                                      {midTermScore !== null ? midTermScore : "—"}
+                                      {midTermScore !== null ? formatLangNumber(midTermScore, language) : "—"}
                                     </td>
                                     <td className="py-3.5 px-4 text-center font-mono font-black text-emerald-600 dark:text-emerald-400 text-sm">
-                                      {caTotal !== null ? `${caTotal} / 100` : "—"}
+                                      {caTotal !== null ? `${formatLangNumber(caTotal, language)} / ${formatLangNumber(100, language)}` : "—"}
                                     </td>
                                   </tr>
                                 );
@@ -502,7 +502,7 @@ export default function StudentDashboard() {
                             </h4>
                           </div>
                           <span className="text-xs font-mono font-bold text-cyan-600 dark:text-cyan-400 bg-cyan-50 dark:bg-cyan-950/40 px-2.5 py-1 rounded-lg border border-cyan-500/20">
-                            {t("max_points")}: 100
+                            {t("max_points")}: {formatLangNumber(100, language)}
                           </span>
                         </div>
 
@@ -511,7 +511,7 @@ export default function StudentDashboard() {
                             <thead className="bg-slate-50 dark:bg-slate-900/80 border-b border-slate-200 dark:border-slate-800 text-slate-500 dark:text-slate-400 font-bold uppercase tracking-wider">
                               <tr>
                                 <th className="py-3 px-4">{t("subject")}</th>
-                                <th className="py-3 px-4 text-center text-cyan-600 dark:text-cyan-400">{t("final_exam")} Score (/100)</th>
+                                <th className="py-3 px-4 text-center text-cyan-600 dark:text-cyan-400">{t("final_exam")} Score (/{formatLangNumber(100, language)})</th>
                                 <th className="py-3 px-4 text-center">{t("grade")}</th>
                               </tr>
                             </thead>
@@ -527,7 +527,7 @@ export default function StudentDashboard() {
                                   <tr key={sub.id} className="hover:bg-slate-50 dark:hover:bg-slate-900/20 transition-colors">
                                     <td className="py-3.5 px-4 font-bold text-slate-800 dark:text-slate-200">{sub.subjectName}</td>
                                     <td className="py-3.5 px-4 text-center font-mono font-black text-cyan-600 dark:text-cyan-400 text-sm">
-                                      {finalScore !== null ? `${finalScore} / 100` : "—"}
+                                      {finalScore !== null ? `${formatLangNumber(finalScore, language)} / ${formatLangNumber(100, language)}` : "—"}
                                     </td>
                                     <td className="py-3.5 px-4 text-center">
                                       {finalScore !== null ? (
@@ -588,18 +588,18 @@ export default function StudentDashboard() {
                             <tr key={fee.id} className="hover:bg-slate-50 dark:hover:bg-slate-850/30 transition-colors">
                               <td className="py-4 px-6">
                                 <span className="block font-semibold text-slate-800 dark:text-slate-200">{fee.feeName}</span>
-                                <span className="block text-[10px] text-slate-400 font-mono">Statement ID: {stripLeadingZeros(fee.id)}</span>
+                                <span className="block text-[10px] text-slate-400 font-mono">Statement ID: {formatLangNumber(stripLeadingZeros(fee.id), language)}</span>
                               </td>
-                              <td className="py-4 px-6 font-mono text-center text-slate-800 dark:text-slate-100">{formatCurrency(fee.amount)}</td>
-                              <td className="py-4 px-6 font-mono text-center text-slate-500 dark:text-slate-400">{formatCurrency(fee.deductions)}</td>
-                              <td className="py-4 px-6 font-mono text-center text-emerald-600 dark:text-emerald-400">{formatCurrency(fee.paid)}</td>
+                              <td className="py-4 px-6 font-mono text-center text-slate-800 dark:text-slate-100">{formatCurrency(fee.amount, "$", language)}</td>
+                              <td className="py-4 px-6 font-mono text-center text-slate-500 dark:text-slate-400">{formatCurrency(fee.deductions, "$", language)}</td>
+                              <td className="py-4 px-6 font-mono text-center text-emerald-600 dark:text-emerald-400">{formatCurrency(fee.paid, "$", language)}</td>
                               <td className="py-4 px-6 text-right">
                                 <span className={`inline-flex px-2.5 py-0.5 text-xs font-bold font-mono rounded ${
                                   remaining > 0
                                     ? "bg-rose-100/50 dark:bg-rose-950/40 text-rose-600 dark:text-rose-455 border border-rose-200 dark:border-rose-500/10"
                                     : "bg-emerald-100/50 dark:bg-emerald-950/40 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-500/10"
                                 }`}>
-                                  {formatCurrency(remaining)}
+                                  {formatCurrency(remaining, "$", language)}
                                 </span>
                               </td>
                             </tr>
@@ -627,15 +627,15 @@ export default function StudentDashboard() {
                   <div className="flex flex-col gap-4 border-b border-slate-100 dark:border-slate-800 pb-5 text-sm">
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 dark:text-slate-400">Total Invoiced</span>
-                      <span className="font-mono text-slate-800 dark:text-slate-200 font-bold">{formatCurrency(totalAssignedFees)}</span>
+                      <span className="font-mono text-slate-800 dark:text-slate-200 font-bold">{formatCurrency(totalAssignedFees, "$", language)}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 dark:text-slate-400">Total Credits/Waivers</span>
-                      <span className="font-mono text-slate-500 dark:text-slate-400">-{formatCurrency(totalDeductions)}</span>
+                      <span className="font-mono text-slate-500 dark:text-slate-400">-{formatCurrency(totalDeductions, "$", language)}</span>
                     </div>
                     <div className="flex justify-between items-center">
                       <span className="text-slate-500 dark:text-slate-400">Total Payments Logged</span>
-                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">-{formatCurrency(totalPaid)}</span>
+                      <span className="font-mono text-emerald-600 dark:text-emerald-400 font-bold">-{formatCurrency(totalPaid, "$", language)}</span>
                     </div>
                   </div>
 
@@ -644,7 +644,7 @@ export default function StudentDashboard() {
                     <span className={`text-3xl font-extrabold font-mono tracking-tight ${
                       remainingBalance > 0 ? "text-rose-500 dark:text-rose-400" : "text-emerald-500 dark:text-emerald-400"
                     }`}>
-                      {formatCurrency(remainingBalance)}
+                      {formatCurrency(remainingBalance, "$", language)}
                     </span>
                   </div>
 

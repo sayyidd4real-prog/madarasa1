@@ -2538,7 +2538,7 @@ export default function AdminDashboard() {
                   {/* Pagination Footer */}
                   <div className="p-4 border-t border-slate-800/80 bg-slate-950/40 flex items-center justify-between flex-wrap gap-3">
                     <span className="text-xs text-slate-500">
-                      Page <span className="text-slate-300 font-bold">{studentCurrentPage}</span> of <span className="text-slate-300 font-bold">{totalStudentPages}</span>
+                      Page <span className="text-slate-300 font-bold">{formatLangNumber(studentCurrentPage, language)}</span> of <span className="text-slate-300 font-bold">{formatLangNumber(totalStudentPages, language)}</span>
                     </span>
                     <div className="flex items-center gap-1.5">
                       <button
@@ -2560,7 +2560,7 @@ export default function AdminDashboard() {
                             : "bg-slate-900 hover:bg-slate-800 border border-slate-800 text-slate-355 hover:text-slate-100"
                             }`}
                         >
-                          {pageNum}
+                          {formatLangNumber(pageNum, language)}
                         </button>
                       ))}
 
@@ -3447,7 +3447,7 @@ export default function AdminDashboard() {
                           <option value={25}>25</option>
                           <option value={50}>50</option>
                         </select>
-                        <span>transactions of <b>{sortedFinanceList.length}</b> total</span>
+                        <span>transactions of <b>{formatLangNumber(sortedFinanceList.length, language)}</b> total</span>
                       </div>
 
                       <div className="flex items-center gap-2">
@@ -3459,7 +3459,7 @@ export default function AdminDashboard() {
                         >
                           Previous
                         </button>
-                        <span>Page <b>{financeCurrentPage}</b> of <b>{totalFinancePages}</b></span>
+                        <span>Page <b>{formatLangNumber(financeCurrentPage, language)}</b> of <b>{formatLangNumber(totalFinancePages, language)}</b></span>
                         <button
                           type="button"
                           onClick={() => setFinanceCurrentPage(prev => Math.min(totalFinancePages, prev + 1))}
@@ -3923,7 +3923,7 @@ export default function AdminDashboard() {
                                     <div className="flex flex-wrap gap-x-3 gap-y-0.5 mt-1 text-xs text-slate-400 font-mono">
                                       {regClass?.room && <span>Room: {regClass.room}</span>}
                                       <span className="text-slate-700">·</span>
-                                      <span className="text-emerald-400 font-semibold">{entries.length} record(s) found</span>
+                                      <span className="text-emerald-400 font-semibold">{formatLangNumber(entries.length, language)} record(s) found</span>
                                     </div>
                                   </div>
                                 </div>
@@ -4036,10 +4036,10 @@ export default function AdminDashboard() {
                                               )}
 
                                               <span className="font-bold text-slate-100 text-sm">{student.name}</span>
-                                              <span className="font-mono text-emerald-400 text-[10px] font-bold bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/50">{student.id}</span>
+                                              <span className="font-mono text-emerald-400 text-[10px] font-bold bg-emerald-950/40 px-1.5 py-0.5 rounded border border-emerald-900/50">{formatLangNumber(stripLeadingZeros(student.id), language)}</span>
                                             </div>
                                             <div className="flex flex-wrap items-center gap-x-2 gap-y-0.5 mt-0.5 text-[10px] text-slate-400 font-mono">
-                                              <span>{year}</span>
+                                              <span>{formatLangNumber(year, language)}</span>
                                               <span className="text-slate-700">·</span>
                                               <span>{term}</span>
                                             </div>
@@ -4052,7 +4052,7 @@ export default function AdminDashboard() {
                                               <div className={`font-bold font-mono text-sm ${
                                                 rank === 1 ? "text-amber-400" : rank === 2 ? "text-slate-300" : rank === 3 ? "text-amber-500" : "text-slate-400"
                                               }`}>
-                                                #{rank}
+                                                #{formatLangNumber(rank, language)}
                                               </div>
                                             </div>
 
@@ -4060,11 +4060,11 @@ export default function AdminDashboard() {
                                               <>
                                                 <div className="text-right">
                                                   <div className="text-[10px] text-slate-500 uppercase font-bold">Total</div>
-                                                  <div className="text-emerald-400 font-bold font-mono text-sm">{rTotal}</div>
+                                                  <div className="text-emerald-400 font-bold font-mono text-sm">{formatLangNumber(rTotal, language)}</div>
                                                 </div>
                                                 <div className="text-right">
                                                   <div className="text-[10px] text-slate-500 uppercase font-bold">Avg</div>
-                                                  <div className="text-emerald-300 font-bold font-mono text-sm">{Math.round(rAvg)}%</div>
+                                                  <div className="text-emerald-300 font-bold font-mono text-sm">{formatLangNumber(Math.round(rAvg), language)}{language === "ar" ? "٪" : "%"}</div>
                                                 </div>
                                                 <span className={`inline-flex px-2 py-0.5 text-[9px] font-extrabold uppercase tracking-wide rounded border ${getGradeBadge(rGrade)}`}>{rGrade}</span>
                                               </>
@@ -4107,15 +4107,15 @@ export default function AdminDashboard() {
                                           <span className="text-[10px] text-slate-500 uppercase font-bold">{t("rank")}</span>
                                           <span className={`font-bold ${
                                             rank === 1 ? "text-amber-400" : rank === 2 ? "text-slate-300" : rank === 3 ? "text-amber-500" : "text-slate-400"
-                                          }`}>#{rank}</span>
+                                          }`}>#{formatLangNumber(rank, language)}</span>
                                           {rCount > 0 && (
                                             <>
                                               <span className="text-slate-700">·</span>
                                               <span className="text-[10px] text-slate-500 uppercase font-bold">Total</span>
-                                              <span className="text-emerald-400 font-bold">{rTotal}</span>
+                                              <span className="text-emerald-400 font-bold">{formatLangNumber(rTotal, language)}</span>
                                               <span className="text-slate-700">·</span>
                                               <span className="text-[10px] text-slate-500 uppercase font-bold">Avg</span>
-                                              <span className="text-emerald-300 font-bold">{Math.round(rAvg)}%</span>
+                                              <span className="text-emerald-300 font-bold">{formatLangNumber(Math.round(rAvg), language)}{language === "ar" ? "٪" : "%"}</span>
                                               <span className="text-slate-700">·</span>
                                               <span className={`inline-flex px-1.5 py-0.5 text-[9px] font-extrabold uppercase rounded border ${getGradeBadge(rGrade)}`}>{rGrade}</span>
                                             </>
@@ -4135,7 +4135,7 @@ export default function AdminDashboard() {
                                                 {/* Detail header */}
                                                 <div className="flex flex-wrap items-center gap-2 text-xs">
                                                   <span className="text-slate-500 font-bold uppercase tracking-wide">Marksheet:</span>
-                                                  <span className="text-slate-300 font-mono">{regClassName} · {year} · {term}</span>
+                                                  <span className="text-slate-300 font-mono">{regClassName} · {formatLangNumber(year, language)} · {term}</span>
                                                 </div>
 
                                                 {/* Edit mode */}
@@ -4197,16 +4197,16 @@ export default function AdminDashboard() {
                                                             return (
                                                               <td key={sub.id} className="py-3 px-4 text-center">
                                                                 {s !== undefined
-                                                                  ? <span className="font-bold text-slate-200 font-mono">{s}</span>
+                                                                  ? <span className="font-bold text-slate-200 font-mono">{formatLangNumber(s, language)}</span>
                                                                   : <span className="text-slate-700">—</span>}
                                                               </td>
                                                             );
                                                           })}
                                                           <td className="py-3 px-4 text-center font-bold text-emerald-400 font-mono">
-                                                            {rCount > 0 ? rTotal : <span className="text-slate-700">—</span>}
+                                                            {rCount > 0 ? formatLangNumber(rTotal, language) : <span className="text-slate-700">—</span>}
                                                           </td>
                                                           <td className="py-3 px-4 text-center font-bold text-emerald-300 font-mono">
-                                                            {rCount > 0 ? `${Math.round(rAvg)}%` : <span className="text-slate-700">—</span>}
+                                                            {rCount > 0 ? `${formatLangNumber(Math.round(rAvg), language)}${language === "ar" ? "٪" : "%"}` : <span className="text-slate-700">—</span>}
                                                           </td>
                                                           <td className="py-3 px-4 text-center">
                                                             {rCount > 0
